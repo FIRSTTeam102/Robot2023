@@ -3,7 +3,6 @@ package frc.robot;
 import frc.robot.swerve.SwerveModuleConstants;
 
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -38,13 +37,12 @@ public final class Constants {
 		// the front-to-back distance between the drivetrain wheels, should be measured from center to center
 		public static final double wheelBase_m = 1.0;
 
-		public static final Translation2d[] modulePositions = {
+		public static final Translation2d[] moduleTranslations = {
 			new Translation2d(wheelBase_m / 2.0, trackWidth_m / 2.0),
 			new Translation2d(wheelBase_m / 2.0, -trackWidth_m / 2.0),
 			new Translation2d(-wheelBase_m / 2.0, trackWidth_m / 2.0),
 			new Translation2d(-wheelBase_m / 2.0, -trackWidth_m / 2.0)
 		};
-		public static final SwerveDriveKinematics swerveKinematics = new SwerveDriveKinematics(modulePositions);
 
 		/**
 		 * MK4i module config
@@ -59,20 +57,20 @@ public final class Constants {
 		public static final boolean angleInverted = false;
 		public static final NeutralMode angleNeutralMode = NeutralMode.Coast;
 		public static final double maxSpeed_mps = Units.feetToMeters(16.3);
-		public static final double maxAngularVelocity_mps = 11.5;
+		public static final double maxAngularVelocity_radps = 11.5;
 		public static final boolean encoderInverted = false;
 
 		public static final double openLoopRamp = 0.25;
 		public static final double closedLoopRamp = 0.0;
 
 		/* angle motor PID values */
-		public static final double angleKp = 0.6;
+		public static final double angleKp = 0.3; // todo: calibrate
 		public static final double angleKi = 0.0;
-		public static final double angleKd = 12.0;
+		public static final double angleKd = 0.005;
 		public static final double angleKf = 0.0;
 
 		/* drive motor PID values */
-		public static final double driveKp = 0.10;
+		public static final double driveKp = 0.05; // todo: calibrate
 		public static final double driveKi = 0.0;
 		public static final double driveKd = 0.0;
 		public static final double driveKf = 0.0;

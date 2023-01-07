@@ -24,9 +24,9 @@ public class Conversions {
 	* @param gearRatio gear ratio between CANCoder and mechanism
 	* @return degrees of rotation of mechanism
 	*/
-	public static double cancoderToDegrees(double counts, double gearRatio) {
-		return counts * (360.0 / (gearRatio * 4096.0));
-	}
+	// public static double cancoderToDegrees(double counts, double gearRatio) {
+	// return counts * (360.0 / (gearRatio * 4096.0));
+	// }
 
 	/**
 	 * @param velocityCounts Falcon velocity counts

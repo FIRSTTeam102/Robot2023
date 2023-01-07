@@ -22,6 +22,7 @@ import com.ctre.phoenix.sensors.Pigeon2;
  */
 public class Swerve extends SubsystemBase {
 	public SwerveDriveOdometry odometry;
+	public SwerveDriveKinematics kinematics = new SwerveDriveKinematics(SwerveConstants.moduleTranslations);
 	public SwerveModule[] modules = {
 		new SwerveModule(0, SwerveConstants.frontLeft),
 		new SwerveModule(1, SwerveConstants.frontRight),
@@ -51,13 +52,13 @@ public class Swerve extends SubsystemBase {
 		gyro.configFactoryDefault();
 		zeroGyro();
 
-		odometry = new SwerveDriveOdometry(SwerveConstants.swerveKinematics, getYaw(), modulePositions);
+		odometry = new SwerveDriveOdometry(kinematics, getYaw(), modulePositions);
 
 		SmartDashboard.putData("Field", fieldSim);
 	}
 
 	public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
-		SwerveModuleState[] swerveModuleStates = SwerveConstants.swerveKinematics.toSwerveModuleStates(
+		SwerveModuleState[] swerveModuleStates = kinematics.toSwerveModuleStates(
 			fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
 				translation.getX(),
 				translation.getY(),
@@ -124,16 +125,16 @@ public class Swerve extends SubsystemBase {
 			SmartDashboard.putNumber("Mod " + mod.moduleNumber + " position", mod.getPosition().distanceMeters);
 			// SmartDashboard.putData("Mod " + mod.moduleNumber, mod.getState().angle);
 
-			// update odometry
-			odometry.update(getYaw(), modulePositions);
-
 			// update field pose
-			var modulePositionFromChassis = SwerveConstants.modulePositions[mod.moduleNumber]
+			var modulePositionFromChassis = SwerveConstants.moduleTranslations[mod.moduleNumber]
 				.rotateBy(getYaw())
 				.plus(getPose().getTranslation());
 			modulePoses[mod.moduleNumber] = new Pose2d(modulePositionFromChassis,
 				modules[mod.moduleNumber].getState().angle.plus(getPose().getRotation()));
 		}
+
+		// update odometry
+		odometry.update(getYaw(), modulePositions);
 
 		fieldSim.setRobotPose(getPose());
 		fieldSim.getObject("Swerve Modules").setPoses(modulePoses);

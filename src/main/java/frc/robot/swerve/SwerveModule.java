@@ -33,9 +33,9 @@ public class SwerveModule {
 
 	// todo: get real sim paramaters
 	TalonFXSimCollection angleMotorSim;
-	FlywheelSim angleWheelSim = new FlywheelSim(DCMotor.getFalcon500(1), SwerveConstants.angleGearRatio, 2);
+	FlywheelSim angleWheelSim = new FlywheelSim(DCMotor.getFalcon500(1), SwerveConstants.angleGearRatio, 0.004);
 	TalonFXSimCollection driveMotorSim;
-	FlywheelSim driveWheelSim = new FlywheelSim(DCMotor.getFalcon500(1), SwerveConstants.driveGearRatio, 2);
+	FlywheelSim driveWheelSim = new FlywheelSim(DCMotor.getFalcon500(1), SwerveConstants.driveGearRatio, 0.025);
 	CANCoderSimCollection angleEncoderSim;
 
 	SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(SwerveConstants.driveKs,
@@ -118,7 +118,7 @@ public class SwerveModule {
 	// todo: what are we actually using the cancoder for?
 	public Rotation2d getEncoderPos() {
 		return Rotation2d
-			.fromDegrees(Conversions.cancoderToDegrees(angleEncoder.getAbsolutePosition(), SwerveConstants.angleGearRatio));
+			.fromDegrees(angleEncoder.getAbsolutePosition()); // * SwerveConstants.angleGearRatio);
 	}
 
 	public SwerveModuleState getState() {

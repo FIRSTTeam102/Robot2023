@@ -11,6 +11,7 @@ import frc.robot.subsystems.Swerve;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class TeleopSwerve extends CommandBase {
@@ -35,7 +36,9 @@ public class TeleopSwerve extends CommandBase {
 		double rAxis = MathUtil.applyDeadband(-controller.getRightX(), OperatorConstants.stickDeadband);
 
 		translation = new Translation2d(yAxis, xAxis).times(SwerveConstants.maxSpeed_mps);
-		rotation = rAxis * SwerveConstants.maxAngularVelocity_mps;
+		rotation = rAxis * SwerveConstants.maxAngularVelocity_radps;
 		swerveSubsystem.drive(translation, rotation, fieldRelative, openLoop);
+
+		SmartDashboard.putNumber("drive target angle", translation.getAngle().getDegrees());
 	}
 }
