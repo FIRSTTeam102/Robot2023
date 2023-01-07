@@ -1,0 +1,44 @@
+{
+	"java.configuration.updateBuildConfiguration": "automatic",
+	"java.server.launchMode": "Standard",
+	"files.exclude": {
+		"**/.git": true,
+		"**/.svn": true,
+		"**/.hg": true,
+		"**/CVS": true,
+		"**/.DS_Store": true,
+		"bin/": true,
+		"**/.classpath": true,
+		"**/.project": true,
+		"**/.settings": true,
+		"**/.factorypath": true,
+		"**/*~": true
+	},
+	"java.test.config": [
+		{
+			"name": "WPIlibUnitTests",
+			"workingDirectory": "${workspaceFolder}/build/jni/release",
+			"vmargs": [
+				"-Djava.library.path=${workspaceFolder}/build/jni/release"
+			],
+			"env": {
+				"LD_LIBRARY_PATH": "${workspaceFolder}/build/jni/release",
+				"DYLD_LIBRARY_PATH": "${workspaceFolder}/build/jni/release"
+			}
+		},
+	],
+	"java.test.defaultConfig": "WPIlibUnitTests",
+	"java.format.settings.url": "eclipse-formatter.xml",
+	"java.completion.importOrder": ["frc", "edu.wpi", "com.ctre", "java", "javax", ""],
+	// "java.sources.organizeImports.starThreshold": 2,
+	"[java]": {
+		"editor.insertSpaces": false,
+		"editor.tabSize": 2,
+		"editor.detectIndentation": false,
+		"editor.codeActionsOnSave": {
+			"source.organizeImports": true,
+			"source.fixAll": true
+		},
+		"editor.formatOnSave": true
+	}
+}
