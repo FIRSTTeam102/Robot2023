@@ -11,7 +11,6 @@ import frc.robot.subsystems.Swerve;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class TeleopSwerve extends CommandBase {
@@ -31,14 +30,23 @@ public class TeleopSwerve extends CommandBase {
 
 	@Override
 	public void execute() {
-		double yAxis = MathUtil.applyDeadband(-controller.getLeftY(), OperatorConstants.stickDeadband);
-		double xAxis = MathUtil.applyDeadband(-controller.getLeftX(), OperatorConstants.stickDeadband);
-		double rAxis = MathUtil.applyDeadband(-controller.getRightX(), OperatorConstants.stickDeadband);
+		double yAxis = modifyAxis(-controller.getLeftY());
+		double xAxis = modifyAxis(-controller.getLeftX());
+		double rAxis = modifyAxis(-controller.getRightX());
 
-		translation = new Translation2d(yAxis, xAxis).times(SwerveConstants.maxSpeed_mps);
+		translation = new Translation2d(yAxis, xAxis).times(SwerveConstants.maxVelocity_mps);
 		rotation = rAxis * SwerveConstants.maxAngularVelocity_radps;
-		swerveSubsystem.drive(translation, rotation, fieldRelative, openLoop);
+		swerveSubsystem.drive(translation, rotation);
+	}
 
-		SmartDashboard.putNumber("drive target angle", translation.getAngle().getDegrees());
+	@Override
+	public void end(boolean interrupted) {
+		swerveSubsystem.stop();
+		super.end(interrupted);
+	}
+
+	private static double modifyAxis(double value) {
+		value = MathUtil.applyDeadband(value, OperatorConstants.stickDeadband);
+		return Math.copySign(value * value, value);
 	}
 }

@@ -57,6 +57,7 @@ public class RobotContainer {
 		// driverController.b().whileTrue(exampleSubsystem.exampleMethodCommand());
 
 		/* driver */
+		driverController.a().onTrue(new InstantCommand(() -> swerveSubsystem.toggleFieldRelative()));
 		driverController.b().onTrue(new InstantCommand(() -> swerveSubsystem.zeroGyro()));
 
 		/* operator */

@@ -1,13 +1,15 @@
 package frc.robot;
 
 public class Conversions {
+	public static final double falconCountsPerRotation = 2048.0;
+
 	/**
 	 * @param counts Falcon counts
 	 * @param gearRatio gear ratio between Falcon and mechanism
 	 * @return degrees of rotation of mechanism
 	 */
 	public static double falconToDegrees(double counts, double gearRatio) {
-		return counts * (360.0 / (gearRatio * 2048.0));
+		return counts * 360.0 / (gearRatio * falconCountsPerRotation);
 	}
 
 	/**
@@ -16,17 +18,8 @@ public class Conversions {
 	 * @return Falcon counts
 	 */
 	public static double degreesToFalcon(double degrees, double gearRatio) {
-		return degrees / (360.0 / (gearRatio * 2048.0));
+		return degrees / (360.0 / (gearRatio * falconCountsPerRotation));
 	}
-
-	/**
-	* @param counts CANCoder counts
-	* @param gearRatio gear ratio between CANCoder and mechanism
-	* @return degrees of rotation of mechanism
-	*/
-	// public static double cancoderToDegrees(double counts, double gearRatio) {
-	// return counts * (360.0 / (gearRatio * 4096.0));
-	// }
 
 	/**
 	 * @param velocityCounts Falcon velocity counts
@@ -34,7 +27,7 @@ public class Conversions {
 	 * @return RPM of mechanism
 	 */
 	public static double falconToRpm(double velocityCounts, double gearRatio) {
-		return velocityCounts * (600.0 / 2048.0) / gearRatio;
+		return velocityCounts * (600.0 / falconCountsPerRotation) / gearRatio;
 	}
 
 	/**
@@ -43,7 +36,7 @@ public class Conversions {
 	 * @return Falcon velocity counts
 	 */
 	public static double rpmToFalcon(double RPM, double gearRatio) {
-		return RPM * gearRatio * (2048.0 / 600.0);
+		return RPM * gearRatio * (falconCountsPerRotation / 600.0);
 	}
 
 	/**
@@ -90,8 +83,8 @@ public class Conversions {
 	 * @param gearRatio gear ratio between Falcon and mechanism (set to 1 for Falcon RPM)
 	 * @return position
 	 */
-	public static double falconToM(double positionCounts, double circumference, double gearRatio) {
-		return ((positionCounts / 2048.0) / gearRatio) * circumference;
+	public static double falconToMeters(double positionCounts, double circumference, double gearRatio) {
+		return circumference * positionCounts / (gearRatio * falconCountsPerRotation);
 	}
 
 	/**
@@ -100,8 +93,8 @@ public class Conversions {
 	 * @param gearRatio gear ratio between Falcon and mechanism (set to 1 for Falcon RPM)
 	 * @return Falcon position counts
 	 */
-	public static double mToFalcon(double position, double circumference, double gearRatio) {
-		return 2048.0 * (position * gearRatio) / circumference;
+	public static double metersToFalcon(double position, double circumference, double gearRatio) {
+		return falconCountsPerRotation * gearRatio * position / circumference;
 	}
 
 	/**
@@ -111,6 +104,6 @@ public class Conversions {
 	 * @return CANCoder position counts
 	 */
 	public static double mToCancoder(double position, double circumference, double gearRatio) {
-		return 4096.0 * (position * gearRatio) / circumference;
+		return 4096.0 * gearRatio * position / circumference;
 	}
 }

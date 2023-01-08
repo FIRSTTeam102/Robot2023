@@ -3,7 +3,6 @@ package frc.robot;
 import frc.robot.swerve.SwerveModuleConstants;
 
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
@@ -17,6 +16,8 @@ import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+	public static final double loopPeriod_s = edu.wpi.first.wpilibj.TimedRobot.kDefaultPeriod;
+
 	public static class OperatorConstants {
 		public static final int driverControllerPort = 0;
 		public static final int operatorControllerPort = 1;
@@ -25,7 +26,6 @@ public final class Constants {
 
 	public static class SwerveConstants {
 		public static final int pigeonId = 1;
-		public static final boolean gyroInverted = false;
 
 		public static final SwerveModuleConstants frontLeft = new SwerveModuleConstants(21, 22, 1, 0.0);
 		public static final SwerveModuleConstants frontRight = new SwerveModuleConstants(23, 24, 2, .0);
@@ -49,16 +49,21 @@ public final class Constants {
 		 * @see https://github.com/SwerveDriveSpecialties/swerve-lib/blob/develop/src/main/java/com/swervedrivespecialties/swervelib/SdsModuleConfigurations.java
 		 */
 		public static final double wheelDiameter_m = 0.10033;
+		public static final double wheelRadius_m = wheelDiameter_m / 2;
 		public static final double wheelCircumference_m = wheelDiameter_m * Math.PI;
-		public static final double driveGearRatio = (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0);
+		public static final double driveGearRatio = 1 / ((14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0));
 		public static final boolean driveInverted = true;
 		public static final NeutralMode driveNeutralMode = NeutralMode.Brake;
-		public static final double angleGearRatio = (14.0 / 50.0) * (10.0 / 60.0);
-		public static final boolean angleInverted = false;
+		public static final double angleGearRatio = 1 / ((14.0 / 50.0) * (10.0 / 60.0));
+		public static final boolean angleInverted = true;
 		public static final NeutralMode angleNeutralMode = NeutralMode.Coast;
-		public static final double maxSpeed_mps = Units.feetToMeters(16.3);
-		public static final double maxAngularVelocity_radps = 11.5;
 		public static final boolean encoderInverted = false;
+
+		public static final double maxVelocity_mps = 6380.0 /* Falcon max RPM */
+			/ 60.0 / driveGearRatio * wheelCircumference_m;
+		public static final double maxAngularVelocity_radps = maxVelocity_mps
+			/ Math.hypot(trackWidth_m / 2.0, wheelBase_m / 2.0);
+		public static final double maxCoastVelocity_mps = 0.05;
 
 		public static final double openLoopRamp = 0.25;
 		public static final double closedLoopRamp = 0.0;
@@ -68,17 +73,31 @@ public final class Constants {
 		public static final double angleKi = 0.0;
 		public static final double angleKd = 0.005;
 		public static final double angleKf = 0.0;
+		/* sim angle motor PID values */
+		public static final double simAngleKp = 12.0;
+		public static final double simAngleKi = 0.0;
+		public static final double simAngleKd = 0.0;
+		public static final double simAngleKf = 0.0;
 
 		/* drive motor PID values */
 		public static final double driveKp = 0.05; // todo: calibrate
 		public static final double driveKi = 0.0;
 		public static final double driveKd = 0.0;
 		public static final double driveKf = 0.0;
+		/* sim drive motor PID values */
+		public static final double simDriveKp = 0.8;
+		public static final double simDriveKi = 0.0;
+		public static final double simDriveKd = 0.0;
+		public static final double simDriveKf = 0.0;
 
 		/* drive motor characterization values (feed forward) */
 		public static final double driveKs = (0.667 / 12); // divide by 12 to convert from volts to percent output for CTRE
 		public static final double driveKv = (2.44 / 12);
 		public static final double driveKa = (0.27 / 12);
+		/* sim drive motor characterization values */
+		public static final double simDriveKs = 0.116970;
+		public static final double simDriveKv = 0.133240;
+		public static final double simDriveKa = 0.0;
 
 		/* current limiting */
 		public static final SupplyCurrentLimitConfiguration angleCurrentLimit = new SupplyCurrentLimitConfiguration(

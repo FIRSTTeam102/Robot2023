@@ -29,8 +29,9 @@
 	],
 	"java.test.defaultConfig": "WPIlibUnitTests",
 	"java.format.settings.url": "eclipse-formatter.xml",
-	"java.completion.importOrder": ["frc", "edu.wpi", "com.ctre", "java", "javax", ""],
+	"java.completion.importOrder": ["frc", "edu.wpi", "com.ctre", "com.pathplanner", "java", "javax", ""],
 	// "java.sources.organizeImports.starThreshold": 2,
+	"java.sources.organizeImports.staticStarThreshold": 2,
 	"[java]": {
 		"editor.insertSpaces": false,
 		"editor.tabSize": 2,

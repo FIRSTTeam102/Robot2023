@@ -1,172 +1,97 @@
 package frc.robot.swerve;
 
-import frc.robot.Constants.SwerveConstants;
-import frc.robot.Conversions;
+import static frc.robot.Constants.SwerveConstants.maxVelocity_mps;
 
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import frc.robot.swerve.SwerveModuleIO.SwerveModuleIOInputs;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.simulation.BatterySim;
-import edu.wpi.first.wpilibj.simulation.FlywheelSim;
-import edu.wpi.first.wpilibj.simulation.RoboRioSim;
-
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.DemandType;
-import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import com.ctre.phoenix.sensors.AbsoluteSensorRange;
-import com.ctre.phoenix.sensors.CANCoderSimCollection;
-import com.ctre.phoenix.sensors.SensorInitializationStrategy;
-import com.ctre.phoenix.sensors.WPI_CANCoder;
 
 public class SwerveModule {
 	public int moduleNumber;
-
-	private double angleOffset;
-	private WPI_TalonFX angleMotor;
-	private WPI_TalonFX driveMotor;
-	private WPI_CANCoder angleEncoder;
 	private Rotation2d lastAngle;
+	private final SwerveModuleIO io;
+	private final SwerveModuleIOInputs inputs = new SwerveModuleIOInputs();
 
-	// todo: get real sim paramaters
-	TalonFXSimCollection angleMotorSim;
-	FlywheelSim angleWheelSim = new FlywheelSim(DCMotor.getFalcon500(1), SwerveConstants.angleGearRatio, 0.004);
-	TalonFXSimCollection driveMotorSim;
-	FlywheelSim driveWheelSim = new FlywheelSim(DCMotor.getFalcon500(1), SwerveConstants.driveGearRatio, 0.025);
-	CANCoderSimCollection angleEncoderSim;
-
-	SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(SwerveConstants.driveKs,
-		SwerveConstants.driveKv, SwerveConstants.driveKa);
-
-	public SwerveModule(int moduleNumber, SwerveModuleConstants moduleConstants) {
+	public SwerveModule(int moduleNumber, SwerveModuleIO io) {
 		this.moduleNumber = moduleNumber;
-		angleOffset = moduleConstants.angleOffset_deg();
-
-		angleEncoder = new WPI_CANCoder(moduleConstants.encoderId());
-		angleEncoder.configFactoryDefault();
-		angleEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
-		angleEncoder.configSensorDirection(SwerveConstants.encoderInverted);
-		angleEncoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
-		angleEncoderSim = angleEncoder.getSimCollection();
-
-		angleMotor = new WPI_TalonFX(moduleConstants.angleMotorId());
-		angleMotor.configFactoryDefault();
-		angleMotor.config_kP(0, SwerveConstants.angleKp);
-		angleMotor.config_kI(0, SwerveConstants.angleKi);
-		angleMotor.config_kD(0, SwerveConstants.angleKd);
-		angleMotor.config_kF(0, SwerveConstants.angleKf);
-		// angleMotor.configSupplyCurrentLimit(SwerveConstants.angleCurrentLimit);
-		angleMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
-		angleMotor.setInverted(SwerveConstants.angleInverted);
-		angleMotor.setNeutralMode(SwerveConstants.angleNeutralMode);
-		resetToAbsolute();
-		angleMotorSim = angleMotor.getSimCollection();
-
-		driveMotor = new WPI_TalonFX(moduleConstants.driveMotorId());
-		driveMotor.configFactoryDefault();
-		driveMotor.config_kP(0, SwerveConstants.driveKp);
-		driveMotor.config_kI(0, SwerveConstants.driveKi);
-		driveMotor.config_kD(0, SwerveConstants.driveKd);
-		driveMotor.config_kF(0, SwerveConstants.driveKf);
-		// driveMotor.configSupplyCurrentLimit(SwerveConstants.driveCurrentLimit);
-		driveMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
-		driveMotor.configOpenloopRamp(SwerveConstants.openLoopRamp);
-		driveMotor.configClosedloopRamp(SwerveConstants.closedLoopRamp);
-		driveMotor.setInverted(SwerveConstants.driveInverted);
-		driveMotor.setNeutralMode(SwerveConstants.driveNeutralMode);
-		driveMotor.setSelectedSensorPosition(0);
-		driveMotorSim = driveMotor.getSimCollection();
+		this.io = io;
 
 		lastAngle = getState().angle;
 	}
 
-	public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
-		// custom optimize command, since default WPILib optimize assumes continuous controller which CTRE is not
-		desiredState = CTREModuleState.optimize(desiredState, getState().angle);
+	/**
+	 * Set this swerve module to the specified speed and angle.
+	 *
+	 * @param desiredState the desired state of the module
+	 * @param isOpenLoop if true, the drive motor will be set to the calculated fraction of the max
+	 * 	velocity; if false, the drive motor will set to the specified velocity using a closed-loop
+	 * 	controller (PID)
+	 * @param forceAngle if true, the module will be forced to rotate to the specified angle; if
+	 * 	false, the module will not rotate if the velocity is less than 1% of the max velocity
+	 */
+	public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop, boolean forceAngle) {
+		// custom hardware-specific optimize command
+		desiredState = io.optimize(desiredState, getState().angle);
 		// System.out.format("a%f s%f\n", desiredState.angle.getDegrees(), desiredState.speedMetersPerSecond);
 
 		if (isOpenLoop) {
-			double percentOutput = desiredState.speedMetersPerSecond / SwerveConstants.maxSpeed_mps;
+			double percentOutput = desiredState.speedMetersPerSecond / maxVelocity_mps;
 			// System.out.format("%d percent %f; state angle %f\n", moduleNumber, percentOutput,
 			// desiredState.angle.getDegrees());
-			driveMotor.set(ControlMode.PercentOutput, percentOutput);
+			io.setDriveMotorPercentage(percentOutput);
 		} else {
-			double velocity = Conversions.mpsToFalcon(desiredState.speedMetersPerSecond,
-				SwerveConstants.wheelCircumference_m, SwerveConstants.driveGearRatio);
-			// System.out.format("%d velocity %f\n", moduleNumber, velocity);
-			driveMotor.set(ControlMode.Velocity, velocity, DemandType.ArbitraryFeedForward,
-				feedforward.calculate(desiredState.speedMetersPerSecond));
+			// System.out.format("%d velocity %fmps\n", moduleNumber, desiredState.speedMetersPerSecond);
+			io.setDriveVelocity(desiredState.speedMetersPerSecond);
 		}
 
-		// prevent jitter if speed is less then 1%
-		var angle = (Math.abs(desiredState.speedMetersPerSecond) <= (SwerveConstants.maxSpeed_mps * 0.01))
+		// Unless the angle is forced (e.g., X-stance), don't rotate the module if speed is less then
+		// 1%. This prevents jittering if the controller isn't tuned perfectly. Perhaps more
+		// importantly, it allows for smooth repeated movement as the wheel direction doesn't reset
+		// during pauses (e.g., multi-segmented auto paths).
+		var angle = (!forceAngle && Math.abs(desiredState.speedMetersPerSecond) <= (maxVelocity_mps * 0.01))
 			? lastAngle
 			: desiredState.angle;
-		angleMotor.set(ControlMode.Position,
-			Conversions.degreesToFalcon(angle.getDegrees(), SwerveConstants.angleGearRatio)); // todo: is this right?
+
+		io.setAnglePosition(angle.getDegrees());
 		lastAngle = angle;
 	}
 
-	private void resetToAbsolute() {
-		double absolutePosition = getEncoderPos().getDegrees() - angleOffset;
-		angleMotor.setSelectedSensorPosition(absolutePosition);
-	}
-
-	// todo: what are we actually using the cancoder for?
-	public Rotation2d getEncoderPos() {
-		return Rotation2d
-			.fromDegrees(angleEncoder.getAbsolutePosition()); // * SwerveConstants.angleGearRatio);
+	/**
+	 * Set the drive motor to the specified voltage. This is only used for characterization via the
+	 * FeedForwardCharacterization command. The module will be set to 0 degrees throughout the
+	 * characterization; as a result, the wheels don't need to be clamped to hold them straight.
+	 *
+	 * @param voltage the specified voltage for the drive motor
+	 */
+	public void setVoltageForCharacterization(double voltage) {
+		io.setAnglePosition(0.0);
+		lastAngle = Rotation2d.fromDegrees(0.0);
+		io.setDriveMotorPercentage(voltage / 12.0);
 	}
 
 	public SwerveModuleState getState() {
-		double velocity = Conversions.falconToMps(driveMotor.getSelectedSensorVelocity(),
-			SwerveConstants.wheelCircumference_m, SwerveConstants.driveGearRatio);
-		Rotation2d angle = Rotation2d.fromDegrees(Conversions
-			.falconToDegrees(angleMotor.getSelectedSensorPosition(), SwerveConstants.angleGearRatio));
+		double velocity = inputs.driveVelocityMetersPerSec;
+		Rotation2d angle = Rotation2d.fromDegrees(inputs.anglePositionDeg);
 		return new SwerveModuleState(velocity, angle);
 	}
 
 	public SwerveModulePosition getPosition() {
-		double position = Conversions.falconToM(driveMotor.getSelectedSensorPosition(),
-			SwerveConstants.wheelCircumference_m, SwerveConstants.driveGearRatio);
-		Rotation2d angle = Rotation2d.fromDegrees(Conversions
-			.falconToDegrees(angleMotor.getSelectedSensorPosition(), SwerveConstants.angleGearRatio));
-		return new SwerveModulePosition(position, angle);
+		double distance = inputs.driveDistanceMeters;
+		Rotation2d angle = Rotation2d.fromDegrees(inputs.anglePositionDeg);
+		return new SwerveModulePosition(distance, angle);
 	}
 
-	/**
-	 * @param dt tick time (s)
-	 */
-	public void simulationPeriodic(double dt) {
-		angleMotorSim.setBusVoltage(RobotController.getBatteryVoltage());
-		angleWheelSim.setInputVoltage(angleMotorSim.getMotorOutputLeadVoltage());
-		// System.out.println(angleMotorSim.getMotorOutputLeadVoltage());
-		angleWheelSim.update(dt);
-		angleMotorSim.setIntegratedSensorVelocity(
-			(int) Conversions.rpmToFalcon(angleWheelSim.getAngularVelocityRPM(), SwerveConstants.angleGearRatio));
-		angleMotorSim.addIntegratedSensorPosition(
-			(int) Conversions.mToFalcon(angleWheelSim.getAngularVelocityRPM() * (dt * 60), 1,
-				SwerveConstants.angleGearRatio));
+	public void updateInputs() {
+		io.updateInputs(inputs);
+	}
 
-		angleEncoderSim.setVelocity(
-			(int) Conversions.rpmToCancoder(angleWheelSim.getAngularVelocityRPM(), SwerveConstants.angleGearRatio));
-		angleEncoderSim.addPosition(
-			(int) Conversions.mToCancoder(angleWheelSim.getAngularVelocityRPM() * (dt * 60),
-				1, SwerveConstants.angleGearRatio));
+	public void setDriveBrakeMode(boolean enable) {
+		io.setDriveBrakeMode(enable);
+	}
 
-		driveMotorSim.setBusVoltage(RobotController.getBatteryVoltage());
-		driveWheelSim.setInputVoltage(driveMotorSim.getMotorOutputLeadVoltage());
-		driveWheelSim.update(dt);
-		driveMotorSim.setIntegratedSensorVelocity(
-			(int) Conversions.rpmToFalcon(driveWheelSim.getAngularVelocityRPM(), SwerveConstants.driveGearRatio));
-		driveMotorSim.addIntegratedSensorPosition((int) Conversions
-			.mToFalcon(driveWheelSim.getAngularVelocityRPM() * (dt * 60), 1, SwerveConstants.driveGearRatio));
-
-		RoboRioSim.setVInVoltage(
-			BatterySim.calculateDefaultBatteryLoadedVoltage(angleWheelSim.getCurrentDrawAmps(),
-				driveWheelSim.getCurrentDrawAmps()));
+	public void setAngleBrakeMode(boolean enable) {
+		io.setAngleBrakeMode(enable);
 	}
 }
