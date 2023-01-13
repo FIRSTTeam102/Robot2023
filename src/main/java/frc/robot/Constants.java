@@ -18,15 +18,21 @@ import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 public final class Constants {
 	public static final double loopPeriod_s = edu.wpi.first.wpilibj.TimedRobot.kDefaultPeriod;
 
+	public static final RobotMode robotMode = RobotMode.ACTIVE;
+
+	public enum RobotMode {
+		ACTIVE, REPLAY;
+	}
+
 	public static class OperatorConstants {
 		public static final int driverControllerPort = 0;
 		public static final int operatorControllerPort = 1;
 		public static final double stickDeadband = 0.02;
 	}
 
-	public static class SwerveConstants {
-		public static final int pigeonId = 1;
+	public static final int pigeonId = 1;
 
+	public static class SwerveConstants {
 		public static final SwerveModuleConstants frontLeft = new SwerveModuleConstants(21, 22, 1, 0.0);
 		public static final SwerveModuleConstants frontRight = new SwerveModuleConstants(23, 24, 2, .0);
 		public static final SwerveModuleConstants backRight = new SwerveModuleConstants(25, 26, 3, 0.0);
@@ -98,6 +104,14 @@ public final class Constants {
 		public static final double simDriveKs = 0.116970;
 		public static final double simDriveKv = 0.133240;
 		public static final double simDriveKa = 0.0;
+
+		/* auto path PID values */
+		public static final double autoDriveKp = 5.0;
+		public static final double autoDriveKi = 0.0;
+		public static final double autoDriveKd = 0.0;
+		public static final double autoTurnKp = 0.5;
+		public static final double autoTurnKi = 0.0;
+		public static final double autoTurnKd = 0.0;
 
 		/* current limiting */
 		public static final SupplyCurrentLimitConfiguration angleCurrentLimit = new SupplyCurrentLimitConfiguration(

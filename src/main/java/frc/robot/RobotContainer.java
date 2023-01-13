@@ -1,9 +1,10 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.autos.Autos;
 import frc.robot.commands.TeleopSwerve;
-import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.io.GyroIO;
+import frc.robot.io.GyroIOPigeon2;
+import frc.robot.io.GyroIOSim;
 import frc.robot.subsystems.Swerve;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -12,6 +13,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
 /**
  * This class is where the bulk of the robot should be declared. Since
  * Command-based is a "declarative" paradigm, very little robot logic should actually be handled in
@@ -19,16 +22,22 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * the robot (including subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
+	private final GyroIO gyroIO = Robot.isReal()
+		? new GyroIOPigeon2(Constants.pigeonId)
+		: new GyroIOSim(this);
+
 	/**
 	 * Subsystems
 	 */
-	private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
-	private final Swerve swerveSubsystem = new Swerve();
+	// private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
+	public final Swerve swerve = new Swerve(gyroIO);
 
 	private final CommandXboxController driverController = new CommandXboxController(
 		OperatorConstants.driverControllerPort);
 	private final CommandXboxController operatorController = new CommandXboxController(
 		OperatorConstants.operatorControllerPort);
+
+	private LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto mode");
 
 	/**
 	 * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -36,9 +45,13 @@ public class RobotContainer {
 	public RobotContainer() {
 		DriverStation.silenceJoystickConnectionWarning(true);
 
-		swerveSubsystem.setDefaultCommand(new TeleopSwerve(swerveSubsystem, driverController.getHID()));
+		swerve.setDefaultCommand(new TeleopSwerve(swerve, driverController.getHID()));
 
 		configureBindings();
+
+		// setup autos
+		autoChooser.addDefaultOption("Nothing", new InstantCommand());
+		autoChooser.addDefaultOption("PP test", Autos.pathPlannerTest(swerve));
 	}
 
 	/**
@@ -57,8 +70,8 @@ public class RobotContainer {
 		// driverController.b().whileTrue(exampleSubsystem.exampleMethodCommand());
 
 		/* driver */
-		driverController.a().onTrue(new InstantCommand(() -> swerveSubsystem.toggleFieldRelative()));
-		driverController.b().onTrue(new InstantCommand(() -> swerveSubsystem.zeroGyro()));
+		driverController.a().onTrue(new InstantCommand(() -> swerve.toggleFieldRelative()));
+		driverController.b().onTrue(new InstantCommand(() -> swerve.zeroGyro()));
 
 		/* operator */
 	}
@@ -68,8 +81,8 @@ public class RobotContainer {
 	 *
 	 * @return the command to run in autonomous
 	 */
+
 	public Command getAutonomousCommand() {
-		// An example command will be run in autonomous
-		return Autos.exampleAuto(exampleSubsystem);
+		return autoChooser.get();
 	}
 }

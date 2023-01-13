@@ -1,0 +1,1 @@
+These files contain abstractions for physical hardware communication, and AdvantageKit logging

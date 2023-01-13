@@ -3,10 +3,13 @@ package frc.robot.swerve;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
+import org.littletonrobotics.junction.AutoLog;
+
 /**
  * swerve module hardware abstraction interface
  */
 public interface SwerveModuleIO {
+	@AutoLog
 	public static class SwerveModuleIOInputs {
 		double drivePositionDeg = 0.0;
 		double driveDistanceMeters = 0.0;

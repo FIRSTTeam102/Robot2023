@@ -161,3 +161,7 @@ bin/
 # Simulation GUI and other tools window save file
 *-window.json
 simgui*.json
+!simgui-ds.json
+
+# Automatically generated when building
+src/main/java/frc/robot/BuildConstants.java

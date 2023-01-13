@@ -1,0 +1,40 @@
+package frc.robot;
+
+import frc.robot.Constants.SwerveConstants;
+import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.PathPlannerCommand;
+import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.Swerve;
+
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
+
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.commands.FollowPathWithEvents;
+
+import java.util.HashMap;
+import java.util.List;
+
+public final class Autos {
+	/** Example factory for an autonomous command. */
+	public static CommandBase exampleAuto(ExampleSubsystem subsystem) {
+		return Commands.sequence(subsystem.exampleMethodCommand(), new ExampleCommand(subsystem));
+	}
+
+	public static Command pathPlannerTest(Swerve swerve) {
+		List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup("test path",
+			new PathConstraints(SwerveConstants.maxVelocity_mps, 3.0));
+
+		HashMap<String, Command> eventMap = new HashMap<>();
+		eventMap.put("marker1", new PrintCommand("Passed marker 1"));
+
+		return new FollowPathWithEvents(
+			new PathPlannerCommand(pathGroup.get(0), swerve, true),
+			pathGroup.get(0).getMarkers(),
+			eventMap);
+	}
+}

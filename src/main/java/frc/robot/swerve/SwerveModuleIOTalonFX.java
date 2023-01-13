@@ -56,8 +56,7 @@ public class SwerveModuleIOTalonFX implements SwerveModuleIO {
 		angleMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
 		angleMotor.setInverted(angleInverted);
 		angleMotor.setNeutralMode(angleNeutralMode);
-		angleMotor.setSelectedSensorPosition(Conversions.degreesToFalcon(getCanCoder().getDegrees() - angleOffsetDeg,
-			angleGearRatio)); // reset to absolute position
+		setFalconInternalAngleToCanCoder(); // reset to absolute position
 
 		driveMotor = new TalonFX(moduleConstants.driveMotorId());
 		driveMotor.configFactoryDefault();
@@ -74,6 +73,11 @@ public class SwerveModuleIOTalonFX implements SwerveModuleIO {
 		driveMotor.setSelectedSensorPosition(0);
 	}
 
+	private void setFalconInternalAngleToCanCoder() {
+		angleMotor.setSelectedSensorPosition(
+			Conversions.degreesToFalcon(getCanCoder().getDegrees() - angleOffsetDeg, angleGearRatio));
+	}
+
 	private Rotation2d getCanCoder() {
 		return Rotation2d.fromDegrees(angleEncoder.getAbsolutePosition());
 	}
@@ -86,6 +90,9 @@ public class SwerveModuleIOTalonFX implements SwerveModuleIO {
 	/** Updates the set of inputs. */
 	@Override
 	public void updateInputs(SwerveModuleIOInputs inputs) {
+		// sync cancoder reading to internal falcon reading
+		setFalconInternalAngleToCanCoder();
+
 		inputs.drivePositionDeg = Conversions.falconToDegrees(
 			driveMotor.getSelectedSensorPosition(), driveGearRatio);
 		inputs.driveDistanceMeters = Conversions.falconToMeters(

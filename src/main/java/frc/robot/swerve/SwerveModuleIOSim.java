@@ -21,13 +21,13 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 	private FlywheelSim driveWheelSim = new FlywheelSim(DCMotor.getFalcon500(1), driveGearRatio, 0.025);
 	private FlywheelSim angleWheelSim = new FlywheelSim(DCMotor.getFalcon500(1), angleGearRatio, 0.004);
 
-	private double turnRelativePositionRad = 0.0;
-	private double turnAbsolutePositionRad = Math.random() * 2.0 * Math.PI;
+	private double turnRelativePosition_rad = 0.0;
+	private double turnAbsolutePosition_rad = Math.random() * 2.0 * Math.PI;
 	private double driveAppliedVolts = 0.0;
 	private double turnAppliedVolts = 0.0;
 	private boolean isDriveOpenLoop = true;
-	private double driveSetpointMPS = 0.0;
-	private double angleSetpointDeg = 0.0;
+	private double driveSetpoint_mps = 0.0;
+	private double angleSetpoint_deg = 0.0;
 
 	private SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(simDriveKs, simDriveKv, simDriveKa);
 	private PIDController driveController = new PIDController(simDriveKp, simDriveKi, simDriveKd);
@@ -42,14 +42,13 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 
 		// update the inputs that will be logged
 		double angleDiffRad = angleWheelSim.getAngularVelocityRadPerSec() * loopPeriod_s;
-		turnRelativePositionRad += angleDiffRad;
-		turnAbsolutePositionRad += angleDiffRad;
-		while (turnAbsolutePositionRad < 0) {
-			turnAbsolutePositionRad += 2.0 * Math.PI;
-		}
-		while (turnAbsolutePositionRad > 2.0 * Math.PI) {
-			turnAbsolutePositionRad -= 2.0 * Math.PI;
-		}
+		turnRelativePosition_rad += angleDiffRad;
+		turnAbsolutePosition_rad += angleDiffRad;
+		while (turnAbsolutePosition_rad < 0)
+			turnAbsolutePosition_rad += 2.0 * Math.PI;
+
+		while (turnAbsolutePosition_rad > 2.0 * Math.PI)
+			turnAbsolutePosition_rad -= 2.0 * Math.PI;
 
 		inputs.drivePositionDeg = inputs.drivePositionDeg
 			+ (driveWheelSim.getAngularVelocityRadPerSec() * loopPeriod_s * (180.0 / Math.PI));
@@ -63,8 +62,8 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 		inputs.driveCurrentAmps = new double[] {Math.abs(driveWheelSim.getCurrentDrawAmps())};
 		// inputs.driveTempCelsius = new double[] {};
 
-		inputs.angleAbsolutePositionDeg = turnAbsolutePositionRad * (180.0 / Math.PI);
-		inputs.anglePositionDeg = turnRelativePositionRad * (180.0 / Math.PI);
+		inputs.angleAbsolutePositionDeg = turnAbsolutePosition_rad * (180.0 / Math.PI);
+		inputs.anglePositionDeg = turnRelativePosition_rad * (180.0 / Math.PI);
 		inputs.angleVelocityRevPerMin = angleWheelSim.getAngularVelocityRadPerSec() * (60.0 / (2.0 * Math.PI));
 
 		inputs.angleAppliedPercentage = turnAppliedVolts / 12.0;
@@ -72,12 +71,12 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 		// inputs.angleTempCelsius = new double[] {};
 
 		// calculate and apply the "on-board" controllers for the turn and drive motors
-		turnAppliedVolts = turnController.calculate(turnRelativePositionRad, angleSetpointDeg * (Math.PI / 180.0));
+		turnAppliedVolts = turnController.calculate(turnRelativePosition_rad, angleSetpoint_deg * (Math.PI / 180.0));
 		turnAppliedVolts = MathUtil.clamp(turnAppliedVolts, -12.0, 12.0);
 		angleWheelSim.setInputVoltage(turnAppliedVolts);
 
 		if (!isDriveOpenLoop) {
-			double velocityRadPerSec = driveSetpointMPS / wheelRadius_m;
+			double velocityRadPerSec = driveSetpoint_mps / wheelRadius_m;
 			driveAppliedVolts = feedForward.calculate(velocityRadPerSec)
 				+ driveController.calculate(inputs.driveVelocityMetersPerSec, velocityRadPerSec);
 			driveAppliedVolts = MathUtil.clamp(driveAppliedVolts, -12.0, 12.0);
@@ -102,12 +101,12 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 	@Override
 	public void setDriveVelocity(double velocity) {
 		isDriveOpenLoop = false;
-		driveSetpointMPS = velocity;
+		driveSetpoint_mps = velocity;
 	}
 
 	/** Run the turn motor to the specified angle. */
 	@Override
 	public void setAnglePosition(double degrees) {
-		angleSetpointDeg = degrees;
+		angleSetpoint_deg = degrees;
 	}
 }

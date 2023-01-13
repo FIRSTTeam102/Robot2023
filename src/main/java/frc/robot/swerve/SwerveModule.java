@@ -2,17 +2,17 @@ package frc.robot.swerve;
 
 import static frc.robot.Constants.SwerveConstants.maxVelocity_mps;
 
-import frc.robot.swerve.SwerveModuleIO.SwerveModuleIOInputs;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+
+import org.littletonrobotics.junction.Logger;
 
 public class SwerveModule {
 	public int moduleNumber;
 	private Rotation2d lastAngle;
 	private final SwerveModuleIO io;
-	private final SwerveModuleIOInputs inputs = new SwerveModuleIOInputs();
+	private final SwerveModuleIOInputsAutoLogged inputs = new SwerveModuleIOInputsAutoLogged();
 
 	public SwerveModule(int moduleNumber, SwerveModuleIO io) {
 		this.moduleNumber = moduleNumber;
@@ -85,6 +85,7 @@ public class SwerveModule {
 
 	public void updateInputs() {
 		io.updateInputs(inputs);
+		Logger.getInstance().processInputs("SwerveModule " + moduleNumber, inputs);
 	}
 
 	public void setDriveBrakeMode(boolean enable) {

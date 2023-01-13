@@ -29,7 +29,7 @@
 	],
 	"java.test.defaultConfig": "WPIlibUnitTests",
 	"java.format.settings.url": "eclipse-formatter.xml",
-	"java.completion.importOrder": ["frc", "edu.wpi", "com.ctre", "com.pathplanner", "java", "javax", ""],
+	"java.completion.importOrder": ["frc", "edu.wpi", "com.ctre", "com.pathplanner", "org.littletonrobotics", "java", "javax", ""],
 	// "java.sources.organizeImports.starThreshold": 2,
 	"java.sources.organizeImports.staticStarThreshold": 2,
 	"[java]": {

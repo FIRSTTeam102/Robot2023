@@ -1,8 +1,17 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.TimedRobot;
+import static frc.robot.Constants.robotMode;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -10,9 +19,9 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * the package after creating this project, you must also update the build.gradle file in the
  * project.
  */
-public class Robot extends TimedRobot {
-	private Command mAutonomousCommand;
-	private RobotContainer mRobotContainer;
+public class Robot extends LoggedRobot {
+	private Command autonomousCommand;
+	private RobotContainer robotContainer;
 
 	/**
 	 * This function is run when the robot is first started up and should be used
@@ -20,11 +29,43 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void robotInit() {
+		var logger = Logger.getInstance();
+		logger.recordMetadata("RuntimeType", getRuntimeType().toString());
+		logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
+		logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
+		logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+		logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
+		logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
+		logger.recordMetadata("GitDirty", switch (BuildConstants.DIRTY) {
+			case 0 -> "Clean";
+			case 1 -> "Dirty";
+			default -> "Unknown";
+		});
+
+		switch (robotMode) {
+			case REPLAY -> {
+				setUseTiming(false); // run as fast as possible
+				String logPath = LogFileUtil.findReplayLog();
+				Logger.getInstance().setReplaySource(new WPILOGReader(logPath));
+				Logger.getInstance().addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+			}
+			case ACTIVE -> {
+				logger.addDataReceiver(new NT4Publisher()); // publish data to NetworkTables
+				if (isReal()) {
+					LoggedPowerDistribution.getInstance(); // enable power distribution logging
+				} else {
+					// sim
+				}
+			}
+		}
+
+		logger.start();
+
 		/*
 		 * Instantiate our RobotContainer. This will perform all our button bindings,
 		 * and put our autonomous chooser on the dashboard.
 		 */
-		mRobotContainer = new RobotContainer();
+		robotContainer = new RobotContainer();
 	}
 
 	/**
@@ -58,10 +99,10 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void autonomousInit() {
-		mAutonomousCommand = mRobotContainer.getAutonomousCommand();
+		autonomousCommand = robotContainer.getAutonomousCommand();
 		// schedule the autonomous command (example)
-		if (mAutonomousCommand != null)
-			mAutonomousCommand.schedule();
+		if (autonomousCommand != null)
+			autonomousCommand.schedule();
 	}
 
 	/** This function is called periodically during autonomous. */
@@ -75,8 +116,8 @@ public class Robot extends TimedRobot {
 		 * autonomous to continue until interrupted by another command, remove this line or comment it
 		 * out.
 		 */
-		if (mAutonomousCommand != null)
-			mAutonomousCommand.cancel();
+		if (autonomousCommand != null)
+			autonomousCommand.cancel();
 	}
 
 	/** This function is called periodically during operator control. */
