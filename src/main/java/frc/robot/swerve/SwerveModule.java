@@ -34,23 +34,21 @@ public class SwerveModule {
 	public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop, boolean forceAngle) {
 		// custom hardware-specific optimize command
 		desiredState = io.optimize(desiredState, getState().angle);
-		// System.out.format("a%f s%f\n", desiredState.angle.getDegrees(), desiredState.speedMetersPerSecond);
 
 		if (isOpenLoop) {
 			double percentOutput = desiredState.speedMetersPerSecond / maxVelocity_mps;
-			// System.out.format("%d percent %f; state angle %f\n", moduleNumber, percentOutput,
-			// desiredState.angle.getDegrees());
 			io.setDriveMotorPercentage(percentOutput);
 		} else {
-			// System.out.format("%d velocity %fmps\n", moduleNumber, desiredState.speedMetersPerSecond);
 			io.setDriveVelocity(desiredState.speedMetersPerSecond);
 		}
 
-		// Unless the angle is forced (e.g., X-stance), don't rotate the module if speed is less then
-		// 1%. This prevents jittering if the controller isn't tuned perfectly. Perhaps more
-		// importantly, it allows for smooth repeated movement as the wheel direction doesn't reset
-		// during pauses (e.g., multi-segmented auto paths).
-		var angle = (!forceAngle && Math.abs(desiredState.speedMetersPerSecond) <= (maxVelocity_mps * 0.01))
+		/*
+		 * Unless the angle is forced (e.g., X-stance), don't rotate the module if speed is too low.
+		 * This prevents jittering if the controller isn't tuned perfectly. Perhaps more
+		 * importantly, it allows for smooth repeated movement as the wheel direction doesn't reset
+		 * during pauses (e.g., multi-segmented auto paths).
+		 */
+		var angle = (!forceAngle && Math.abs(desiredState.speedMetersPerSecond) <= (maxVelocity_mps * 0.05))
 			? lastAngle
 			: desiredState.angle;
 

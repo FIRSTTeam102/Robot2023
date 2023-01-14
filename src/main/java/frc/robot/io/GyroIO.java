@@ -3,12 +3,12 @@ package frc.robot.io;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface GyroIO {
-	@AutoLog
 	/**
 	 * pitch = rotating around side-to-side axis
 	 * yaw = rotating around vertical axis
 	 * roll = rotating around front-to-back axis
 	 */
+	@AutoLog
 	public static class GyroIOInputs {
 		public boolean connected = false;
 		public double pitch_deg = 0.0;

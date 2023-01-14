@@ -56,6 +56,7 @@ public class SwerveModuleIOTalonFX implements SwerveModuleIO {
 		angleMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
 		angleMotor.setInverted(angleInverted);
 		angleMotor.setNeutralMode(angleNeutralMode);
+		angleMotor.configClosedLoopPeakOutput(0, angleMaxPercentOutput);
 		setFalconInternalAngleToCanCoder(); // reset to absolute position
 
 		driveMotor = new TalonFX(moduleConstants.driveMotorId());
@@ -75,7 +76,7 @@ public class SwerveModuleIOTalonFX implements SwerveModuleIO {
 
 	private void setFalconInternalAngleToCanCoder() {
 		angleMotor.setSelectedSensorPosition(
-			Conversions.degreesToFalcon(getCanCoder().getDegrees() - angleOffsetDeg, angleGearRatio));
+			Conversions.degreesToFalcon(angleEncoder.getPosition(), angleGearRatio));
 	}
 
 	private Rotation2d getCanCoder() {
@@ -108,10 +109,12 @@ public class SwerveModuleIOTalonFX implements SwerveModuleIO {
 		// inputs.driveTempCelsius = new double[] {driveMotor.getTemperature()};
 
 		inputs.angleAbsolutePositionDeg = angleEncoder.getAbsolutePosition();
-		inputs.anglePositionDeg = Conversions.falconToDegrees(
-			angleMotor.getSelectedSensorPosition(), angleGearRatio);
-		inputs.angleVelocityRevPerMin = Conversions.falconToRpm(
-			angleMotor.getSelectedSensorVelocity(), angleGearRatio);
+		// inputs.anglePositionDeg = Conversions.falconToDegrees(
+		// angleMotor.getSelectedSensorPosition(), angleGearRatio);
+		inputs.anglePositionDeg = angleEncoder.getPosition();
+		// inputs.angleVelocityRevPerMin = Conversions.falconToRpm(
+		// angleMotor.getSelectedSensorVelocity(), angleGearRatio);
+		inputs.angleVelocityRevPerMin = angleEncoder.getVelocity() * 60 / 360;
 		inputs.angleAppliedPercentage = angleMotor.getMotorOutputPercent();
 		inputs.angleCurrentAmps = new double[] {angleMotor.getStatorCurrent()};
 		// inputs.angleTempCelsius = new double[] {angleMotor.getTemperature()};

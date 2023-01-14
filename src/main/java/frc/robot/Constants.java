@@ -30,13 +30,13 @@ public final class Constants {
 		public static final double stickDeadband = 0.02;
 	}
 
-	public static final int pigeonId = 1;
+	public static final int pigeonId = 20;
 
 	public static class SwerveConstants {
-		public static final SwerveModuleConstants frontLeft = new SwerveModuleConstants(21, 22, 1, 0.0);
-		public static final SwerveModuleConstants frontRight = new SwerveModuleConstants(23, 24, 2, .0);
-		public static final SwerveModuleConstants backRight = new SwerveModuleConstants(25, 26, 3, 0.0);
-		public static final SwerveModuleConstants backLeft = new SwerveModuleConstants(27, 28, 4, 0.0);
+		public static final SwerveModuleConstants frontLeft = new SwerveModuleConstants(21, 22, 23, 0.0);
+		public static final SwerveModuleConstants frontRight = new SwerveModuleConstants(24, 25, 26, .0);
+		public static final SwerveModuleConstants backRight = new SwerveModuleConstants(27, 28, 29, 0.0);
+		public static final SwerveModuleConstants backLeft = new SwerveModuleConstants(30, 31, 32, 0.0);
 
 		// the left-to-right distance between the drivetrain wheels, should be measured from center to center
 		public static final double trackWidth_m = 1.0;
@@ -63,6 +63,8 @@ public final class Constants {
 		public static final double angleGearRatio = 1 / ((14.0 / 50.0) * (10.0 / 60.0));
 		public static final boolean angleInverted = true;
 		public static final NeutralMode angleNeutralMode = NeutralMode.Coast;
+		// todo: fix with pid or something, test once actual robot is built to see if there's any overshooting problems
+		public static final double angleMaxPercentOutput = 0.5;
 		public static final boolean encoderInverted = false;
 
 		public static final double maxVelocity_mps = 6380.0 /* Falcon max RPM */
@@ -75,9 +77,9 @@ public final class Constants {
 		public static final double closedLoopRamp = 0.0;
 
 		/* angle motor PID values */
-		public static final double angleKp = 0.3; // todo: calibrate
+		public static final double angleKp = 0.15; // todo: calibrate
 		public static final double angleKi = 0.0;
-		public static final double angleKd = 0.005;
+		public static final double angleKd = 1.5;
 		public static final double angleKf = 0.0;
 		/* sim angle motor PID values */
 		public static final double simAngleKp = 12.0;

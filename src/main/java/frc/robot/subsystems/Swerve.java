@@ -53,7 +53,7 @@ public class Swerve extends SubsystemBase {
 
 	// configurable stuff
 	private boolean brakeMode = true;
-	private boolean fieldRelative = true;
+	private boolean fieldRelative = false;
 
 	public GyroIO gyroIO;
 	public GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
@@ -69,11 +69,11 @@ public class Swerve extends SubsystemBase {
 			new SwerveModule(0,
 				Robot.isReal() ? new SwerveModuleIOTalonFX(frontLeft) : new SwerveModuleIOSim()),
 			new SwerveModule(1,
-				Robot.isReal() ? new SwerveModuleIOTalonFX(frontRight) : new SwerveModuleIOSim()),
+				!Robot.isReal() ? new SwerveModuleIOTalonFX(frontRight) : new SwerveModuleIOSim()),
 			new SwerveModule(2,
-				Robot.isReal() ? new SwerveModuleIOTalonFX(backRight) : new SwerveModuleIOSim()),
+				!Robot.isReal() ? new SwerveModuleIOTalonFX(backRight) : new SwerveModuleIOSim()),
 			new SwerveModule(3,
-				Robot.isReal() ? new SwerveModuleIOTalonFX(backLeft) : new SwerveModuleIOSim())
+				!Robot.isReal() ? new SwerveModuleIOTalonFX(backLeft) : new SwerveModuleIOSim())
 		};
 
 		this.gyroIO = gyroIO;
