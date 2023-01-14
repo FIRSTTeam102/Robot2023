@@ -121,4 +121,15 @@ public final class Constants {
 		public static final SupplyCurrentLimitConfiguration driveCurrentLimit = new SupplyCurrentLimitConfiguration(
 			true, 35, 60, 0.1);
 	}
+
+	public static class VerticalElevatorConstants {
+
+		/* ports */
+		public static final int motorPort = 10;
+		public static final int topSwitchPort = 1;
+		public static final int bottomSwitchPort = 2;
+
+		/* speeds */
+		public static final double percentSpeed = 0.6;
+	}
 }
