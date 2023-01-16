@@ -76,9 +76,13 @@ public class RobotContainer {
 		driverController.a().onTrue(new InstantCommand(() -> swerve.toggleFieldRelative()));
 		driverController.b().onTrue(new InstantCommand(() -> swerve.zeroGyro()));
 
-		operatorController.rightBumper().whileTrue(new MoveVerticalElevator(verticalElevator, 0.4));
-		operatorController.leftBumper().whileTrue(new MoveVerticalElevator(verticalElevator, -0.4));
 		/* operator */
+
+		/*
+		 * remove later -- just for testing
+		 */
+		operatorController.x().whileTrue(new MoveVerticalElevator(verticalElevator, 0.7));
+		operatorController.y().whileTrue(new MoveVerticalElevator(verticalElevator, -0.7));
 	}
 
 	/**

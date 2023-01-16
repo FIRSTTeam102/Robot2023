@@ -125,7 +125,7 @@ public final class Constants {
 	public static class VerticalElevatorConstants {
 
 		/* ports */
-		public static final int motorPort = 10;
+		public static final int motorPort = 21;
 		public static final int topSwitchPort = 1;
 		public static final int bottomSwitchPort = 2;
 

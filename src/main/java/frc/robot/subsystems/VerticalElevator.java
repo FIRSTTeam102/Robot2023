@@ -11,16 +11,17 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 public class VerticalElevator extends SubsystemBase {
-	private TalonFX motor = new TalonFX(VerticalElevatorConstants.motorPort);
+	private WPI_TalonSRX motor = new WPI_TalonSRX(VerticalElevatorConstants.motorPort);
 	private static DigitalInput topSwitch = new DigitalInput(VerticalElevatorConstants.topSwitchPort);
 	private static DigitalInput bottomSwitch = new DigitalInput(VerticalElevatorConstants.bottomSwitchPort);
 
 	/** Creates a new VerticalElevator. */
 	public VerticalElevator() {
-		motor.configFactoryDefault();
+		motor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
 	}
 
 	public boolean getTopStatus() {
@@ -41,7 +42,6 @@ public class VerticalElevator extends SubsystemBase {
 	@Override
 	public void periodic() {
 		// This method will be called once per scheduler run
-		System.out.println(
-			String.format("Sensor Pos: %f | % Output: %f", motor.getSelectedSensorPosition(), motor.getMotorOutputPercent()));
+		System.out.println(motor.getSelectedSensorPosition());
 	}
 }
