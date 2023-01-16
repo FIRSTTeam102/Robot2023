@@ -121,4 +121,10 @@ public final class Constants {
 		public static final SupplyCurrentLimitConfiguration driveCurrentLimit = new SupplyCurrentLimitConfiguration(
 			true, 35, 60, 0.1);
 	}
+
+	public static final class ClawConstants {
+		public static final int motorId = 42; // todo: change
+		public static final int sensorPin = 4; // todo: change
+		public static final double speed = 0.5;
+	}
 }
