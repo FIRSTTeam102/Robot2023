@@ -2,6 +2,9 @@ package frc.robot;
 
 import static frc.robot.Constants.robotMode;
 
+import frc.robot.subsystems.Lights;
+
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -88,7 +91,12 @@ public class Robot extends LoggedRobot {
 
 	/** This function is called once each time the robot enters Disabled mode. */
 	@Override
-	public void disabledInit() {}
+	public void disabledInit() {
+		Lights.setControlMode(switch (DriverStation.getAlliance()) {
+			case Blue -> Lights.ControlMode.DisabledBlue;
+			default -> Lights.ControlMode.DisabledRed;
+		});
+	}
 
 	@Override
 	public void disabledPeriodic() {}
