@@ -107,6 +107,7 @@ public class Robot extends LoggedRobot {
 	 */
 	@Override
 	public void autonomousInit() {
+		Lights.setControlMode(Lights.ControlMode.Regular);
 		autonomousCommand = robotContainer.getAutonomousCommand();
 		// schedule the autonomous command (example)
 		if (autonomousCommand != null)
@@ -119,6 +120,7 @@ public class Robot extends LoggedRobot {
 
 	@Override
 	public void teleopInit() {
+		Lights.setControlMode(Lights.ControlMode.Regular);
 		/*
 		 * This makes sure that the autonomous stops running when teleop starts running. If you want the
 		 * autonomous to continue until interrupted by another command, remove this line or comment it

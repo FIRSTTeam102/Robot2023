@@ -52,11 +52,10 @@ public class Lights {
 	private static void setStatus(int subsystem, int status) {
 		if (subsystem < 0 || subsystem > 0b1111 || status < 0 || status > 0b1111)
 			throw new RuntimeException("invalid lights status message");
-		Integer message = (subsystem << 4) ^ status;
+		Integer message = (status << 4) ^ subsystem;
+		System.out.println("Lights serial message: " + message);
 		if (Robot.isReal())
 			serial.write(new byte[] {message.byteValue()}, 1);
-		else
-			System.out.println("Lights serial message: " + message);
 	}
 
 	public static void setStatus(Subsystem subsystem, Status status) {
