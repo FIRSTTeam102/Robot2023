@@ -6,22 +6,32 @@ package frc.robot.subsystems;
 
 import frc.robot.Constants.VerticalElevatorConstants;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
 
 public class VerticalElevator extends SubsystemBase {
-	private WPI_TalonSRX motor = new WPI_TalonSRX(VerticalElevatorConstants.motorPort);
-	private static DigitalInput topSwitch = new DigitalInput(VerticalElevatorConstants.topSwitchPort);
-	private static DigitalInput bottomSwitch = new DigitalInput(VerticalElevatorConstants.bottomSwitchPort);
+	private CANSparkMax motor = new CANSparkMax(VerticalElevatorConstants.motorPort, MotorType.kBrushless);
+	private SparkMaxPIDController pidController = motor.getPIDController();
+	private RelativeEncoder encoder = motor.getEncoder();
+
+	private DigitalInput topSwitch = new DigitalInput(VerticalElevatorConstants.topSwitchPort);
+	private DigitalInput bottomSwitch = new DigitalInput(VerticalElevatorConstants.bottomSwitchPort);
 
 	/** Creates a new VerticalElevator. */
 	public VerticalElevator() {
-		motor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
+		pidController.setP(VerticalElevatorConstants.kP);
+		pidController.setD(VerticalElevatorConstants.kD);
+		pidController.setI(VerticalElevatorConstants.kI);
+		pidController.setIZone(VerticalElevatorConstants.kIZone);
+		pidController.setFF(VerticalElevatorConstants.kF);
+		pidController.setOutputRange(VerticalElevatorConstants.kMinOuput, VerticalElevatorConstants.kMaxOutput);
+
+		encoder.setPositionConversionFactor(VerticalElevatorConstants.conversionFactor);
 	}
 
 	public boolean getTopStatus() {
@@ -36,12 +46,13 @@ public class VerticalElevator extends SubsystemBase {
 	 * REMOVE AFTER TESTING
 	 */
 	public void setSpeed(double speed) {
-		motor.set(ControlMode.PercentOutput, MathUtil.clamp(speed, -1.0, 1.0));
+		motor.set(speed);
 	}
 
 	@Override
 	public void periodic() {
 		// This method will be called once per scheduler run
-		System.out.println(motor.getSelectedSensorPosition());
+		System.out.println(encoder.getPosition());
+
 	}
 }

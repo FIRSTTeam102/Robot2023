@@ -131,5 +131,20 @@ public final class Constants {
 
 		/* speeds */
 		public static final double percentSpeed = 0.6;
+
+		/* pid stuff */
+
+		public static final double kMinOuput = -1;
+		public static final double kMaxOutput = 1;
+
+		public static final double feedForward = 0.00;
+
+		public static final double kF = 0.0;
+		public static final double kP = 0.0;
+		public static final double kI = 0.0;
+		public static final double kIZone = 0.0;
+		public static final double kD = 0.0;
+
+		public static final double conversionFactor = 1;
 	}
 }
