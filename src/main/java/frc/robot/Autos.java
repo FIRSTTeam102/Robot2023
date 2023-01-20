@@ -29,6 +29,9 @@ public final class Autos {
 		List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup("test path",
 			new PathConstraints(SwerveConstants.maxVelocity_mps, 3.0));
 
+		if (pathGroup == null)
+			return new PrintCommand("no path group");
+
 		HashMap<String, Command> eventMap = new HashMap<>();
 		eventMap.put("marker1", new PrintCommand("Passed marker 1"));
 

@@ -33,7 +33,7 @@ public class SwerveModule {
 	 */
 	public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop, boolean forceAngle) {
 		// custom hardware-specific optimize command
-		desiredState = io.optimize(desiredState, getState().angle);
+		desiredState = SwerveModuleState.optimize(desiredState, getState().angle);
 
 		if (isOpenLoop) {
 			double percentOutput = desiredState.speedMetersPerSecond / maxVelocity_mps;
@@ -52,33 +52,33 @@ public class SwerveModule {
 			? lastAngle
 			: desiredState.angle;
 
-		io.setAnglePosition(angle.getDegrees());
+		io.setAnglePosition(angle);
 		lastAngle = angle;
 	}
 
 	/**
 	 * Set the drive motor to the specified voltage. This is only used for characterization via the
-	 * FeedForwardCharacterization command. The module will be set to 0 degrees throughout the
+	 * FeedForwardCharacterization command. The module will be set to 0 throughout the
 	 * characterization; as a result, the wheels don't need to be clamped to hold them straight.
 	 *
 	 * @param voltage the specified voltage for the drive motor
 	 */
 	public void setVoltageForCharacterization(double voltage) {
-		io.setAnglePosition(0.0);
-		lastAngle = Rotation2d.fromDegrees(0.0);
+		lastAngle = Rotation2d.fromRadians(0.0);
+		io.setAnglePosition(lastAngle);
 		io.setDriveMotorPercentage(voltage / 12.0);
 	}
 
 	public SwerveModuleState getState() {
-		double velocity = inputs.driveVelocityMetersPerSec;
-		Rotation2d angle = Rotation2d.fromDegrees(inputs.anglePositionDeg);
-		return new SwerveModuleState(velocity, angle);
+		return new SwerveModuleState(
+			inputs.driveVelocity_mps,
+			Rotation2d.fromRadians(inputs.anglePosition_rad));
 	}
 
 	public SwerveModulePosition getPosition() {
-		double distance = inputs.driveDistanceMeters;
-		Rotation2d angle = Rotation2d.fromDegrees(inputs.anglePositionDeg);
-		return new SwerveModulePosition(distance, angle);
+		return new SwerveModulePosition(
+			inputs.driveDistance_m,
+			Rotation2d.fromRadians(inputs.anglePosition_rad));
 	}
 
 	public void updateInputs() {

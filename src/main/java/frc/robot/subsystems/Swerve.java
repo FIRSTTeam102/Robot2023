@@ -6,8 +6,8 @@ import frc.robot.Robot;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOInputsAutoLogged;
 import frc.robot.swerve.SwerveModule;
+import frc.robot.swerve.SwerveModuleIOReal;
 import frc.robot.swerve.SwerveModuleIOSim;
-import frc.robot.swerve.SwerveModuleIOTalonFX;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -37,7 +37,6 @@ public class Swerve extends SubsystemBase {
 	public SwerveModuleState[] moduleStates = {new SwerveModuleState(), new SwerveModuleState(),
 		new SwerveModuleState(), new SwerveModuleState()};
 
-	// public SwerveDriveOdometry odometry; // use poseEstimator instead
 	// we can also mix in vision measurements to make it more accurate to the field
 	public SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(
 		kinematics, new Rotation2d(), modulePositions, new Pose2d());
@@ -67,13 +66,13 @@ public class Swerve extends SubsystemBase {
 	public Swerve(GyroIO gyroIO) {
 		modules = new SwerveModule[] {
 			new SwerveModule(0,
-				Robot.isReal() ? new SwerveModuleIOTalonFX(frontLeft) : new SwerveModuleIOSim()),
+				Robot.isReal() ? new SwerveModuleIOReal(frontLeft) : new SwerveModuleIOSim()),
 			new SwerveModule(1,
-				!Robot.isReal() ? new SwerveModuleIOTalonFX(frontRight) : new SwerveModuleIOSim()),
+				Robot.isReal() ? new SwerveModuleIOReal(frontRight) : new SwerveModuleIOSim()),
 			new SwerveModule(2,
-				!Robot.isReal() ? new SwerveModuleIOTalonFX(backRight) : new SwerveModuleIOSim()),
+				Robot.isReal() ? new SwerveModuleIOReal(backRight) : new SwerveModuleIOSim()),
 			new SwerveModule(3,
-				!Robot.isReal() ? new SwerveModuleIOTalonFX(backLeft) : new SwerveModuleIOSim())
+				Robot.isReal() ? new SwerveModuleIOReal(backLeft) : new SwerveModuleIOSim())
 		};
 
 		this.gyroIO = gyroIO;
@@ -83,17 +82,14 @@ public class Swerve extends SubsystemBase {
 		timer.reset();
 		timer.start();
 
-		// odometry = new SwerveDriveOdometry(kinematics, getYaw(), modulePositions);
-
 		SmartDashboard.putData("Field", fieldSim);
 	}
 
 	public SwerveModuleState[] getStates() {
-		SwerveModuleState[] states = new SwerveModuleState[4];
 		for (SwerveModule mod : modules) {
-			states[mod.moduleNumber] = mod.getState();
+			moduleStates[mod.moduleNumber] = mod.getState();
 		}
-		return states;
+		return moduleStates;
 	}
 
 	public void setModuleStates(SwerveModuleState[] desiredStates) {
@@ -117,7 +113,14 @@ public class Swerve extends SubsystemBase {
 	 * @return the pose of the robot
 	 */
 	public Pose2d getPose() {
-		return poseEstimator.getEstimatedPosition(); // odometry.getPoseMeters();
+		return poseEstimator.getEstimatedPosition();
+	}
+
+	public SwerveModulePosition[] getPositions() {
+		for (SwerveModule mod : modules) {
+			modulePositions[mod.moduleNumber] = mod.getPosition();
+		}
+		return modulePositions;
 	}
 
 	/**
@@ -131,18 +134,11 @@ public class Swerve extends SubsystemBase {
 	public void resetOdometry(PathPlannerState state) {
 		setGyroOffset(state.holonomicRotation.getDegrees());
 
-		for (int i = 0; i < modules.length; i++) {
-			modulePositions[i] = modules[i].getPosition();
-		}
-
 		// estimatedPoseWithoutGyro = new Pose2d(state.poseMeters.getTranslation(), state.holonomicRotation);
 		poseEstimator.resetPosition(
-			getYaw(), modulePositions,
+			getYaw(), getPositions(),
 			new Pose2d(state.poseMeters.getTranslation(), state.holonomicRotation));
 	}
-	// public void resetOdometry(Pose2d pose) {
-	// odometry.resetPosition(getYaw(), modulePositions, pose);
-	// }
 
 	public Rotation2d getYaw() {
 		return Rotation2d.fromDegrees(gyroInputs.yaw_deg + gyroOffset);
@@ -185,7 +181,6 @@ public class Swerve extends SubsystemBase {
 	private void setBrakeMode(boolean enable) {
 		brakeMode = enable;
 		for (SwerveModule mod : modules) {
-			// mod.setAngleBrakeMode(enable);
 			mod.setDriveBrakeMode(enable);
 		}
 	}
@@ -239,8 +234,7 @@ public class Swerve extends SubsystemBase {
 
 	/**
 	 * Sets the swerve modules in the x-stance orientation. In this orientation the wheels are aligned
-	 * to make an 'X'. This makes it more difficult for other robots to push the robot, which is
-	 * useful when shooting.
+	 * to make an 'X', which makes it more difficult for other robots to push the robot.
 	 */
 	private void setXStance() {
 		chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
@@ -248,7 +242,7 @@ public class Swerve extends SubsystemBase {
 		states[0].angle = new Rotation2d(Math.PI / 2 - Math.atan(trackWidth_m / wheelBase_m));
 		states[1].angle = new Rotation2d(Math.PI / 2 + Math.atan(trackWidth_m / wheelBase_m));
 		states[2].angle = new Rotation2d(Math.PI / 2 + Math.atan(trackWidth_m / wheelBase_m));
-		states[3].angle = new Rotation2d(3.0 / 2.0 * Math.PI - Math.atan(trackWidth_m / wheelBase_m));
+		states[3].angle = new Rotation2d(Math.PI * 3.0 / 2.0 - Math.atan(trackWidth_m / wheelBase_m));
 		for (SwerveModule swerveModule : modules) {
 			swerveModule.setDesiredState(states[swerveModule.moduleNumber], true, true);
 		}
@@ -269,9 +263,9 @@ public class Swerve extends SubsystemBase {
 		}
 
 		// update odometry
-		// odometry.update(getYaw(), modulePositions);
 		poseEstimator.updateWithTime(timer.get(), getYaw(), modulePositions);
 		var pose = poseEstimator.getEstimatedPosition();
+		// todo: estimate without using gyro?
 
 		Logger.getInstance().recordOutput("Odometry/Robot", pose);
 		// Logger.getInstance().recordOutput("3DField", new Pose3d(pose));

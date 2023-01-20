@@ -22,9 +22,17 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  * the robot (including subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
+	private static RobotContainer instance = null;
+
+	public static RobotContainer getInstance() {
+		if (instance == null)
+			instance = new RobotContainer();
+		return instance;
+	}
+
 	private final GyroIO gyroIO = Robot.isReal()
 		? new GyroIOPigeon2(Constants.pigeonId)
-		: new GyroIOSim(this);
+		: new GyroIOSim();
 
 	/**
 	 * Subsystems
@@ -32,9 +40,9 @@ public class RobotContainer {
 	// private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
 	public final Swerve swerve = new Swerve(gyroIO);
 
-	private final CommandXboxController driverController = new CommandXboxController(
+	public final CommandXboxController driverController = new CommandXboxController(
 		OperatorConstants.driverControllerPort);
-	private final CommandXboxController operatorController = new CommandXboxController(
+	public final CommandXboxController operatorController = new CommandXboxController(
 		OperatorConstants.operatorControllerPort);
 
 	private LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto mode");

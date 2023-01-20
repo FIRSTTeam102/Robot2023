@@ -3,9 +3,12 @@ package frc.robot.swerve;
 import static frc.robot.Constants.loopPeriod_s;
 import static frc.robot.Constants.SwerveConstants.*;
 
+import frc.robot.Conversions;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
@@ -22,12 +25,12 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 	private FlywheelSim angleWheelSim = new FlywheelSim(DCMotor.getFalcon500(1), angleGearRatio, 0.004);
 
 	private double turnRelativePosition_rad = 0.0;
-	private double turnAbsolutePosition_rad = Math.random() * 2.0 * Math.PI;
+	private double turnAbsolutePosition_rad = Math.random() * Conversions.twoPi;
 	private double driveAppliedVolts = 0.0;
 	private double turnAppliedVolts = 0.0;
 	private boolean isDriveOpenLoop = true;
 	private double driveSetpoint_mps = 0.0;
-	private double angleSetpoint_deg = 0.0;
+	private double angleSetpoint_rad = 0.0;
 
 	private SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(simDriveKs, simDriveKv, simDriveKa);
 	private PIDController driveController = new PIDController(simDriveKp, simDriveKi, simDriveKd);
@@ -44,41 +47,37 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 		double angleDiffRad = angleWheelSim.getAngularVelocityRadPerSec() * loopPeriod_s;
 		turnRelativePosition_rad += angleDiffRad;
 		turnAbsolutePosition_rad += angleDiffRad;
-		while (turnAbsolutePosition_rad < 0)
-			turnAbsolutePosition_rad += 2.0 * Math.PI;
+		turnAbsolutePosition_rad = MathUtil.inputModulus(turnAbsolutePosition_rad, 0, Conversions.twoPi);
 
-		while (turnAbsolutePosition_rad > 2.0 * Math.PI)
-			turnAbsolutePosition_rad -= 2.0 * Math.PI;
-
-		inputs.drivePositionDeg = inputs.drivePositionDeg
+		inputs.drivePosition_deg = inputs.drivePosition_deg
 			+ (driveWheelSim.getAngularVelocityRadPerSec() * loopPeriod_s * (180.0 / Math.PI));
 
-		inputs.driveDistanceMeters = inputs.driveDistanceMeters
+		inputs.driveDistance_m = inputs.driveDistance_m
 			+ (driveWheelSim.getAngularVelocityRadPerSec() * loopPeriod_s * wheelRadius_m);
 
-		inputs.driveVelocityMetersPerSec = driveWheelSim.getAngularVelocityRadPerSec() * wheelRadius_m;
+		inputs.driveVelocity_mps = driveWheelSim.getAngularVelocityRadPerSec() * wheelRadius_m;
 
 		inputs.driveAppliedPercentage = driveAppliedVolts / 12.0;
 		inputs.driveCurrentAmps = new double[] {Math.abs(driveWheelSim.getCurrentDrawAmps())};
 		// inputs.driveTempCelsius = new double[] {};
 
-		inputs.angleAbsolutePositionDeg = turnAbsolutePosition_rad * (180.0 / Math.PI);
-		inputs.anglePositionDeg = turnRelativePosition_rad * (180.0 / Math.PI);
-		inputs.angleVelocityRevPerMin = angleWheelSim.getAngularVelocityRadPerSec() * (60.0 / (2.0 * Math.PI));
+		inputs.angleAbsolutePosition_rad = turnAbsolutePosition_rad;
+		inputs.anglePosition_rad = turnRelativePosition_rad;
+		inputs.angleVelocity_rpm = angleWheelSim.getAngularVelocityRadPerSec() * (60.0 / (2.0 * Math.PI));
 
 		inputs.angleAppliedPercentage = turnAppliedVolts / 12.0;
 		inputs.angleCurrentAmps = new double[] {Math.abs(angleWheelSim.getCurrentDrawAmps())};
 		// inputs.angleTempCelsius = new double[] {};
 
 		// calculate and apply the "on-board" controllers for the turn and drive motors
-		turnAppliedVolts = turnController.calculate(turnRelativePosition_rad, angleSetpoint_deg * (Math.PI / 180.0));
+		turnAppliedVolts = turnController.calculate(turnRelativePosition_rad, angleSetpoint_rad);
 		turnAppliedVolts = MathUtil.clamp(turnAppliedVolts, -12.0, 12.0);
 		angleWheelSim.setInputVoltage(turnAppliedVolts);
 
 		if (!isDriveOpenLoop) {
 			double velocityRadPerSec = driveSetpoint_mps / wheelRadius_m;
 			driveAppliedVolts = feedForward.calculate(velocityRadPerSec)
-				+ driveController.calculate(inputs.driveVelocityMetersPerSec, velocityRadPerSec);
+				+ driveController.calculate(inputs.driveVelocity_mps, velocityRadPerSec);
 			driveAppliedVolts = MathUtil.clamp(driveAppliedVolts, -12.0, 12.0);
 			driveWheelSim.setInputVoltage(driveAppliedVolts);
 		}
@@ -106,7 +105,7 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 
 	/** Run the turn motor to the specified angle. */
 	@Override
-	public void setAnglePosition(double degrees) {
-		angleSetpoint_deg = degrees;
+	public void setAnglePosition(Rotation2d angle) {
+		angleSetpoint_rad = angle.getRadians();
 	}
 }
