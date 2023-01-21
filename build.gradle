@@ -135,3 +135,10 @@ gversion {
 	timeZone = "America/New_York"
 }
 project.compileJava.dependsOn(createVersionFile)
+
+// don't run tests on build
+gradle.taskGraph.whenReady { graph ->
+	if (graph.hasTask(build)) {
+		test.enabled = false
+	}
+}

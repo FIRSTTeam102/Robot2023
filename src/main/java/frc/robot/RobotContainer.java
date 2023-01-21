@@ -37,7 +37,6 @@ public class RobotContainer {
 	/**
 	 * Subsystems
 	 */
-	// private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
 	public final Swerve swerve = new Swerve(gyroIO);
 
 	public final CommandXboxController driverController = new CommandXboxController(
@@ -71,12 +70,6 @@ public class RobotContainer {
 	 * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
 	 */
 	private void configureBindings() {
-		// Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-		// new Trigger(exampleSubsystem::exampleCondition)
-		// .onTrue(new ExampleCommand(exampleSubsystem));
-		// Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed, cancelling on release
-		// driverController.b().whileTrue(exampleSubsystem.exampleMethodCommand());
-
 		/* driver */
 		driverController.a().onTrue(new InstantCommand(() -> swerve.toggleFieldRelative()));
 		driverController.b().onTrue(new InstantCommand(() -> swerve.zeroGyro()));

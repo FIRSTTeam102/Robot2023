@@ -7,7 +7,7 @@ import org.littletonrobotics.junction.AutoLog;
 /**
  * swerve module hardware abstraction interface
  */
-public interface SwerveModuleIO {
+public interface SwerveModuleIO extends AutoCloseable {
 	@AutoLog
 	public static class SwerveModuleIOInputs {
 		double drivePosition_deg = 0.0;
@@ -42,4 +42,6 @@ public interface SwerveModuleIO {
 
 	/** Enable or disable brake mode on the turn motor. */
 	public default void setAngleBrakeMode(boolean enable) {}
+
+	public default void close() throws Exception {}
 }

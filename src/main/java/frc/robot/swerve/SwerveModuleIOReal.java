@@ -176,4 +176,11 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		// always leave the angle motor in coast mode
 		angleMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
 	}
+
+	@Override
+	public void close() throws Exception {
+		driveMotor.DestroyObject();
+		angleEncoder.DestroyObject();
+		angleMotor.close();
+	}
 }

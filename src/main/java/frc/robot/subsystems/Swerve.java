@@ -28,7 +28,7 @@ import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 
 import org.littletonrobotics.junction.Logger;
 
-public class Swerve extends SubsystemBase {
+public class Swerve extends SubsystemBase implements AutoCloseable {
 	public SwerveDriveKinematics kinematics = new SwerveDriveKinematics(moduleTranslations);
 
 	public SwerveModule[] modules;
@@ -284,5 +284,11 @@ public class Swerve extends SubsystemBase {
 		}
 		fieldSim.setRobotPose(pose);
 		fieldSim.getObject("Swerve Modules").setPoses(modulePoses);
+	}
+
+	@Override
+	public void close() throws Exception {
+		for (var mod : modules)
+			mod.close();
 	}
 }

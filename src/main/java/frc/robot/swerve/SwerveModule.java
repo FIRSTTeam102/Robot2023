@@ -8,7 +8,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 import org.littletonrobotics.junction.Logger;
 
-public class SwerveModule {
+public class SwerveModule implements AutoCloseable {
 	public int moduleNumber;
 	private Rotation2d lastAngle;
 	private final SwerveModuleIO io;
@@ -92,5 +92,10 @@ public class SwerveModule {
 
 	public void setAngleBrakeMode(boolean enable) {
 		io.setAngleBrakeMode(enable);
+	}
+
+	@Override
+	public void close() throws Exception {
+		io.close();
 	}
 }
