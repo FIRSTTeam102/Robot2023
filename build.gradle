@@ -1,6 +1,6 @@
 plugins {
 	id "java"
-	id "edu.wpi.first.GradleRIO" version "2023.1.1"
+	id "edu.wpi.first.GradleRIO" version "2023.2.1"
 	id "com.peterabeles.gversion" version "1.10"
 }
 
@@ -69,9 +69,10 @@ dependencies {
 	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
 	testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.2'
 	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+	testImplementation 'org.mockito:mockito-inline:4.11.+'
 
 	// keep version in sync with AdvantageKit version
-	annotationProcessor "org.littletonrobotics.akit.junction:junction-autolog:2.0.0"
+	annotationProcessor "org.littletonrobotics.akit.junction:junction-autolog:2.1.1"
 }
 
 test {
@@ -134,3 +135,10 @@ gversion {
 	timeZone = "America/New_York"
 }
 project.compileJava.dependsOn(createVersionFile)
+
+// don't run tests on build
+gradle.taskGraph.whenReady { graph ->
+	if (graph.hasTask(build)) {
+		test.enabled = false
+	}
+}

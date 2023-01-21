@@ -1,3 +1,7 @@
-Swerve library based on [HuskieRobotics/3061-lib](https://github.com/HuskieRobotics/3061-lib), [Mechanical-Advantage/SwerveDevelopment](https://github.com/Mechanical-Advantage/SwerveDevelopment), and [Team364/BaseFalconSwerve](https://github.com/Team364/BaseFalconSwerve) with modifications/refactors
+Swerve library based on: (with modifications/refactors)
+* [HuskieRobotics/3061-lib](https://github.com/HuskieRobotics/3061-lib)
+* [Mechanical-Advantage/SwerveDevelopment](https://github.com/Mechanical-Advantage/SwerveDevelopment)
+* [Team364/BaseFalconSwerve](https://github.com/Team364/BaseFalconSwerve)
+* [REVrobotics/MAXSwerve-Java-Template](https://github.com/REVrobotics/MAXSwerve-Java-Template)
 
 Motor communication is abstracted through [SwerveModuleIO](./SwerveModuleIO.java) and implementations for physical/sim hardware

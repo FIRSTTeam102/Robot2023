@@ -24,20 +24,27 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  * the robot (including subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
+	private static RobotContainer instance = null;
+
+	public static RobotContainer getInstance() {
+		if (instance == null)
+			instance = new RobotContainer();
+		return instance;
+	}
+
 	private final GyroIO gyroIO = Robot.isReal()
 		? new GyroIOPigeon2(Constants.pigeonId)
-		: new GyroIOSim(this);
+		: new GyroIOSim();
 
 	/**
 	 * Subsystems
 	 */
-	// private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
 	public final Swerve swerve = new Swerve(gyroIO);
 	public final Claw claw = new Claw();
 
-	private final CommandXboxController driverController = new CommandXboxController(
+	public final CommandXboxController driverController = new CommandXboxController(
 		OperatorConstants.driverControllerPort);
-	private final CommandXboxController operatorController = new CommandXboxController(
+	public final CommandXboxController operatorController = new CommandXboxController(
 		OperatorConstants.operatorControllerPort);
 
 	private LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto mode");
@@ -66,12 +73,6 @@ public class RobotContainer {
 	 * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
 	 */
 	private void configureBindings() {
-		// Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-		// new Trigger(exampleSubsystem::exampleCondition)
-		// .onTrue(new ExampleCommand(exampleSubsystem));
-		// Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed, cancelling on release
-		// driverController.b().whileTrue(exampleSubsystem.exampleMethodCommand());
-
 		/* driver */
 		driverController.a().onTrue(new InstantCommand(() -> swerve.toggleFieldRelative()));
 		driverController.b().onTrue(new InstantCommand(() -> swerve.zeroGyro()));
