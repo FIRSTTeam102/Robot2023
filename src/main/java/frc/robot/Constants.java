@@ -7,6 +7,10 @@ import edu.wpi.first.math.geometry.Translation2d;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 
+import com.revrobotics.CANSparkMax.IdleMode;
+
+import org.littletonrobotics.junction.LoggedRobot;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -16,7 +20,7 @@ import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-	public static final double loopPeriod_s = edu.wpi.first.wpilibj.TimedRobot.kDefaultPeriod;
+	public static final double loopPeriod_s = LoggedRobot.defaultPeriodSecs; // edu.wpi.first.wpilibj.TimedRobot.kDefaultPeriod
 
 	public static final RobotMode robotMode = RobotMode.ACTIVE;
 
@@ -60,12 +64,15 @@ public final class Constants {
 		public static final double driveGearRatio = 1 / ((14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0));
 		public static final boolean driveInverted = true;
 		public static final NeutralMode driveNeutralMode = NeutralMode.Brake;
+
 		public static final double angleGearRatio = 1 / ((14.0 / 50.0) * (10.0 / 60.0));
 		public static final boolean angleInverted = true;
-		public static final NeutralMode angleNeutralMode = NeutralMode.Coast;
+		public static final IdleMode angleIdleMode = IdleMode.kCoast;
 		// todo: fix with pid or something, test once actual robot is built to see if there's any overshooting problems
 		public static final double angleMaxPercentOutput = 0.5;
 		public static final boolean encoderInverted = false;
+		public static final double angleEncoderPositionFactor_rad = (2 * Math.PI);
+		public static final double angleEncoderVelocityFactor_radps = (2 * Math.PI) / 60.0;
 
 		public static final double maxVelocity_mps = 6380.0 /* Falcon max RPM */
 			/ 60.0 / driveGearRatio * wheelCircumference_m;
@@ -77,9 +84,9 @@ public final class Constants {
 		public static final double closedLoopRamp = 0.0;
 
 		/* angle motor PID values */
-		public static final double angleKp = 0.15; // todo: calibrate
+		public static final double angleKp = 0.01; // todo: calibrate
 		public static final double angleKi = 0.0;
-		public static final double angleKd = 1.5;
+		public static final double angleKd = 0.005;
 		public static final double angleKf = 0.0;
 		/* sim angle motor PID values */
 		public static final double simAngleKp = 12.0;
@@ -116,8 +123,8 @@ public final class Constants {
 		public static final double autoTurnKd = 0.0;
 
 		/* current limiting */
-		public static final SupplyCurrentLimitConfiguration angleCurrentLimit = new SupplyCurrentLimitConfiguration(
-			true, 25, 40, 0.1);
+		// public static final SupplyCurrentLimitConfiguration angleCurrentLimit = new SupplyCurrentLimitConfiguration(
+		// true, 25, 40, 0.1);
 		public static final SupplyCurrentLimitConfiguration driveCurrentLimit = new SupplyCurrentLimitConfiguration(
 			true, 35, 60, 0.1);
 	}

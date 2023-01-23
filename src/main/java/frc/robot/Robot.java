@@ -2,6 +2,9 @@ package frc.robot;
 
 import static frc.robot.Constants.robotMode;
 
+import frc.robot.subsystems.Lights;
+
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -65,7 +68,7 @@ public class Robot extends LoggedRobot {
 		 * Instantiate our RobotContainer. This will perform all our button bindings,
 		 * and put our autonomous chooser on the dashboard.
 		 */
-		robotContainer = new RobotContainer();
+		robotContainer = RobotContainer.getInstance();
 	}
 
 	/**
@@ -88,7 +91,12 @@ public class Robot extends LoggedRobot {
 
 	/** This function is called once each time the robot enters Disabled mode. */
 	@Override
-	public void disabledInit() {}
+	public void disabledInit() {
+		Lights.setControlMode(switch (DriverStation.getAlliance()) {
+			case Blue -> Lights.ControlMode.DisabledBlue;
+			default -> Lights.ControlMode.DisabledRed;
+		});
+	}
 
 	@Override
 	public void disabledPeriodic() {}
@@ -99,6 +107,7 @@ public class Robot extends LoggedRobot {
 	 */
 	@Override
 	public void autonomousInit() {
+		Lights.setControlMode(Lights.ControlMode.Regular);
 		autonomousCommand = robotContainer.getAutonomousCommand();
 		// schedule the autonomous command (example)
 		if (autonomousCommand != null)
@@ -111,6 +120,7 @@ public class Robot extends LoggedRobot {
 
 	@Override
 	public void teleopInit() {
+		Lights.setControlMode(Lights.ControlMode.Regular);
 		/*
 		 * This makes sure that the autonomous stops running when teleop starts running. If you want the
 		 * autonomous to continue until interrupted by another command, remove this line or comment it

@@ -1,4 +1,6 @@
 {
+	"todohighlight.isCaseSensitive": false,
+	"todohighlight.include": ["src/**/*"],
 	"java.configuration.updateBuildConfiguration": "automatic",
 	"java.server.launchMode": "Standard",
 	"files.exclude": {
@@ -28,8 +30,9 @@
 		},
 	],
 	"java.test.defaultConfig": "WPIlibUnitTests",
+	"wpilib.skipTests": true,
 	"java.format.settings.url": "eclipse-formatter.xml",
-	"java.completion.importOrder": ["frc", "edu.wpi", "com.ctre", "com.pathplanner", "org.littletonrobotics", "java", "javax", ""],
+	"java.completion.importOrder": ["frc", "edu.wpi", "com.ctre", "com.pathplanner", "com.revrobotics", "org.littletonrobotics", "java", "javax", ""],
 	// "java.sources.organizeImports.starThreshold": 2,
 	"java.sources.organizeImports.staticStarThreshold": 2,
 	"[java]": {

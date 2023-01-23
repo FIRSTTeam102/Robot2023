@@ -2,6 +2,8 @@ package frc.robot;
 
 public class Conversions {
 	public static final double falconCountsPerRotation = 2048.0;
+	public static final double cancoderCountsPerRotation = 4096.0;
+	public static final double twoPi = 2 * Math.PI;
 
 	/**
 	 * @param counts Falcon counts
