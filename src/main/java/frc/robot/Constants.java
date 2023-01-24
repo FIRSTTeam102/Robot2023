@@ -36,7 +36,8 @@ public final class Constants {
 
 	public static final class GrabberConstants {
 		public static final int motorId = 42; // todo: change
-		public static final int sensorPin = 4; // todo: change
+		public static final int objectSensorPin = 4; // todo: change
+		public static final int closedSensorPin = 5;
 		public static final double speed = 0.5;
 		public static final int openingTime = 50;
 	}

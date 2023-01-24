@@ -9,17 +9,21 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.CANSparkMax;
 
 public class Grabber extends SubsystemBase {
-	public boolean isClosed = false;
+	private DigitalInput closedSensor = new DigitalInput(GrabberConstants.closedSensorPin);
 	private CANSparkMax motor = new CANSparkMax(GrabberConstants.motorId, CANSparkMax.MotorType.kBrushless);
-	private DigitalInput sensor = new DigitalInput(GrabberConstants.sensorPin);
+	private DigitalInput objectSensor = new DigitalInput(GrabberConstants.objectSensorPin);
 
 	/** Creates a new Grabber. */
 	public Grabber() {
 		motor.set(0);
 	}
 
-	public boolean isGrabbed() {
-		return sensor.get();
+	public boolean objectDetected() {
+		return objectSensor.get();
+	}
+
+	public boolean isClosed() {
+		return closedSensor.get();
 	}
 
 	public void moveInward() {
@@ -34,10 +38,12 @@ public class Grabber extends SubsystemBase {
 		motor.set(0);
 	}
 
-	CloseGrabber closeGrabber = new CloseGrabber(this, 250);
+	CloseGrabber closeGrabber = new CloseGrabber(this);
 
 	@Override
 	public void periodic() {
-
+		if (objectDetected() && !closeGrabber.isScheduled()) {
+			closeGrabber.schedule();
+		}
 	}
 }
