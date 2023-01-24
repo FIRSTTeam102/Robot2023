@@ -6,24 +6,27 @@ package frc.robot.subsystems;
 
 import frc.robot.Constants.VerticalElevatorConstants;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxLimitSwitch;
 import com.revrobotics.SparkMaxPIDController;
 
 public class VerticalElevator extends SubsystemBase {
 	private CANSparkMax motor = new CANSparkMax(VerticalElevatorConstants.motorPort, MotorType.kBrushless);
+
 	private SparkMaxPIDController pidController = motor.getPIDController();
 	private RelativeEncoder encoder = motor.getEncoder();
-
-	private DigitalInput topSwitch = new DigitalInput(VerticalElevatorConstants.topSwitchPort);
-	private DigitalInput bottomSwitch = new DigitalInput(VerticalElevatorConstants.bottomSwitchPort);
+	private SparkMaxLimitSwitch topSwitch = motor.getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);
+	private SparkMaxLimitSwitch bottomSwitch = motor.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);
 
 	/** Creates a new VerticalElevator. */
 	public VerticalElevator() {
+		topSwitch.enableLimitSwitch(true);
+		bottomSwitch.enableLimitSwitch(true);
+
 		pidController.setP(VerticalElevatorConstants.kP);
 		pidController.setD(VerticalElevatorConstants.kD);
 		pidController.setI(VerticalElevatorConstants.kI);
@@ -31,15 +34,15 @@ public class VerticalElevator extends SubsystemBase {
 		pidController.setFF(VerticalElevatorConstants.kF);
 		pidController.setOutputRange(VerticalElevatorConstants.kMinOuput, VerticalElevatorConstants.kMaxOutput);
 
-		encoder.setPositionConversionFactor(VerticalElevatorConstants.conversionFactor);
+		encoder.setPositionConversionFactor(VerticalElevatorConstants.conversionFactor_meters_per_rotation);
 	}
 
 	public boolean getTopStatus() {
-		return topSwitch.get();
+		return topSwitch.isPressed();
 	}
 
 	public boolean getBottomStatus() {
-		return bottomSwitch.get();
+		return bottomSwitch.isPressed();
 	}
 
 	/**
@@ -54,5 +57,10 @@ public class VerticalElevator extends SubsystemBase {
 		// This method will be called once per scheduler run
 		System.out.println(encoder.getPosition());
 
+		if (getTopStatus())
+			encoder.setPosition(0);
+
+		if (getBottomStatus())
+			encoder.setPosition(VerticalElevatorConstants.maxHeight_m);
 	}
 }

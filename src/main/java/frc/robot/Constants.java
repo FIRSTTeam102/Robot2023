@@ -152,6 +152,7 @@ public final class Constants {
 		public static final double kIZone = 0.0;
 		public static final double kD = 0.0;
 
-		public static final double conversionFactor = 1;
+		public static final double conversionFactor_meters_per_rotation = 1;
+		public static final double maxHeight_m = 3.2;
 	}
 }
