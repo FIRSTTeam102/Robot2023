@@ -10,9 +10,9 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 public class Claw extends SubsystemBase {
-	public boolean isClosed = false;
+	private DigitalInput closedSensor = new DigitalInput(ClawConstants.closedSensorPin);
 	private TalonSRX motor = new TalonSRX(ClawConstants.motorId);
-	private DigitalInput sensor = new DigitalInput(ClawConstants.sensorPin);
+	private DigitalInput objectSensor = new DigitalInput(ClawConstants.objectSensorPin);
 
 	/** Creates a new Claw. */
 	public Claw() {}
@@ -29,12 +29,16 @@ public class Claw extends SubsystemBase {
 		motor.set(ControlMode.PercentOutput, 0);
 	}
 
-	CloseClaw closeClaw = new CloseClaw(this, 250);
+	public boolean isClosed() {
+		return closedSensor.get();
+	}
+
+	private CloseClaw closeClaw = new CloseClaw(this);
 
 	@Override
 	public void periodic() {
 		// get sensor input and enter conditional if something returns
-		if (sensor.get() && !closeClaw.isScheduled()) {
+		if (objectSensor.get() && !closeClaw.isScheduled()) {
 			closeClaw.schedule(); // close or moveinward
 		}
 	}

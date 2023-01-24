@@ -22,7 +22,7 @@ public class OpenClaw extends CommandBase {
 
 	@Override
 	public void initialize() {
-		if (claw.isClosed) {
+		if (claw.isClosed()) {
 			claw.moveOutward();
 		} else {
 			counter = counterTarget;
@@ -36,7 +36,6 @@ public class OpenClaw extends CommandBase {
 
 	@Override
 	public void end(boolean interrupted) {
-		claw.isClosed = false;
 		claw.stop();
 	}
 
