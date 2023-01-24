@@ -57,10 +57,10 @@ public class VerticalElevator extends SubsystemBase {
 		// This method will be called once per scheduler run
 		System.out.println(encoder.getPosition());
 
-		if (getTopStatus())
+		if (getBottomStatus())
 			encoder.setPosition(0);
 
-		if (getBottomStatus())
+		if (getTopStatus())
 			encoder.setPosition(VerticalElevatorConstants.maxHeight_m);
 	}
 }
