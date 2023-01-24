@@ -3,14 +3,16 @@ package frc.robot.swerve;
 import static frc.robot.Constants.SwerveConstants.*;
 
 import frc.robot.Conversions;
+import frc.robot.SendableSparkMaxPIDController;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.CANCoderConfiguration;
@@ -27,20 +29,20 @@ import com.revrobotics.SparkMaxPIDController;
  * a Falcon 500 motor (TalonFX) for drive, NEO (SparkMax) for turn, and a CAN coder.
  */
 public class SwerveModuleIOReal implements SwerveModuleIO {
-	private TalonFX driveMotor;
+	private WPI_TalonFX driveMotor;
 	private CANCoder angleEncoder;
 	private CANSparkMax angleMotor;
 	private SparkMaxPIDController anglePidController;
 	private SparkMaxAbsoluteEncoder angleMotorAbsoluteEncoder;
 	private SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(driveKs, driveKv, driveKa);
-	private double angleOffset_rad;
+	private double angleOffset_rad; // todo: implement
 
 	/**
 	 * Make a new SwerveModuleIOTalonFX object.
 	 *
 	 * @param SwerveModuleConstants module config
 	 */
-	public SwerveModuleIOReal(SwerveModuleConstants moduleConstants) {
+	public SwerveModuleIOReal(SwerveModuleConstants moduleConstants, int moduleNumber) {
 		this.angleOffset_rad = moduleConstants.angleOffset_rad();
 
 		angleEncoder = new CANCoder(moduleConstants.encoderId());
@@ -75,11 +77,16 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		anglePidController.setPositionPIDWrappingMinInput(0);
 		anglePidController.setPositionPIDWrappingMaxInput(Conversions.twoPi);
 
+		// custom shuffleboard pid controller
+		var anglePIDSendable = new SendableSparkMaxPIDController(anglePidController, CANSparkMax.ControlType.kPosition,
+			"Swerve turn " + moduleNumber);
+		Shuffleboard.getTab("PID").add(anglePIDSendable);
+
 		// todo: fix sync angle from cancoder -> spark
 		// setFalconInternalAngleToCanCoder(); // reset to absolute position
 		// angleMotorAbsoluteEncoder.setZeroOffset(angleOffset_rad);
 
-		driveMotor = new TalonFX(moduleConstants.driveMotorId());
+		driveMotor = new WPI_TalonFX(moduleConstants.driveMotorId());
 		driveMotor.configFactoryDefault();
 		driveMotor.config_kP(0, driveKp);
 		driveMotor.config_kI(0, driveKi);

@@ -37,16 +37,19 @@ public final class Constants {
 	public static final int pigeonId = 20;
 
 	public static class SwerveConstants {
-		public static final SwerveModuleConstants frontLeft = new SwerveModuleConstants(21, 22, 23, 0.0);
-		public static final SwerveModuleConstants frontRight = new SwerveModuleConstants(24, 25, 26, .0);
-		public static final SwerveModuleConstants backRight = new SwerveModuleConstants(27, 28, 29, 0.0);
-		public static final SwerveModuleConstants backLeft = new SwerveModuleConstants(30, 31, 32, 0.0);
+		public static final SwerveModuleConstants moduleConstants[] = {
+			new SwerveModuleConstants(21, 22, 23, 0.0),
+			new SwerveModuleConstants(24, 25, 26, .0),
+			new SwerveModuleConstants(27, 28, 29, 0.0),
+			new SwerveModuleConstants(30, 31, 32, 0.0)
+		};
 
 		// the left-to-right distance between the drivetrain wheels, should be measured from center to center
 		public static final double trackWidth_m = 1.0;
 		// the front-to-back distance between the drivetrain wheels, should be measured from center to center
 		public static final double wheelBase_m = 1.0;
 
+		// indexes must match moduleConstants
 		public static final Translation2d[] moduleTranslations = {
 			new Translation2d(wheelBase_m / 2.0, trackWidth_m / 2.0),
 			new Translation2d(wheelBase_m / 2.0, -trackWidth_m / 2.0),

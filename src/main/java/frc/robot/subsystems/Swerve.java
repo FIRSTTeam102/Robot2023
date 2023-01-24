@@ -64,16 +64,14 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 
 	/** Creates a new Swerve. */
 	public Swerve(GyroIO gyroIO) {
-		modules = new SwerveModule[] {
-			new SwerveModule(0,
-				Robot.isReal() ? new SwerveModuleIOReal(frontLeft) : new SwerveModuleIOSim()),
-			new SwerveModule(1,
-				Robot.isReal() ? new SwerveModuleIOReal(frontRight) : new SwerveModuleIOSim()),
-			new SwerveModule(2,
-				Robot.isReal() ? new SwerveModuleIOReal(backRight) : new SwerveModuleIOSim()),
-			new SwerveModule(3,
-				Robot.isReal() ? new SwerveModuleIOReal(backLeft) : new SwerveModuleIOSim())
-		};
+		modules = new SwerveModule[moduleConstants.length];
+		int moduleNumber = 0;
+		for (var mod : moduleConstants) {
+			modules[moduleNumber] = new SwerveModule(moduleNumber, Robot.isReal()
+				? new SwerveModuleIOReal(mod, moduleNumber)
+				: new SwerveModuleIOSim());
+			moduleNumber++;
+		}
 
 		this.gyroIO = gyroIO;
 		zeroGyro();
