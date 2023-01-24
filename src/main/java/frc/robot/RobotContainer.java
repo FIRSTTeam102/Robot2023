@@ -1,12 +1,12 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.OpenClaw;
+import frc.robot.commands.OpenGrabber;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
-import frc.robot.subsystems.Claw;
+import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Swerve;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -40,7 +40,7 @@ public class RobotContainer {
 	 * Subsystems
 	 */
 	public final Swerve swerve = new Swerve(gyroIO);
-	public final Claw claw = new Claw();
+	public final Grabber grabber = new Grabber();
 
 	public final CommandXboxController driverController = new CommandXboxController(
 		OperatorConstants.driverControllerPort);
@@ -78,7 +78,7 @@ public class RobotContainer {
 		driverController.b().onTrue(new InstantCommand(() -> swerve.zeroGyro()));
 
 		/* operator */
-		operatorController.rightBumper().onTrue(new OpenClaw(claw, 250));
+		operatorController.leftBumper().onTrue(new OpenGrabber(grabber, 0.25));
 	}
 
 	/**
