@@ -1,10 +1,12 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.SetArmPosition;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Swerve;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -38,11 +40,15 @@ public class RobotContainer {
 	 * Subsystems
 	 */
 	public final Swerve swerve = new Swerve(gyroIO);
+	public final Arm arm = new Arm();
 
 	public final CommandXboxController driverController = new CommandXboxController(
 		OperatorConstants.driverControllerPort);
 	public final CommandXboxController operatorController = new CommandXboxController(
 		OperatorConstants.operatorControllerPort);
+
+	/* Commands */
+	public final SetArmPosition resetArm = new SetArmPosition(arm);
 
 	private LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto mode");
 

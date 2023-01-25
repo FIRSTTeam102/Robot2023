@@ -131,4 +131,20 @@ public final class Constants {
 		public static final SupplyCurrentLimitConfiguration driveCurrentLimit = new SupplyCurrentLimitConfiguration(
 			true, 35, 60, 0.1);
 	}
+
+	public static final class ArmConstants {
+		public static final int motorPort = 10;
+
+		public static final double rotationsToMaxLength = 4.6;
+		public static final double conversionFactor = 1 / rotationsToMaxLength;
+
+		public static final double kP = 0;
+		public static final double kD = 0;
+		public static final double kI = 0;
+		public static final double kIZone = 0;
+		public static final double kF = 0;
+
+		public static final double kMinOutput = -1;
+		public static final double kMaxOutput = 1;
+	}
 }
