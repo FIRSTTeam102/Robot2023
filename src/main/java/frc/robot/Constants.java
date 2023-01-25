@@ -3,6 +3,7 @@ package frc.robot;
 import frc.robot.swerve.SwerveModuleConstants;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
@@ -129,8 +130,7 @@ public final class Constants {
 			true, 35, 60, 0.1);
 	}
 
-	public static class VerticalElevatorConstants {
-
+	public static class ElevatorConstants {
 		/* ports */
 		public static final int motorPort = 21;
 		public static final int topSwitchPort = 1;
@@ -139,20 +139,30 @@ public final class Constants {
 		/* speeds */
 		public static final double percentSpeed = 0.6;
 
-		/* pid stuff */
-
 		public static final double kMinOuput = -1;
 		public static final double kMaxOutput = 1;
 
-		public static final double feedForward = 0.00;
-
-		public static final double kF = 0.0;
+		/* pid stuff */
 		public static final double kP = 0.0;
 		public static final double kI = 0.0;
 		public static final double kIZone = 0.0;
 		public static final double kD = 0.0;
 
+		/**
+		 * characterization values (feed forward)
+		 * {@link edu.wpi.first.math.controller.ElevatorFeedforward#ElevatorFeedforward(double, double, double, double)}
+		 */
+		// public static final double kS = 0.2;
+		// public static final double kG = 1.0;
+		// public static final double kV = 5.0;
+		// public static final double kA = 0.2;
+
+		/* sizes */
 		public static final double conversionFactor_meters_per_rotation = 1;
+		public static final double minHeight_m = 0.0;
 		public static final double maxHeight_m = 3.2;
+		public static final double gearRatio = 1.0; // fixme:
+		public static final double carriageMass_kg = 1.0; // fixme:
+		public static final double drumRadius_m = Units.inchesToMeters(0.5);
 	}
 }

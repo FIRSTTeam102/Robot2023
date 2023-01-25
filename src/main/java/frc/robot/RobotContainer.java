@@ -1,13 +1,13 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.MoveVerticalElevator;
+import frc.robot.commands.MoveElevator;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
+import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Swerve;
-import frc.robot.subsystems.VerticalElevator;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -40,7 +40,7 @@ public class RobotContainer {
 	 * Subsystems
 	 */
 	public final Swerve swerve = new Swerve(gyroIO);
-	public final VerticalElevator verticalElevator = new VerticalElevator();
+	public final Elevator elevator = new Elevator();
 
 	public final CommandXboxController driverController = new CommandXboxController(
 		OperatorConstants.driverControllerPort);
@@ -80,10 +80,10 @@ public class RobotContainer {
 		/* operator */
 
 		/*
-		 * remove later -- just for testing
+		 * fixme: remove later, just for testing
 		 */
-		operatorController.x().whileTrue(new MoveVerticalElevator(verticalElevator, 0.7));
-		operatorController.y().whileTrue(new MoveVerticalElevator(verticalElevator, -0.7));
+		operatorController.x().whileTrue(new MoveElevator(elevator, 0.7));
+		operatorController.y().whileTrue(new MoveElevator(elevator, -0.7));
 	}
 
 	/**
