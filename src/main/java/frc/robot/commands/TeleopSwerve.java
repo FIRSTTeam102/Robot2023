@@ -19,12 +19,12 @@ public class TeleopSwerve extends CommandBase {
 	private boolean fieldRelative = false;
 	private boolean openLoop = true;
 
-	private Swerve swerveSubsystem;
+	private Swerve swerve;
 	private XboxController controller;
 
-	public TeleopSwerve(Swerve swerveSubsystem, XboxController controller) {
-		this.swerveSubsystem = swerveSubsystem;
-		addRequirements(swerveSubsystem);
+	public TeleopSwerve(Swerve swerve, XboxController controller) {
+		this.swerve = swerve;
+		addRequirements(swerve);
 		this.controller = controller;
 	}
 
@@ -36,12 +36,12 @@ public class TeleopSwerve extends CommandBase {
 
 		translation = new Translation2d(yAxis, xAxis).times(SwerveConstants.maxVelocity_mps);
 		rotation = rAxis * SwerveConstants.maxAngularVelocity_radps;
-		swerveSubsystem.drive(translation, rotation);
+		swerve.drive(translation, rotation);
 	}
 
 	@Override
 	public void end(boolean interrupted) {
-		swerveSubsystem.stop();
+		swerve.stop();
 		super.end(interrupted);
 	}
 

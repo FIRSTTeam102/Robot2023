@@ -1,6 +1,7 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.ChargeStationBalance;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
@@ -8,6 +9,7 @@ import frc.robot.io.GyroIOSim;
 import frc.robot.subsystems.Swerve;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -30,14 +32,14 @@ public class RobotContainer {
 		return instance;
 	}
 
-	private final GyroIO gyroIO = Robot.isReal()
+	public final GyroIO gyro = Robot.isReal()
 		? new GyroIOPigeon2(Constants.pigeonId)
 		: new GyroIOSim();
 
 	/**
 	 * Subsystems
 	 */
-	public final Swerve swerve = new Swerve(gyroIO);
+	public final Swerve swerve = new Swerve(gyro);
 
 	public final CommandXboxController driverController = new CommandXboxController(
 		OperatorConstants.driverControllerPort);
@@ -52,6 +54,7 @@ public class RobotContainer {
 	public RobotContainer() {
 		DriverStation.silenceJoystickConnectionWarning(true);
 
+		// will be automatically scheduled when no other scheduled commands require swerve
 		swerve.setDefaultCommand(new TeleopSwerve(swerve, driverController.getHID()));
 
 		configureBindings();
@@ -59,6 +62,8 @@ public class RobotContainer {
 		// setup autos
 		autoChooser.addDefaultOption("Nothing", new InstantCommand());
 		autoChooser.addDefaultOption("PP test", Autos.pathPlannerTest(swerve));
+
+		SmartDashboard.putData("do balancing", new ChargeStationBalance(swerve));
 	}
 
 	/**
@@ -72,7 +77,7 @@ public class RobotContainer {
 	private void configureBindings() {
 		/* driver */
 		driverController.a().onTrue(new InstantCommand(() -> swerve.toggleFieldRelative()));
-		driverController.b().onTrue(new InstantCommand(() -> swerve.zeroGyro()));
+		driverController.b().onTrue(new InstantCommand(() -> swerve.zeroYaw()));
 
 		/* operator */
 	}

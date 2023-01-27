@@ -11,10 +11,7 @@ public class GyroIOPigeon2 implements GyroIO {
 	public GyroIOPigeon2(int deviceNumber) {
 		gyro = new Pigeon2(deviceNumber);
 		gyro.configFactoryDefault();
-
-		/**
-		 * todo: {@link com.ctre.phoenix.sensors.Pigeon2#configMountPose(double, double, double)}
-		 */
+		gyro.configMountPose(0, 0, 0);
 	}
 
 	@Override
@@ -22,10 +19,10 @@ public class GyroIOPigeon2 implements GyroIO {
 		gyro.getRawGyro(xyz_dps);
 		gyro.getYawPitchRoll(ypr_deg);
 		inputs.connected = gyro.getLastError().equals(ErrorCode.OK);
-		inputs.pitch_deg = ypr_deg[0];
-		inputs.pitch_dps = xyz_dps[0];
-		inputs.yaw_deg = ypr_deg[1];
-		inputs.yaw_dps = xyz_dps[1];
+		inputs.yaw_deg = ypr_deg[0];
+		inputs.yaw_dps = xyz_dps[0];
+		inputs.pitch_deg = ypr_deg[1];
+		inputs.pitch_dps = xyz_dps[1];
 		inputs.roll_deg = ypr_deg[2];
 		inputs.roll_dps = xyz_dps[2];
 	}
@@ -33,5 +30,11 @@ public class GyroIOPigeon2 implements GyroIO {
 	@Override
 	public void setYaw(double yaw_deg) {
 		gyro.setYaw(yaw_deg);
+	}
+
+	@Override
+	public void resetPitchRoll() {
+		gyro.configMountPosePitch(gyro.getPitch());
+		gyro.configMountPoseRoll(gyro.getRoll());
 	}
 }

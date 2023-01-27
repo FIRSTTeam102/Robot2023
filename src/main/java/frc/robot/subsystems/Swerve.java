@@ -9,6 +9,7 @@ import frc.robot.swerve.SwerveModule;
 import frc.robot.swerve.SwerveModuleIOReal;
 import frc.robot.swerve.SwerveModuleIOSim;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -18,6 +19,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -27,6 +29,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 
 import org.littletonrobotics.junction.Logger;
+
+import lombok.Setter;
 
 public class Swerve extends SubsystemBase implements AutoCloseable {
 	public SwerveDriveKinematics kinematics = new SwerveDriveKinematics(moduleTranslations);
@@ -52,6 +56,7 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 
 	// configurable stuff
 	private boolean brakeMode = true;
+	@Setter
 	private boolean fieldRelative = false;
 
 	public GyroIO gyroIO;
@@ -74,7 +79,7 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 		}
 
 		this.gyroIO = gyroIO;
-		zeroGyro();
+		zeroYaw();
 
 		timer = new Timer();
 		timer.reset();
@@ -142,8 +147,18 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 		return Rotation2d.fromDegrees(gyroInputs.yaw_deg + gyroOffset);
 	}
 
-	public void zeroGyro() {
+	public void zeroYaw() {
 		gyroIO.setYaw(0);
+	}
+
+	// rotating around side-to-side axis (leaning forward/backward)
+	public double getPitch_rad() {
+		return MathUtil.angleModulus(Units.degreesToRadians(gyroInputs.pitch_deg));
+	}
+
+	// rotating around front-to-back axis (leaning left/right)
+	public double getRoll_rad() {
+		return MathUtil.angleModulus(Units.degreesToRadians(gyroInputs.roll_deg));
 	}
 
 	/**
@@ -183,9 +198,13 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 		}
 	}
 
-	public void setFieldRelative(boolean fieldRelative) {
-		this.fieldRelative = fieldRelative;
-	}
+	// handle by the scheduler instead
+	// public enum Mode {
+	// normal, balance, xStance
+	// }
+	// @Getter
+	// @Setter
+	// private Mode mode = Mode.normal;
 
 	public void toggleFieldRelative() {
 		this.fieldRelative = !this.fieldRelative;
@@ -234,6 +253,7 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 	 * Sets the swerve modules in the x-stance orientation. In this orientation the wheels are aligned
 	 * to make an 'X', which makes it more difficult for other robots to push the robot.
 	 */
+	// todo: move to command
 	private void setXStance() {
 		chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
 		SwerveModuleState[] states = kinematics.toSwerveModuleStates(chassisSpeeds, centerRotation);

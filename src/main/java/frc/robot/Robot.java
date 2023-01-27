@@ -108,8 +108,12 @@ public class Robot extends LoggedRobot {
 	@Override
 	public void autonomousInit() {
 		Lights.setControlMode(Lights.ControlMode.Regular);
+
+		// we always should start flat in the community
+		// todo: evaluate if necessary
+		robotContainer.gyro.resetPitchRoll();
+
 		autonomousCommand = robotContainer.getAutonomousCommand();
-		// schedule the autonomous command (example)
 		if (autonomousCommand != null)
 			autonomousCommand.schedule();
 	}

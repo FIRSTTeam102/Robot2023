@@ -22,4 +22,6 @@ public interface GyroIO {
 	public default void updateInputs(GyroIOInputs inputs) {}
 
 	public default void setYaw(double yaw_deg) {}
+
+	public default void resetPitchRoll() {}
 }
