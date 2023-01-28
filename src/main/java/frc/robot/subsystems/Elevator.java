@@ -69,9 +69,12 @@ public class Elevator extends SubsystemBase {
 		return inputs.bottomSwitch;
 	}
 
-	// fixme: remove after testing
 	public void setSpeed(double speed) {
-		motor.set(speed);
+		pidController.setReference(speed, CANSparkMax.ControlType.kDutyCycle);
+	}
+
+	public void stop() {
+		pidController.setReference(0, CANSparkMax.ControlType.kDutyCycle);
 	}
 
 	public void setPosition(double position_m) {

@@ -1,7 +1,7 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.MoveElevator;
+import frc.robot.commands.ManualElevatorControl;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
@@ -49,6 +49,8 @@ public class RobotContainer {
 
 	private LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto mode");
 
+	private final ManualElevatorControl manualElevatorControl = new ManualElevatorControl(elevator, operatorController);
+
 	/**
 	 * The container for the robot. Contains subsystems, OI devices, and commands.
 	 */
@@ -79,11 +81,12 @@ public class RobotContainer {
 
 		/* operator */
 
+		operatorController.leftTrigger(.3).whileTrue(manualElevatorControl);
+
 		/*
 		 * fixme: remove later, just for testing
 		 */
-		operatorController.x().whileTrue(new MoveElevator(elevator, 0.7));
-		operatorController.y().whileTrue(new MoveElevator(elevator, -0.7));
+
 	}
 
 	/**
