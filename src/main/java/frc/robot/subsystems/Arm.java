@@ -19,10 +19,12 @@ public class Arm extends SubsystemBase {
 
 	private SparkMaxPIDController pidController = motor.getPIDController();
 	private RelativeEncoder encoder = motor.getEncoder();
-	private SparkMaxLimitSwitch limitSwitch = motor.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);
+	private SparkMaxLimitSwitch frontLimitSwitch = motor.getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);
+	private SparkMaxLimitSwitch backLimitSwitch = motor.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);
 
 	public Arm() {
-		limitSwitch.enableLimitSwitch(true);
+		frontLimitSwitch.enableLimitSwitch(true);
+		backLimitSwitch.enableLimitSwitch(true);
 
 		pidController.setP(ArmConstants.kP);
 		pidController.setD(ArmConstants.kD);
@@ -44,6 +46,10 @@ public class Arm extends SubsystemBase {
 		pidController.setReference(position, CANSparkMax.ControlType.kPosition);
 	}
 
+	public void setSpeed(double speed) {
+		pidController.setReference(speed, CANSparkMax.ControlType.kDutyCycle);
+	}
+
 	public void stop() {
 		pidController.setReference(0, CANSparkMax.ControlType.kDutyCycle);
 	}
@@ -51,8 +57,12 @@ public class Arm extends SubsystemBase {
 	@Override
 	public void periodic() {
 		// This method will be called once per scheduler run
-		if (limitSwitch.isPressed()) {
+		if (backLimitSwitch.isPressed()) {
 			encoder.setPosition(0);
+		}
+
+		if (frontLimitSwitch.isPressed()) {
+			encoder.setPosition(ArmConstants.maxLength_ft);
 		}
 	}
 }

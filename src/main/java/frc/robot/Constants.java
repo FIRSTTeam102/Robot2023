@@ -135,6 +135,7 @@ public final class Constants {
 	public static final class ArmConstants {
 		public static final int motorPort = 10;
 
+		public static final double maxLength_ft = 3;
 		public static final double rotationsToMaxLength = 4.6;
 		public static final double conversionFactor = 1 / rotationsToMaxLength;
 

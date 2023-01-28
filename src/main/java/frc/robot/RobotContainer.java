@@ -1,6 +1,7 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.ManualArmControl;
 import frc.robot.commands.SetArmPosition;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.io.GyroIO;
@@ -52,6 +53,8 @@ public class RobotContainer {
 
 	private LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto mode");
 
+	private ManualArmControl manualArmControl = new ManualArmControl(arm, operatorController);
+
 	/**
 	 * The container for the robot. Contains subsystems, OI devices, and commands.
 	 */
@@ -81,6 +84,8 @@ public class RobotContainer {
 		driverController.b().onTrue(new InstantCommand(() -> swerve.zeroGyro()));
 
 		/* operator */
+
+		operatorController.rightTrigger(.3).whileTrue(manualArmControl);
 	}
 
 	/**
