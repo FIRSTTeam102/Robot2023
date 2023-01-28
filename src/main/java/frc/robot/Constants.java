@@ -131,4 +131,9 @@ public final class Constants {
 		public static final SupplyCurrentLimitConfiguration driveCurrentLimit = new SupplyCurrentLimitConfiguration(
 			true, 35, 60, 0.1);
 	}
+
+	public static class VisionConstants {
+		/* networktables */
+
+	}
 }
