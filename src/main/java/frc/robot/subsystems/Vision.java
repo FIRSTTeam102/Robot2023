@@ -4,14 +4,20 @@
 
 package frc.robot.subsystems;
 
+import static frc.robot.Constants.VisionConstants.*;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Vision extends SubsystemBase {
 	/** Creates a new Vision. */
-	public Vision() {}
+	public Vision() {
+
+	}
 
 	@Override
 	public void periodic() {
-		// This method will be called once per scheduler run
+		double x = tx.getDouble(0.0);
+		double y = ty.getDouble(0.0);
+		double area = ta.getDouble(0.0);
 	}
 }

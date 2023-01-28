@@ -3,6 +3,9 @@ package frc.robot;
 import frc.robot.swerve.SwerveModuleConstants;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
@@ -130,10 +133,13 @@ public final class Constants {
 		// true, 25, 40, 0.1);
 		public static final SupplyCurrentLimitConfiguration driveCurrentLimit = new SupplyCurrentLimitConfiguration(
 			true, 35, 60, 0.1);
-	}
+	};
 
 	public static class VisionConstants {
 		/* networktables */
-
-	}
+		public static NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+		public static NetworkTableEntry ty = table.getEntry("ty");
+		public static NetworkTableEntry tx = table.getEntry("tx");
+		public static NetworkTableEntry ta = table.getEntry("ta");
+	};
 }
