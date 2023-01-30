@@ -39,7 +39,7 @@ public final class Constants {
 	public static class SwerveConstants {
 		public static final SwerveModuleConstants moduleConstants[] = {
 			new SwerveModuleConstants(21, 22, 23, 0.0),
-			new SwerveModuleConstants(24, 25, 26, .0),
+			new SwerveModuleConstants(24, 25, 26, 0.0),
 			new SwerveModuleConstants(27, 28, 29, 0.0),
 			new SwerveModuleConstants(30, 31, 32, 0.0)
 		};
@@ -87,7 +87,7 @@ public final class Constants {
 		public static final double closedLoopRamp = 0.0;
 
 		/* angle motor PID values */
-		public static final double angleKp = 0.01; // todo: calibrate
+		public static final double angleKp = 1.0; // todo: calibrate
 		public static final double angleKi = 0.0;
 		public static final double angleKd = 0.005;
 		public static final double angleKf = 0.0;
@@ -126,8 +126,7 @@ public final class Constants {
 		public static final double autoTurnKd = 0.0;
 
 		/* current limiting */
-		// public static final SupplyCurrentLimitConfiguration angleCurrentLimit = new SupplyCurrentLimitConfiguration(
-		// true, 25, 40, 0.1);
+		public static final int angleCurrentLimit_amp = 25;
 		public static final SupplyCurrentLimitConfiguration driveCurrentLimit = new SupplyCurrentLimitConfiguration(
 			true, 35, 60, 0.1);
 	}

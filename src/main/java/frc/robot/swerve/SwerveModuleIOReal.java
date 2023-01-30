@@ -2,6 +2,7 @@ package frc.robot.swerve;
 
 import static frc.robot.Constants.SwerveConstants.*;
 
+import frc.robot.BuildManager;
 import frc.robot.Conversions;
 import frc.robot.SendableSparkMaxPIDController;
 
@@ -12,6 +13,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
@@ -46,7 +48,6 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		this.angleOffset_rad = moduleConstants.angleOffset_rad();
 
 		angleEncoder = new CANCoder(moduleConstants.encoderId());
-		angleEncoder.configFactoryDefault();
 		var angleEncoderConfig = new CANCoderConfiguration();
 		angleEncoderConfig.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
 		angleEncoderConfig.sensorDirection = encoderInverted;
@@ -64,7 +65,7 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		anglePidController.setD(angleKd);
 		anglePidController.setFF(angleKf);
 		anglePidController.setOutputRange(-angleMaxPercentOutput, angleMaxPercentOutput);
-		// angleMotor.configSupplyCurrentLimit(angleCurrentLimit);
+		angleMotor.setSmartCurrentLimit(angleCurrentLimit_amp);
 		// angleMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
 		angleMotor.setInverted(angleInverted);
 		angleMotor.setIdleMode(angleIdleMode);
@@ -76,6 +77,7 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		anglePidController.setPositionPIDWrappingEnabled(true);
 		anglePidController.setPositionPIDWrappingMinInput(0);
 		anglePidController.setPositionPIDWrappingMaxInput(Conversions.twoPi);
+		BuildManager.burnSpark(angleMotor);
 
 		// custom shuffleboard pid controller
 		var anglePIDSendable = new SendableSparkMaxPIDController(anglePidController, CANSparkMax.ControlType.kPosition,
@@ -87,18 +89,19 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		// angleMotorAbsoluteEncoder.setZeroOffset(angleOffset_rad);
 
 		driveMotor = new WPI_TalonFX(moduleConstants.driveMotorId());
-		driveMotor.configFactoryDefault();
-		driveMotor.config_kP(0, driveKp);
-		driveMotor.config_kI(0, driveKi);
-		driveMotor.config_kD(0, driveKd);
-		driveMotor.config_kF(0, driveKf);
-		// driveMotor.configSupplyCurrentLimit(driveCurrentLimit);
-		driveMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
-		driveMotor.configOpenloopRamp(openLoopRamp);
-		driveMotor.configClosedloopRamp(closedLoopRamp);
-		driveMotor.setInverted(driveInverted);
+		var driveMotorConfig = new TalonFXConfiguration();
+		driveMotorConfig.slot0.kP = driveKp;
+		driveMotorConfig.slot0.kI = driveKi;
+		driveMotorConfig.slot0.kD = driveKd;
+		driveMotorConfig.slot0.kF = driveKf;
+		driveMotorConfig.supplyCurrLimit = driveCurrentLimit;
+		driveMotorConfig.initializationStrategy = SensorInitializationStrategy.BootToZero;
+		driveMotorConfig.openloopRamp = openLoopRamp;
+		driveMotorConfig.closedloopRamp = closedLoopRamp;
+		driveMotor.configAllSettings(driveMotorConfig);
 		driveMotor.setNeutralMode(driveNeutralMode);
 		driveMotor.setSelectedSensorPosition(0);
+		driveMotor.setInverted(driveInverted);
 	}
 
 	// private void setFalconInternalAngleToCanCoder() {
