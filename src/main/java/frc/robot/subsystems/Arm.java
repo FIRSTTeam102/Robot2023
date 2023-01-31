@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import frc.robot.Constants.ArmConstants;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.CANSparkMax;
@@ -37,13 +38,11 @@ public class Arm extends SubsystemBase {
 		encoder.setPositionConversionFactor(ArmConstants.conversionFactor_in_per_rotation);
 	}
 
-	/**
-	 * Set arm to a specific position
-	 * 
-	 * @param position position in percentage to complete extension in the range [0, 1] (0 is fully inward, 1 is max extension)
-	 */
-	public void setPos(double position) {
-		pidController.setReference(position, CANSparkMax.ControlType.kPosition);
+	public void setPosInches(double armLength) {
+		double nutDist = armDistToNutDist(armLength);
+		nutDist = MathUtil.clamp(nutDist, ArmConstants.minNutDist_in, ArmConstants.maxNutDist_in);
+
+		pidController.setReference(nutDist, CANSparkMax.ControlType.kSmartMotion);
 	}
 
 	public void setSpeed(double speed) {
@@ -67,6 +66,7 @@ public class Arm extends SubsystemBase {
 	}
 
 	public static double armDistToNutDist(double armDistance) {
-		return Math.sqrt(Math.pow(ArmConstants.armSectionLength_in, 2) - Math.pow(armDistance / 4, 2));
+		return Math.sqrt(Math.pow(ArmConstants.armSectionLength_in, 2) - Math.pow(armDistance / 4, 2))
+			- ArmConstants.minNutDist_in;
 	}
 }

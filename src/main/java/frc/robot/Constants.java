@@ -138,7 +138,7 @@ public final class Constants {
 		public static final double maxNutDist_in = 13.5;
 		public static final double minNutDist_in = 2.441;
 		public static final double armSectionLength_in = 13.75;
-		public static final double conversionFactor_in_per_rotation = 0.3333;
+		public static final double conversionFactor_in_per_rotation = -0.3333;
 
 		public static final double kP = 0;
 		public static final double kD = 0;
