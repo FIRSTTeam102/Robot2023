@@ -34,7 +34,7 @@ public class Arm extends SubsystemBase {
 
 		pidController.setOutputRange(ArmConstants.kMinOutput, ArmConstants.kMaxOutput);
 
-		encoder.setPositionConversionFactor(ArmConstants.conversionFactor);
+		encoder.setPositionConversionFactor(ArmConstants.conversionFactor_in_per_rotation);
 	}
 
 	/**
@@ -62,7 +62,11 @@ public class Arm extends SubsystemBase {
 		}
 
 		if (frontLimitSwitch.isPressed()) {
-			encoder.setPosition(ArmConstants.maxLength_ft);
+			encoder.setPosition(ArmConstants.maxNutDist_in);
 		}
+	}
+
+	public static double armDistToNutDist(double armDistance) {
+		return Math.sqrt(Math.pow(ArmConstants.armSectionLength_in, 2) - Math.pow(armDistance / 4, 2));
 	}
 }

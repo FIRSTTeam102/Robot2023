@@ -135,9 +135,10 @@ public final class Constants {
 	public static final class ArmConstants {
 		public static final int motorPort = 10;
 
-		public static final double maxLength_ft = 3;
-		public static final double rotationsToMaxLength = 4.6;
-		public static final double conversionFactor = 1 / rotationsToMaxLength;
+		public static final double maxNutDist_in = 13.5;
+		public static final double minNutDist_in = 2.441;
+		public static final double armSectionLength_in = 13.75;
+		public static final double conversionFactor_in_per_rotation = 0.3333;
 
 		public static final double kP = 0;
 		public static final double kD = 0;
