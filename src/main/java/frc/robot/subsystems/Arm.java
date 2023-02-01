@@ -7,6 +7,9 @@ package frc.robot.subsystems;
 import frc.robot.Constants.ArmConstants;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.CANSparkMax;
@@ -14,6 +17,8 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxLimitSwitch;
 import com.revrobotics.SparkMaxPIDController;
+
+import java.util.Map;
 
 public class Arm extends SubsystemBase {
 	private CANSparkMax motor = new CANSparkMax(ArmConstants.motorPort, MotorType.kBrushless);
@@ -23,7 +28,23 @@ public class Arm extends SubsystemBase {
 	private SparkMaxLimitSwitch frontLimitSwitch = motor.getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);
 	private SparkMaxLimitSwitch backLimitSwitch = motor.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);
 
+	private GenericEntry ShuffleboardArmEntryRaw; // Total possible length
+	private GenericEntry ShuffleboardArmEntry; // Arm length that will extend to the top node when the robot is touching
+																							// the grid
+
 	public Arm() {
+		ShuffleboardArmEntryRaw = Shuffleboard.getTab("Drive")
+			.add("Arm Length", 0)
+			.withWidget(BuiltInWidgets.kNumberBar)
+			.withProperties(Map.of("min", 0, "max", 48))
+			.getEntry();
+
+		ShuffleboardArmEntry = Shuffleboard.getTab("Drive")
+			.add("Arm Length", 0)
+			.withWidget(BuiltInWidgets.kNumberBar)
+			.withProperties(Map.of("min", 0, "max", 40))
+			.getEntry();
+
 		frontLimitSwitch.enableLimitSwitch(true);
 		backLimitSwitch.enableLimitSwitch(true);
 
@@ -63,10 +84,17 @@ public class Arm extends SubsystemBase {
 		if (frontLimitSwitch.isPressed()) {
 			encoder.setPosition(0);
 		}
+
+		ShuffleboardArmEntry.setDouble(nutDistToArmDist(encoder.getPosition()));
 	}
 
 	public static double armDistToNutDist(double armDistance) {
 		return Math.sqrt(Math.pow(ArmConstants.armSectionLength_in, 2) - Math.pow(armDistance / 4, 2))
 			- ArmConstants.minNutDist_in;
+	}
+
+	public static double nutDistToArmDist(double nutDistance) {
+		return 4 * Math
+			.sqrt(Math.pow(ArmConstants.armSectionLength_in, 2) - Math.pow(nutDistance + ArmConstants.minNutDist_in, 2));
 	}
 }
