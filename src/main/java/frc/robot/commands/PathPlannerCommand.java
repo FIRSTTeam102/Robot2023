@@ -15,24 +15,35 @@ public class PathPlannerCommand extends PPSwerveControllerCommand {
 
 	/**
 	 * @param trajectory the specified trajectory created by PathPlanner
-	 * @param subsystem the drivetrain subsystem required by this command
+	 * @param swerve the drivetrain subsystem required by this command
 	 * @param initialPath true, if this trajectory is the first in a sequence of trajectories or the
 	 *     only trajectory, in which case the gyro and odometry will be initialized to match the start
 	 *     of trajectory; false, if this trajectory is a subsequent trajectory in which case the gyro
 	 *     and odometry will not be re-initialized in order to ensure a smooth transition between
 	 *     trajectories
 	 */
-	public PathPlannerCommand(PathPlannerTrajectory trajectory, Swerve subsystem, boolean initialPath) {
+	public PathPlannerCommand(PathPlannerTrajectory trajectory, Swerve swerve, boolean initialPath) {
 		super(
 			trajectory,
-			subsystem::getPose,
-			subsystem.autoXController,
-			subsystem.autoYController,
-			subsystem.autoRotationController,
-			subsystem::setChasisSpeeds,
-			subsystem);
+			swerve::getPose,
+			swerve.kinematics,
+			swerve.autoXController,
+			swerve.autoYController,
+			swerve.autoRotationController,
+			swerve::setModuleStates,
+			true,
+			swerve);
+		// super(
+		// trajectory,
+		// swerve::getPose,
+		// swerve.autoXController,
+		// swerve.autoYController,
+		// swerve.autoRotationController,
+		// swerve::setChasisSpeeds,
+		// true,
+		// swerve);
 
-		this.swerve = subsystem;
+		this.swerve = swerve;
 		this.trajectory = trajectory;
 		this.initialPath = initialPath;
 	}
