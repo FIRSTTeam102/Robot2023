@@ -40,7 +40,7 @@ public class Arm extends SubsystemBase {
 
 	public void setPosInches(double armLength) {
 		double nutDist = armDistToNutDist(armLength);
-		nutDist = MathUtil.clamp(nutDist, ArmConstants.minNutDist_in, ArmConstants.maxNutDist_in);
+		nutDist = MathUtil.clamp(nutDist, 0, ArmConstants.maxNutDist_in - ArmConstants.minNutDist_in);
 
 		pidController.setReference(nutDist, CANSparkMax.ControlType.kSmartMotion);
 	}
@@ -57,11 +57,11 @@ public class Arm extends SubsystemBase {
 	public void periodic() {
 		// This method will be called once per scheduler run
 		if (backLimitSwitch.isPressed()) {
-			encoder.setPosition(0);
+			encoder.setPosition(ArmConstants.maxNutDist_in - ArmConstants.minNutDist_in);
 		}
 
 		if (frontLimitSwitch.isPressed()) {
-			encoder.setPosition(ArmConstants.maxNutDist_in);
+			encoder.setPosition(0);
 		}
 	}
 
