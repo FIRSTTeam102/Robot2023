@@ -7,6 +7,7 @@ import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
 import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.Vision;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -40,6 +41,7 @@ public class RobotContainer {
 	 * Subsystems
 	 */
 	public final Swerve swerve = new Swerve(gyro);
+	public final Vision vision = new Vision();
 
 	public final CommandXboxController driverController = new CommandXboxController(
 		OperatorConstants.driverControllerPort);
