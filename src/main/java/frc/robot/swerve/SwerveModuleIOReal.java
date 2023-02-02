@@ -4,11 +4,9 @@ import static frc.robot.Constants.SwerveConstants.*;
 
 import frc.robot.BuildManager;
 import frc.robot.Conversions;
-import frc.robot.SendableSparkMaxPIDController;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
@@ -23,6 +21,7 @@ import com.ctre.phoenix.sensors.SensorTimeBase;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.SparkMaxPIDController;
 
@@ -32,57 +31,63 @@ import com.revrobotics.SparkMaxPIDController;
  */
 public class SwerveModuleIOReal implements SwerveModuleIO {
 	private WPI_TalonFX driveMotor;
-	private CANCoder angleEncoder;
+	private CANCoder angleCancoder;
 	private CANSparkMax angleMotor;
-	private SparkMaxPIDController anglePidController;
+	private SparkMaxPIDController angleSparkPidController;
 	private SparkMaxAbsoluteEncoder angleMotorAbsoluteEncoder;
-	private SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(driveKs, driveKv, driveKa);
-	private double angleOffset_rad; // todo: implement
+	private RelativeEncoder angleMotorRelativeEncoder;
+	private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(driveKs, driveKv, driveKa);
+	private double angleOffset_rad;
+
+	private SimpleMotorFeedforward turnFeedforward = new SimpleMotorFeedforward(turnKs, turnKv);
 
 	/**
-	 * Make a new SwerveModuleIOTalonFX object.
-	 *
-	 * @param SwerveModuleConstants module config
+	 * @param moduleConstants module config
+	 * @param moduleNumber module number used for identification
 	 */
 	public SwerveModuleIOReal(SwerveModuleConstants moduleConstants, int moduleNumber) {
 		this.angleOffset_rad = moduleConstants.angleOffset_rad();
 
-		angleEncoder = new CANCoder(moduleConstants.encoderId());
-		var angleEncoderConfig = new CANCoderConfiguration();
-		angleEncoderConfig.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
-		angleEncoderConfig.sensorDirection = encoderInverted;
-		angleEncoderConfig.initializationStrategy = SensorInitializationStrategy.BootToAbsolutePosition;
-		angleEncoderConfig.sensorTimeBase = SensorTimeBase.PerSecond;
-		angleEncoderConfig.sensorCoefficient = Conversions.twoPi / Conversions.cancoderCountsPerRotation;
-		angleEncoderConfig.unitString = "rad";
-		angleEncoder.configAllSettings(angleEncoderConfig);
+		angleCancoder = new CANCoder(moduleConstants.encoderId());
+		var angleCancoderConfig = new CANCoderConfiguration();
+		angleCancoderConfig.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
+		angleCancoderConfig.sensorDirection = encoderInverted;
+		angleCancoderConfig.initializationStrategy = SensorInitializationStrategy.BootToAbsolutePosition;
+		angleCancoderConfig.sensorTimeBase = SensorTimeBase.PerSecond;
+		angleCancoderConfig.sensorCoefficient = Conversions.twoPi / Conversions.cancoderCountsPerRotation;
+		angleCancoderConfig.unitString = "rad";
+		// angleCancoderConfig.magnetOffsetDegrees = moduleConstants.angleOffset_deg();
+		angleCancoder.configAllSettings(angleCancoderConfig);
 
 		angleMotor = new CANSparkMax(moduleConstants.angleMotorId(), MotorType.kBrushless);
 		angleMotor.restoreFactoryDefaults();
-		anglePidController = angleMotor.getPIDController();
-		anglePidController.setP(angleKp);
-		anglePidController.setI(angleKi);
-		anglePidController.setD(angleKd);
-		anglePidController.setFF(angleKf);
-		anglePidController.setOutputRange(-angleMaxPercentOutput, angleMaxPercentOutput);
+		angleSparkPidController = angleMotor.getPIDController();
+		angleSparkPidController.setP(angleKp);
+		angleSparkPidController.setI(angleKi);
+		angleSparkPidController.setD(angleKd);
+		angleSparkPidController.setFF(angleKf);
+		angleSparkPidController.setOutputRange(-angleMaxPercentOutput, angleMaxPercentOutput);
 		angleMotor.setSmartCurrentLimit(angleCurrentLimit_amp);
-		// angleMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
 		angleMotor.setInverted(angleInverted);
 		angleMotor.setIdleMode(angleIdleMode);
+
 		angleMotorAbsoluteEncoder = angleMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
 		angleMotorAbsoluteEncoder.setPositionConversionFactor(angleEncoderPositionFactor_rad);
 		angleMotorAbsoluteEncoder.setVelocityConversionFactor(angleEncoderVelocityFactor_radps);
-		anglePidController.setFeedbackDevice(angleMotorAbsoluteEncoder);
+		angleMotorRelativeEncoder = angleMotor.getEncoder();
+		angleSparkPidController.setFeedbackDevice(angleMotorRelativeEncoder);
+
 		// wrap betwee 0 and 2pi radians
-		anglePidController.setPositionPIDWrappingEnabled(true);
-		anglePidController.setPositionPIDWrappingMinInput(0);
-		anglePidController.setPositionPIDWrappingMaxInput(Conversions.twoPi);
+		angleSparkPidController.setPositionPIDWrappingEnabled(true);
+		angleSparkPidController.setPositionPIDWrappingMinInput(0);
+		angleSparkPidController.setPositionPIDWrappingMaxInput(Conversions.twoPi);
+
 		BuildManager.burnSpark(angleMotor);
 
 		// custom shuffleboard pid controller
-		var anglePIDSendable = new SendableSparkMaxPIDController(anglePidController, CANSparkMax.ControlType.kPosition,
-			"Swerve turn " + moduleNumber);
-		Shuffleboard.getTab("PID").add(anglePIDSendable);
+		// var anglePIDSendable = new SendableSparkMaxPIDController(anglePidController, CANSparkMax.ControlType.kPosition,
+		// "Swerve turn " + moduleNumber);
+		// Shuffleboard.getTab("PID").add(anglePIDSendable);
 
 		// todo: fix sync angle from cancoder -> spark
 		// setFalconInternalAngleToCanCoder(); // reset to absolute position
@@ -98,31 +103,27 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		driveMotorConfig.initializationStrategy = SensorInitializationStrategy.BootToZero;
 		driveMotorConfig.openloopRamp = openLoopRamp;
 		driveMotorConfig.closedloopRamp = closedLoopRamp;
+		driveMotorConfig.peakOutputForward = 0.0; // fixme:
+		driveMotorConfig.peakOutputReverse = -0.0;
 		driveMotor.configAllSettings(driveMotorConfig);
 		driveMotor.setNeutralMode(driveNeutralMode);
 		driveMotor.setSelectedSensorPosition(0);
 		driveMotor.setInverted(driveInverted);
 	}
 
-	// private void setFalconInternalAngleToCanCoder() {
-	// angleMotor.setSelectedSensorPosition(
-	// Conversions.degreesToFalcon(getCanCoder().getDegrees(), angleGearRatio));
-	// }
-
-	private Rotation2d getCanCoder() {
-		return Rotation2d.fromRadians(angleEncoder.getAbsolutePosition());
+	private double getAbsoluteCancoder_rad() {
+		return Conversions.angleModulus2pi(angleCancoder.getAbsolutePosition() - angleOffset_rad);
 	}
 
 	private double calculateFeedforward(double velocity) {
-		double percentage = feedForward.calculate(velocity);
+		double percentage = driveFeedforward.calculate(velocity);
 		return Math.min(percentage, 1.0);
 	}
 
 	/** Updates the set of inputs. */
 	@Override
 	public void updateInputs(SwerveModuleIOInputs inputs) {
-		// todo: sync cancoder reading to internal falcon reading
-		// setFalconInternalAngleToCanCoder();
+		inputs.angleAbsolutePosition_rad = getAbsoluteCancoder_rad();
 
 		inputs.drivePosition_deg = Conversions.falconToDegrees(
 			driveMotor.getSelectedSensorPosition(), driveGearRatio);
@@ -135,15 +136,14 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 			wheelCircumference_m,
 			driveGearRatio);
 		inputs.driveAppliedPercentage = driveMotor.getMotorOutputPercent();
-		inputs.driveCurrentAmps = new double[] {driveMotor.getStatorCurrent()};
+		inputs.driveCurrent_amp = driveMotor.getStatorCurrent();
 		// inputs.driveTempCelsius = new double[] {driveMotor.getTemperature()};
 
-		inputs.angleAbsolutePosition_rad = angleEncoder.getAbsolutePosition();
 		// inputs.angleAbsolutePosition_rad = angleMotorAbsoluteEncoder.getPosition();
-		inputs.anglePosition_rad = angleEncoder.getPosition();
-		inputs.angleVelocity_rpm = angleEncoder.getVelocity();
+		inputs.anglePosition_rad = angleCancoder.getPosition();
+		inputs.angleVelocity_radps = angleCancoder.getVelocity();
 		inputs.angleAppliedPercentage = angleMotor.getAppliedOutput();
-		inputs.angleCurrentAmps = new double[] {angleMotor.getOutputCurrent()};
+		inputs.angleCurrent_amp = angleMotor.getOutputCurrent();
 		// inputs.angleTempCelsius = new double[] {angleMotor.getMotorTemperature()};
 	}
 
@@ -167,11 +167,14 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 			calculateFeedforward(velocity));
 	}
 
-	/** Run the turn motor to the specified angle. */
-	@Override
+	// @Override
 	public void setAnglePosition(Rotation2d angle) {
-		// todo: verify if we need radians or rotations
-		anglePidController.setReference(angle.getRadians(), CANSparkMax.ControlType.kPosition);
+		angleSparkPidController.setReference(angle.getRadians(), CANSparkMax.ControlType.kPosition);
+	}
+
+	@Override
+	public void setAngleVoltage(double voltage) {
+		angleSparkPidController.setReference(voltage, CANSparkMax.ControlType.kVoltage);
 	}
 
 	/** Enable or disable brake mode on the drive motor. */
@@ -190,7 +193,7 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 	@Override
 	public void close() throws Exception {
 		driveMotor.DestroyObject();
-		angleEncoder.DestroyObject();
+		angleCancoder.DestroyObject();
 		angleMotor.close();
 	}
 }

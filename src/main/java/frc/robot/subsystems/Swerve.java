@@ -271,7 +271,7 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 		gyroIO.updateInputs(gyroInputs);
 		Logger.getInstance().processInputs("Gyro", gyroInputs);
 		for (SwerveModule mod : modules) {
-			mod.updateInputs();
+			mod.periodic();
 
 			modulePositions[mod.moduleNumber] = mod.getPosition();
 			moduleStates[mod.moduleNumber] = mod.getState();
@@ -298,7 +298,9 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 					.rotateBy(getYaw())
 					.plus(pose.getTranslation()),
 				moduleStates[i].angle
-					.plus(pose.getRotation()));
+					.plus(pose.getRotation())
+					// show movement direction instead of physical module direction since it's optimized
+					.plus(Rotation2d.fromRadians(moduleStates[i].speedMetersPerSecond < 0 ? Math.PI : 0)));
 		}
 		fieldSim.setRobotPose(pose);
 		fieldSim.getObject("Swerve Modules").setPoses(modulePoses);

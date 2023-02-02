@@ -5,6 +5,10 @@ public class Conversions {
 	public static final double cancoderCountsPerRotation = 4096.0;
 	public static final double twoPi = 2 * Math.PI;
 
+	public static double angleModulus2pi(double angle) {
+		return ((angle % twoPi) + twoPi) % twoPi;
+	}
+
 	/**
 	 * @param counts Falcon counts
 	 * @param gearRatio gear ratio between Falcon and mechanism

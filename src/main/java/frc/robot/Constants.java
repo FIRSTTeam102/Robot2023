@@ -31,17 +31,17 @@ public final class Constants {
 	public static class OperatorConstants {
 		public static final int driverControllerPort = 0;
 		public static final int operatorControllerPort = 1;
-		public static final double stickDeadband = 0.02;
+		public static final double stickDeadband = 0.1;
 	}
 
 	public static final int pigeonId = 20;
 
 	public static class SwerveConstants {
 		public static final SwerveModuleConstants moduleConstants[] = {
-			new SwerveModuleConstants(21, 22, 23, 0.0),
-			new SwerveModuleConstants(24, 25, 26, 0.0),
-			new SwerveModuleConstants(27, 28, 29, 0.0),
-			new SwerveModuleConstants(30, 31, 32, 0.0)
+			new SwerveModuleConstants(21, 22, 23, 0.5538),
+			new SwerveModuleConstants(24, 25, 26, 2.5786),
+			new SwerveModuleConstants(27, 28, 29, 3.0173),
+			new SwerveModuleConstants(30, 31, 32, 2.2473)
 		};
 
 		// the left-to-right distance between the drivetrain wheels, should be measured from center to center
@@ -79,7 +79,7 @@ public final class Constants {
 
 		public static final double maxVelocity_mps = 6380.0 /* Falcon max RPM */
 			/ 60.0 / driveGearRatio * wheelCircumference_m;
-		public static final double maxAngularVelocity_radps = maxVelocity_mps
+		public static final double maxAngularVelocity_radps = 5676 /* NEO max RPM */
 			/ Math.hypot(trackWidth_m / 2.0, wheelBase_m / 2.0);
 		public static final double maxCoastVelocity_mps = 0.05;
 
@@ -87,9 +87,9 @@ public final class Constants {
 		public static final double closedLoopRamp = 0.0;
 
 		/* angle motor PID values */
-		public static final double angleKp = 1.0; // todo: calibrate
+		public static final double angleKp = 4.0; // todo: calibrate
 		public static final double angleKi = 0.0;
-		public static final double angleKd = 0.005;
+		public static final double angleKd = 0.0;
 		public static final double angleKf = 0.0;
 		/* sim angle motor PID values */
 		public static final double simAngleKp = 12.0;
@@ -116,6 +116,11 @@ public final class Constants {
 		public static final double simDriveKs = 0.116970;
 		public static final double simDriveKv = 0.133240;
 		public static final double simDriveKa = 0.0;
+
+		// V = kS + kV * v + kA * a
+		public static final double turnKs = 0.1;
+		public static final double turnKv = 0.005;
+		// public static final double turnKa = 0.000115;
 
 		/* auto path PID values */
 		public static final double autoDriveKp = 5.0;

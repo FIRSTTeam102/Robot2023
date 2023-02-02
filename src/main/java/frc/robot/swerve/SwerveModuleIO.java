@@ -1,7 +1,5 @@
 package frc.robot.swerve;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-
 import org.littletonrobotics.junction.AutoLog;
 
 /**
@@ -14,15 +12,13 @@ public interface SwerveModuleIO extends AutoCloseable {
 		double driveDistance_m = 0.0;
 		double driveVelocity_mps = 0.0;
 		double driveAppliedPercentage = 0.0;
-		double[] driveCurrentAmps = new double[] {};
-		// double[] driveTempCelsius = new double[] {};
+		double driveCurrent_amp = 0.0;
 
 		double angleAbsolutePosition_rad = 0.0;
 		double anglePosition_rad = 0.0;
-		double angleVelocity_rpm = 0.0;
+		double angleVelocity_radps = 0.0;
 		double angleAppliedPercentage = 0.0;
-		double[] angleCurrentAmps = new double[] {};
-		// double[] angleTempCelsius = new double[] {};
+		double angleCurrent_amp = 0.0;
 	}
 
 	/** Updates the set of inputs. */
@@ -34,8 +30,8 @@ public interface SwerveModuleIO extends AutoCloseable {
 	/** Run the drive motor at the specified velocity. */
 	public default void setDriveVelocity(double velocity) {}
 
-	/** Run the turn motor to the specified angle. */
-	public default void setAnglePosition(Rotation2d angls) {}
+	/** Run the turn motor at the specified voltage. */
+	public default void setAngleVoltage(double voltage) {}
 
 	/** Enable or disable brake mode on the drive motor. */
 	public default void setDriveBrakeMode(boolean enable) {}
