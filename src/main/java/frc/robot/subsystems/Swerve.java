@@ -239,7 +239,7 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 		SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, maxVelocity_mps);
 
 		for (SwerveModule mod : modules) {
-			mod.setDesiredState(swerveModuleStates[mod.moduleNumber], true, false);
+			mod.setDesiredState(swerveModuleStates[mod.moduleNumber], false, false);
 		}
 	}
 

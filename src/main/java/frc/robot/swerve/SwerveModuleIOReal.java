@@ -103,8 +103,6 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		driveMotorConfig.initializationStrategy = SensorInitializationStrategy.BootToZero;
 		driveMotorConfig.openloopRamp = openLoopRamp;
 		driveMotorConfig.closedloopRamp = closedLoopRamp;
-		driveMotorConfig.peakOutputForward = 0.0; // fixme:
-		driveMotorConfig.peakOutputReverse = -0.0;
 		driveMotor.configAllSettings(driveMotorConfig);
 		driveMotor.setNeutralMode(driveNeutralMode);
 		driveMotor.setSelectedSensorPosition(0);

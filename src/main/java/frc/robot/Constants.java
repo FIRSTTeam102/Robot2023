@@ -38,16 +38,16 @@ public final class Constants {
 
 	public static class SwerveConstants {
 		public static final SwerveModuleConstants moduleConstants[] = {
-			new SwerveModuleConstants(21, 22, 23, 0.5538),
+			new SwerveModuleConstants(21, 22, 23, 3.6954),
 			new SwerveModuleConstants(24, 25, 26, 2.5786),
 			new SwerveModuleConstants(27, 28, 29, 3.0173),
 			new SwerveModuleConstants(30, 31, 32, 2.2473)
 		};
 
 		// the left-to-right distance between the drivetrain wheels, should be measured from center to center
-		public static final double trackWidth_m = 1.0;
+		public static final double trackWidth_m = 0.502;
 		// the front-to-back distance between the drivetrain wheels, should be measured from center to center
-		public static final double wheelBase_m = 1.0;
+		public static final double wheelBase_m = 0.502;
 
 		// indexes must match moduleConstants
 		public static final Translation2d[] moduleTranslations = {
@@ -80,6 +80,7 @@ public final class Constants {
 		public static final double maxVelocity_mps = 6380.0 /* Falcon max RPM */
 			/ 60.0 / driveGearRatio * wheelCircumference_m;
 		public static final double maxAngularVelocity_radps = 5676 /* NEO max RPM */
+			/ 60.0 / angleGearRatio
 			/ Math.hypot(trackWidth_m / 2.0, wheelBase_m / 2.0);
 		public static final double maxCoastVelocity_mps = 0.05;
 
@@ -109,9 +110,9 @@ public final class Constants {
 		public static final double simDriveKf = 0.0;
 
 		/* drive motor characterization values (feed forward) */
-		public static final double driveKs = (0.667 / 12); // divide by 12 to convert from volts to percent output for CTRE
-		public static final double driveKv = (2.44 / 12);
-		public static final double driveKa = (0.27 / 12);
+		public static final double driveKs = 0.0029032;
+		public static final double driveKv = 0.016325;
+		public static final double driveKa = 0.00035285;
 		/* sim drive motor characterization values */
 		public static final double simDriveKs = 0.116970;
 		public static final double simDriveKv = 0.133240;
