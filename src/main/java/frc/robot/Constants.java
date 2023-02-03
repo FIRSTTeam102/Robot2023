@@ -148,6 +148,8 @@ public final class Constants {
 		public static final double kIZone = 0.0;
 		public static final double kD = 0.0;
 
+		public static final double feedForward_V = 0.0;
+
 		/**
 		 * characterization values (feed forward)
 		 * {@link edu.wpi.first.math.controller.ElevatorFeedforward#ElevatorFeedforward(double, double, double, double)}

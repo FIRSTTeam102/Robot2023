@@ -80,7 +80,7 @@ public class Elevator extends SubsystemBase {
 	public void setPosition(double position_m) {
 		targetPosition_m = position_m;
 		// double feed = feedforward.calculate();
-		pidController.setReference(position_m, CANSparkMax.ControlType.kSmartMotion, 0, 0.0);
+		pidController.setReference(position_m, CANSparkMax.ControlType.kSmartMotion, 0, ElevatorConstants.feedForward_V);
 	}
 
 	@Override
