@@ -3,9 +3,6 @@ package frc.robot;
 import frc.robot.swerve.SwerveModuleConstants;
 
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
@@ -137,18 +134,6 @@ public final class Constants {
 
 	public static class VisionConstants {
 		/* networktables */
-		public static NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-		public static NetworkTableEntry tv = table.getEntry("tv");
-		public static NetworkTableEntry tx = table.getEntry("tx");
-		public static NetworkTableEntry ty = table.getEntry("ty");
-		public static NetworkTableEntry ta = table.getEntry("ta");
-		public static NetworkTableEntry ID = table.getEntry(key:"tid");
-		public static NetworkTableEntry TX = table.getEntry("botpose");
-		public static NetworkTableEntry TY = table.getEntry("botpose");
-		public static NetworkTableEntry TZ = table.getEntry("botpose");
-		public static NetworkTableEntry RX = table.getEntry("botpose");
-		public static NetworkTableEntry RY = table.getEntry("botpose");
-		public static NetworkTableEntry RZ = table.getEntry("botpose");
-		public static NetworkTableEntry tclass = table.getEntry("tclass");
+
 	};
 }
