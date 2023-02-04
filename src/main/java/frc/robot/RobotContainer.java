@@ -4,6 +4,8 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.ChargeStationBalance;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.commands.vision.AprilTagVision;
+import frc.robot.commands.vision.ObjectDetectionVision;
+import frc.robot.commands.vision.RetroreflectiveVision;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
@@ -92,8 +94,14 @@ public class RobotContainer {
 			.whileTrue(new AprilTagVision(vision, AprilTagVision.Routine.MiddleGrid));
 		operatorController.povLeft().and(operatorController.b())
 			.whileTrue(new AprilTagVision(vision, AprilTagVision.Routine.RightGrid));
-		// operatorController.povUp().whileTrue();
-		// operatorController.povRight().whileTrue();
+
+		operatorController.povDown().and(operatorController.a())
+			.whileTrue(new RetroreflectiveVision(vision, RetroreflectiveVision.Routine.MiddleNode));
+		operatorController.povDown().and(operatorController.y())
+			.whileTrue(new RetroreflectiveVision(vision, RetroreflectiveVision.Routine.TopNode));
+
+		operatorController.povRight().and(operatorController.a())
+			.whileTrue(new ObjectDetectionVision(vision, ObjectDetectionVision.Routine.GroundObject));
 	}
 
 	/**

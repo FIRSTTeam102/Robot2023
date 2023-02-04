@@ -4,15 +4,16 @@ import frc.robot.io.VisionIO.Pipeline;
 import frc.robot.subsystems.Vision;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class RetroreflectiveVision extends CommandBase {
 	private Vision vision;
-	private CommandXboxController operatorController;
 
-	public RetroreflectiveVision(Vision vision, CommandXboxController operatorController) {
+	public enum Routine {
+		MiddleNode, TopNode
+	}
+
+	public RetroreflectiveVision(Vision vision, Routine routine) {
 		this.vision = vision;
-		this.operatorController = operatorController;
 	}
 
 	@Override
