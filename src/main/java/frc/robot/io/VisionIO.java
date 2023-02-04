@@ -11,16 +11,16 @@ public class VisionIO {
 	public static class VisionIOInputs {
 		public double target = 0.0;
 
-		public double crosshairToTargetOffsetX = 0.0;
-		public double crosshairToTargetOffsetY = 0.0;
+		public double crosshairToTargetOffsetX_rad = 0.0;
+		public double crosshairToTargetOffsetY_rad = 0.0;
 		public double targetArea = 0.0;
 
-		public double botposeTranslationX = 0.0;
-		public double botposeTranslationY = 0.0;
-		public double botposeTranslationZ = 0.0;
-		public double botposeRotationX = 0.0;
-		public double botposeRotationY = 0.0;
-		public double botposeRotationZ = 0.0;
+		public double botposeTranslationX_m = 0.0;
+		public double botposeTranslationY_m = 0.0;
+		public double botposeTranslationZ_m = 0.0;
+		public double botposeRotationX_rad = 0.0;
+		public double botposeRotationY_rad = 0.0;
+		public double botposeRotationZ_rad = 0.0;
 
 		public double targetAprilTag = 0.0;
 		public double targetObject = 0.0;
@@ -46,17 +46,17 @@ public class VisionIO {
 	public void updateInputs(VisionIOInputs inputs) {
 		inputs.target = tvEntry.getDouble(inputs.target);
 
-		inputs.crosshairToTargetOffsetX = txEntry.getDouble(inputs.crosshairToTargetOffsetX);
-		inputs.crosshairToTargetOffsetY = tyEntry.getDouble(inputs.crosshairToTargetOffsetY);
+		inputs.crosshairToTargetOffsetX_rad = Math.toRadians(txEntry.getDouble(0));
+		inputs.crosshairToTargetOffsetY_rad = Math.toRadians(tyEntry.getDouble(0));
 		inputs.targetArea = taEntry.getDouble(inputs.targetArea);
 
 		botposeCache = botposEntry.getDoubleArray(botposeCache);
-		inputs.botposeTranslationX = botposeCache[0];
-		inputs.botposeTranslationY = botposeCache[1];
-		inputs.botposeTranslationZ = botposeCache[2];
-		inputs.botposeRotationX = botposeCache[3];
-		inputs.botposeRotationY = botposeCache[4];
-		inputs.botposeRotationZ = botposeCache[5];
+		inputs.botposeTranslationX_m = botposeCache[0];
+		inputs.botposeTranslationY_m = botposeCache[1];
+		inputs.botposeTranslationZ_m = botposeCache[2];
+		inputs.botposeRotationX_rad = Math.toRadians(botposeCache[3]);
+		inputs.botposeRotationY_rad = Math.toRadians(botposeCache[4]);
+		inputs.botposeRotationZ_rad = Math.toRadians(botposeCache[5]);
 
 		inputs.targetAprilTag = tidEntry.getDouble(inputs.targetAprilTag);
 		inputs.targetObject = tclassEntry.getDouble(inputs.targetObject);

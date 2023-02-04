@@ -53,13 +53,10 @@ public class RobotContainer {
 
 	private LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto mode");
 
-	private AprilTagVision aprilTagVision = new AprilTagVision(vision, operatorController)
-
 	/**
 	 * The container for the robot. Contains subsystems, OI devices, and commands.
 	 */
-	public RobotContainer()
-	{
+	public RobotContainer() {
 		DriverStation.silenceJoystickConnectionWarning(true);
 
 		// will be automatically scheduled when no other scheduled commands require swerve
