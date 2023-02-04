@@ -143,6 +143,10 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 			new Pose2d(state.poseMeters.getTranslation(), state.holonomicRotation));
 	}
 
+	public void addVisionMeasurement(Pose2d pose) {
+		poseEstimator.addVisionMeasurement(pose, timer.get());
+	}
+
 	public Rotation2d getYaw() {
 		return Rotation2d.fromDegrees(gyroInputs.yaw_deg + gyroOffset);
 	}
