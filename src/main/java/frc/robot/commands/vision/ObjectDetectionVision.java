@@ -4,12 +4,15 @@ import frc.robot.io.VisionIO.Pipeline;
 import frc.robot.subsystems.Vision;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class ObjectDetectionVision extends CommandBase {
 	private Vision vision;
+	private CommandXboxController operatorController;
 
-	public ObjectDetectionVision(Vision vision) {
+	public ObjectDetectionVision(Vision vision, CommandXboxController operatorController) {
 		this.vision = vision;
+		this.operatorController = operatorController;
 	}
 
 	@Override

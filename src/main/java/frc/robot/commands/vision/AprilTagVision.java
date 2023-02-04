@@ -8,7 +8,11 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class AprilTagVision extends CommandBase {
 	private Vision vision;
 
-	public AprilTagVision(Vision vision) {
+	public enum Routine {
+		LeftGrid, MiddleGrid, RightGrid
+	}
+
+	public AprilTagVision(Vision vision, Routine routine) {
 		this.vision = vision;
 	}
 

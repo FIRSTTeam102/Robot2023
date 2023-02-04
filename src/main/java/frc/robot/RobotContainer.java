@@ -3,6 +3,7 @@ package frc.robot;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.ChargeStationBalance;
 import frc.robot.commands.TeleopSwerve;
+import frc.robot.commands.vision.AprilTagVision;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
@@ -50,10 +51,13 @@ public class RobotContainer {
 
 	private LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto mode");
 
+	private AprilTagVision aprilTagVision = new AprilTagVision(vision, operatorController)
+
 	/**
 	 * The container for the robot. Contains subsystems, OI devices, and commands.
 	 */
-	public RobotContainer() {
+	public RobotContainer()
+	{
 		DriverStation.silenceJoystickConnectionWarning(true);
 
 		// will be automatically scheduled when no other scheduled commands require swerve
@@ -82,6 +86,14 @@ public class RobotContainer {
 		driverController.b().onTrue(new InstantCommand(() -> swerve.zeroYaw()));
 
 		/* operator */
+		operatorController.povLeft().and(operatorController.x())
+			.whileTrue(new AprilTagVision(vision, AprilTagVision.Routine.LeftGrid));
+		operatorController.povLeft().and(operatorController.a())
+			.whileTrue(new AprilTagVision(vision, AprilTagVision.Routine.MiddleGrid));
+		operatorController.povLeft().and(operatorController.b())
+			.whileTrue(new AprilTagVision(vision, AprilTagVision.Routine.RightGrid));
+		// operatorController.povUp().whileTrue();
+		// operatorController.povRight().whileTrue();
 	}
 
 	/**
