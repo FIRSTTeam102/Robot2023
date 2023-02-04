@@ -33,25 +33,28 @@ public class AprilTagVision extends CommandBase {
 				if (vision.visionInputs.targetAprilTag == 5 || vision.visionInputs.targetAprilTag == 4) {
 					System.out.println("Left Doublesubstation");
 
-				} else if (vision.visionInputs.targetAprilTag >= 0 && vision.visionInputs.targetAprilTag <= 3 || vision.visionInputs.targetAprilTag 6>= 0 && vision.visionInputs.targetAprilTag <= 8) {
+				} else if (vision.visionInputs.targetAprilTag >= 1 && vision.visionInputs.targetAprilTag <= 3
+					|| vision.visionInputs.targetAprilTag >= 6 && vision.visionInputs.targetAprilTag <= 8) {
 					System.out.println("Left Grid");
 				}
 				break;
 
 			case Middle:
-				if (vision.visionInputs.targetAprilTag >= 0 && vision.visionInputs.targetAprilTag <= 3 || vision.visionInputs.targetAprilTag 6>= 0 && vision.visionInputs.targetAprilTag <= 8) {
+				if (vision.visionInputs.targetAprilTag >= 1 && vision.visionInputs.targetAprilTag <= 3
+					|| vision.visionInputs.targetAprilTag >= 6 && vision.visionInputs.targetAprilTag <= 8) {
 					System.out.println("Middle Grid");
 				}
 				break;
 
 			case Right:
-			if (vision.visionInputs.targetAprilTag == 5 || vision.visionInputs.targetAprilTag == 4) {
-				System.out.println("Right Doublesubstation");
+				if (vision.visionInputs.targetAprilTag == 5 || vision.visionInputs.targetAprilTag == 4) {
+					System.out.println("Right Doublesubstation");
 
-			} else if (vision.visionInputs.targetAprilTag >= 0 && vision.visionInputs.targetAprilTag <= 3 || vision.visionInputs.targetAprilTag 6>= 0 && vision.visionInputs.targetAprilTag <= 8) {
-				System.out.println("Right Grid");
-			}
-			break;
+				} else if (vision.visionInputs.targetAprilTag >= 1 && vision.visionInputs.targetAprilTag <= 3
+					|| vision.visionInputs.targetAprilTag >= 6 && vision.visionInputs.targetAprilTag <= 8) {
+					System.out.println("Right Grid");
+				}
+				break;
 		}
 	}
 
