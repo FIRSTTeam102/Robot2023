@@ -7,13 +7,15 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class ObjectDetectionVision extends CommandBase {
 	private Vision vision;
+	private Routine routine;
 
 	public enum Routine {
-		GroundObject
+		Ground
 	}
 
 	public ObjectDetectionVision(Vision vision, Routine routine) {
 		this.vision = vision;
+		this.routine = routine;
 	}
 
 	@Override
@@ -26,7 +28,11 @@ public class ObjectDetectionVision extends CommandBase {
 		if (!vision.isPipelineReady())
 			return;
 
-		// ObjectDetection code
+		switch (routine) {
+			case Ground:
+				System.out.println("Ground");
+				break;
+		}
 	}
 
 	@Override

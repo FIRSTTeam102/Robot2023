@@ -7,13 +7,15 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class RetroreflectiveVision extends CommandBase {
 	private Vision vision;
+	private Routine routine;
 
 	public enum Routine {
-		MiddleNode, TopNode
+		Middle, Top
 	}
 
 	public RetroreflectiveVision(Vision vision, Routine routine) {
 		this.vision = vision;
+		this.routine = routine;
 	}
 
 	@Override
@@ -26,7 +28,15 @@ public class RetroreflectiveVision extends CommandBase {
 		if (!vision.isPipelineReady())
 			return;
 
-		// Retroreflective code
+		switch (routine) {
+			case Middle:
+				System.out.println("Middle");
+				break;
+
+			case Top:
+				System.out.println("Top");
+				break;
+		}
 	}
 
 	@Override

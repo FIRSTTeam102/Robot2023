@@ -89,19 +89,19 @@ public class RobotContainer {
 
 		/* operator */
 		operatorController.povLeft().and(operatorController.x())
-			.whileTrue(new AprilTagVision(vision, AprilTagVision.Routine.LeftGrid));
+			.whileTrue(new AprilTagVision(vision, AprilTagVision.Routine.Left));
 		operatorController.povLeft().and(operatorController.a())
-			.whileTrue(new AprilTagVision(vision, AprilTagVision.Routine.MiddleGrid));
+			.whileTrue(new AprilTagVision(vision, AprilTagVision.Routine.Middle));
 		operatorController.povLeft().and(operatorController.b())
-			.whileTrue(new AprilTagVision(vision, AprilTagVision.Routine.RightGrid));
+			.whileTrue(new AprilTagVision(vision, AprilTagVision.Routine.Right));
 
 		operatorController.povDown().and(operatorController.a())
-			.whileTrue(new RetroreflectiveVision(vision, RetroreflectiveVision.Routine.MiddleNode));
+			.whileTrue(new RetroreflectiveVision(vision, RetroreflectiveVision.Routine.Middle));
 		operatorController.povDown().and(operatorController.y())
-			.whileTrue(new RetroreflectiveVision(vision, RetroreflectiveVision.Routine.TopNode));
+			.whileTrue(new RetroreflectiveVision(vision, RetroreflectiveVision.Routine.Top));
 
 		operatorController.povRight().and(operatorController.a())
-			.whileTrue(new ObjectDetectionVision(vision, ObjectDetectionVision.Routine.GroundObject));
+			.whileTrue(new ObjectDetectionVision(vision, ObjectDetectionVision.Routine.Ground));
 	}
 
 	/**

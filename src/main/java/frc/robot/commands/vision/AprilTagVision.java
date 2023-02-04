@@ -7,13 +7,15 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class AprilTagVision extends CommandBase {
 	private Vision vision;
+	private Routine routine;
 
 	public enum Routine {
-		LeftGrid, MiddleGrid, RightGrid
+		Left, Middle, Right
 	}
 
 	public AprilTagVision(Vision vision, Routine routine) {
 		this.vision = vision;
+		this.routine = routine;
 	}
 
 	@Override
@@ -26,7 +28,19 @@ public class AprilTagVision extends CommandBase {
 		if (!vision.isPipelineReady())
 			return;
 
-		// AprilTag code
+		switch (routine) {
+			case Left:
+				System.out.println("Left");
+				break;
+
+			case Middle:
+				System.out.println("Middle");
+				break;
+
+			case Right:
+				System.out.println("Right");
+				break;
+		}
 	}
 
 	@Override

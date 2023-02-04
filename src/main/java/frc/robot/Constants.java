@@ -133,7 +133,7 @@ public final class Constants {
 	};
 
 	public static class VisionConstants {
-		/* networktables */
+		/* title */
 
 	};
 }
