@@ -2,13 +2,11 @@ package frc.robot.swerve;
 
 import org.littletonrobotics.junction.AutoLog;
 
-/**
- * swerve module hardware abstraction interface
- */
+/** swerve module hardware abstraction interface */
 public interface SwerveModuleIO extends AutoCloseable {
 	@AutoLog
 	public static class SwerveModuleIOInputs {
-		double drivePosition_deg = 0.0;
+		double drivePosition_rad = 0.0;
 		double driveDistance_m = 0.0;
 		double driveVelocity_mps = 0.0;
 		double driveAppliedPercentage = 0.0;
@@ -30,14 +28,11 @@ public interface SwerveModuleIO extends AutoCloseable {
 	/** Run the drive motor at the specified velocity. */
 	public default void setDriveVelocity(double velocity) {}
 
-	/** Run the turn motor at the specified voltage. */
+	/** Run the angle motor at the specified voltage. */
 	public default void setAngleVoltage(double voltage) {}
 
 	/** Enable or disable brake mode on the drive motor. */
 	public default void setDriveBrakeMode(boolean enable) {}
-
-	/** Enable or disable brake mode on the turn motor. */
-	public default void setAngleBrakeMode(boolean enable) {}
 
 	public default void close() throws Exception {}
 }

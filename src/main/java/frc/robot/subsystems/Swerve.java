@@ -52,7 +52,9 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 
 	private Translation2d centerRotation = new Translation2d(0, 0); // position the robot rotates around
 
-	private Timer timer;
+	// used for pose estimation
+	private Timer timer = new Timer();
+	public double disabledTimeStart = 0.0;
 
 	// configurable stuff
 	private boolean brakeMode = true;
@@ -61,13 +63,12 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 
 	public GyroIO gyroIO;
 	public GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
-	private double gyroOffset = 0.0;
+	private double gyroOffset_deg = 0.0;
 
 	public final PIDController autoXController = new PIDController(autoDriveKp, autoDriveKi, autoDriveKd);
 	public final PIDController autoYController = new PIDController(autoDriveKp, autoDriveKi, autoDriveKd);
 	public final PIDController autoRotationController = new PIDController(autoTurnKp, autoTurnKi, autoTurnKd);
 
-	/** Creates a new Swerve. */
 	public Swerve(GyroIO gyroIO) {
 		modules = new SwerveModule[moduleConstants.length];
 		int moduleNumber = 0;
@@ -81,13 +82,13 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 		this.gyroIO = gyroIO;
 		zeroYaw();
 
-		timer = new Timer();
 		timer.reset();
 		timer.start();
 
 		SmartDashboard.putData("Field", fieldSim);
 	}
 
+	/** update and return states */
 	public SwerveModuleState[] getStates() {
 		for (SwerveModule mod : modules) {
 			moduleStates[mod.moduleNumber] = mod.getState();
@@ -108,13 +109,7 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 		setModuleStates(states);
 	}
 
-	/**
-	 * Returns the pose of the robot (e.g., x and y position of the robot on the field and the robot's
-	 * rotation). The origin of the field to the lower left corner (i.e., the corner of the field to
-	 * the driver's right). Zero degrees is away from the driver and increases in the CCW direction.
-	 *
-	 * @return the pose of the robot
-	 */
+	/** @return the estimated pose of the robot on the field */
 	public Pose2d getPose() {
 		return poseEstimator.getEstimatedPosition();
 	}
@@ -127,15 +122,13 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 	}
 
 	/**
-	 * Sets the odometry of the robot to the specified PathPlanner state. This method should only be
-	 * invoked when the rotation of the robot is known (e.g., at the start of an autonomous path). The
-	 * origin of the field to the lower left corner (i.e., the corner of the field to the driver's
-	 * right). Zero degrees is away from the driver and increases in the CCW direction.
-	 *
-	 * @param state the specified PathPlanner state to which is set the odometry
+	 * sets the odometry of the robot to the specified PathPlanner state
+	 * 
+	 * this should only be done when the rotation of the robot is known
+	 * (like at the start of an autonomous path)
 	 */
 	public void resetOdometry(PathPlannerState state) {
-		setGyroOffset(state.holonomicRotation.getDegrees());
+		setGyroOffset_deg(state.holonomicRotation.getDegrees());
 
 		// estimatedPoseWithoutGyro = new Pose2d(state.poseMeters.getTranslation(), state.holonomicRotation);
 		poseEstimator.resetPosition(
@@ -143,50 +136,47 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 			new Pose2d(state.poseMeters.getTranslation(), state.holonomicRotation));
 	}
 
+	/** @return gyro yaw including code offset */
 	public Rotation2d getYaw() {
-		return Rotation2d.fromDegrees(gyroInputs.yaw_deg + gyroOffset);
+		return Rotation2d.fromDegrees(gyroInputs.yaw_deg + gyroOffset_deg);
+	}
+
+	/** sets the rotation of the robot to the specified value by changing code gyro offset */
+	public void setGyroOffset_deg(double expectedYaw_deg) {
+		gyroOffset_deg = expectedYaw_deg - gyroInputs.yaw_deg;
 	}
 
 	public void zeroYaw() {
 		gyroIO.setYaw(0);
 	}
 
-	// rotating around side-to-side axis (leaning forward/backward)
+	/** @return rotation around side-to-side axis (leaning forward/backward) */
 	public double getPitch_rad() {
 		return MathUtil.angleModulus(Units.degreesToRadians(gyroInputs.pitch_deg));
 	}
 
-	// rotating around front-to-back axis (leaning left/right)
+	/** @return rotation around front-to-back axis (leaning left/right) */
 	public double getRoll_rad() {
 		return MathUtil.angleModulus(Units.degreesToRadians(gyroInputs.roll_deg));
 	}
 
-	/**
-	 * Sets the rotation of the robot to the specified value. This method should only be invoked when
-	 * the rotation of the robot is known (e.g., at the start of an autonomous path). Zero degrees is
-	 * facing away from the driver station; CCW is positive.
-	 *
-	 * @param expectedYaw the rotation of the robot (in degrees)
-	 */
-	public void setGyroOffset(double expectedYaw) {
-		gyroOffset = expectedYaw - gyroInputs.yaw_deg;
-	}
-
-	/**
-	 * If the robot is enabled and brake mode is not enabled, enable it. If the robot is disabled, has
-	 * stopped moving, and brake mode is enabled, disable it.
-	 */
+	/** turn off brake mode if we're disabled for long enough and not moving */
 	private void updateBrakeMode() {
 		if (DriverStation.isEnabled() && !brakeMode) {
 			setBrakeMode(true);
 		} else {
 			boolean stillMoving = false;
-			for (SwerveModuleState state : moduleStates) {
-				if (Math.abs(state.speedMetersPerSecond) > maxCoastVelocity_mps)
-					stillMoving = true;
-			}
 
-			if (brakeMode && !stillMoving)
+			// update if we're still moving for braking
+			for (var mod : moduleStates)
+				if (mod.speedMetersPerSecond > maxCoastVelocity_mps) {
+					stillMoving = true;
+					break;
+				}
+
+			if (brakeMode && !stillMoving
+			// wait for scores to be finalized during a match
+				&& (!DriverStation.isFMSAttached() || (Timer.getFPGATimestamp() - disabledTimeStart) < 4.0))
 				setBrakeMode(false);
 		}
 	}
@@ -220,8 +210,7 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 	 * reference of the field's frame of reference. In the robot's frame of reference, the positive x
 	 * direction is forward; the positive y direction, left; position rotation, CCW. In the field
 	 * frame of reference, the origin of the field to the lower left corner (i.e., the corner of the
-	 * field to the driver's right). Zero degrees is away from the driver and increases in the CCW
-	 * direction.
+	 * field to the driver's right). Zero is away from the driver and increases in the CCW direction.
 	 */
 	public void drive(Translation2d translation, double rotation) {
 		SwerveModuleState[] swerveModuleStates = kinematics.toSwerveModuleStates(
@@ -287,9 +276,6 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 
 		Logger.getInstance().recordOutput("Odometry/Robot", pose);
 		// Logger.getInstance().recordOutput("3DField", new Pose3d(pose));
-
-		// update the brake mode based on the robot's velocity and state (enabled/disabled)
-		updateBrakeMode();
 
 		// update field pose
 		for (int i = 0; i < modules.length; i++) {

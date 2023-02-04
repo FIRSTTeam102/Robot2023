@@ -116,10 +116,6 @@ public class SwerveModule implements AutoCloseable {
 		io.setDriveBrakeMode(enable);
 	}
 
-	public void setAngleBrakeMode(boolean enable) {
-		io.setAngleBrakeMode(enable);
-	}
-
 	@Override
 	public void close() throws Exception {
 		io.close();

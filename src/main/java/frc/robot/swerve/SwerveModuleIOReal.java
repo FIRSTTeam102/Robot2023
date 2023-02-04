@@ -6,7 +6,6 @@ import frc.robot.BuildManager;
 import frc.robot.Conversions;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.geometry.Rotation2d;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
@@ -26,8 +25,8 @@ import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.SparkMaxPIDController;
 
 /**
- * Implementation of the SwerveModuleIO interface for MK4 Swerve Modules with
- * a Falcon 500 motor (TalonFX) for drive, NEO (SparkMax) for turn, and a CAN coder.
+ * Implementation of the SwerveModuleIO interface for MK4i Swerve Modules with
+ * a Falcon 500 motor (TalonFX) for drive, NEO (SparkMax) for turn, and a CANcoder
  */
 public class SwerveModuleIOReal implements SwerveModuleIO {
 	private WPI_TalonFX driveMotor;
@@ -56,7 +55,6 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		angleCancoderConfig.sensorTimeBase = SensorTimeBase.PerSecond;
 		angleCancoderConfig.sensorCoefficient = Conversions.twoPi / Conversions.cancoderCountsPerRotation;
 		angleCancoderConfig.unitString = "rad";
-		// angleCancoderConfig.magnetOffsetDegrees = moduleConstants.angleOffset_deg();
 		angleCancoder.configAllSettings(angleCancoderConfig);
 
 		angleMotor = new CANSparkMax(moduleConstants.angleMotorId(), MotorType.kBrushless);
@@ -84,15 +82,6 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 
 		BuildManager.burnSpark(angleMotor);
 
-		// custom shuffleboard pid controller
-		// var anglePIDSendable = new SendableSparkMaxPIDController(anglePidController, CANSparkMax.ControlType.kPosition,
-		// "Swerve turn " + moduleNumber);
-		// Shuffleboard.getTab("PID").add(anglePIDSendable);
-
-		// todo: fix sync angle from cancoder -> spark
-		// setFalconInternalAngleToCanCoder(); // reset to absolute position
-		// angleMotorAbsoluteEncoder.setZeroOffset(angleOffset_rad);
-
 		driveMotor = new WPI_TalonFX(moduleConstants.driveMotorId());
 		var driveMotorConfig = new TalonFXConfiguration();
 		driveMotorConfig.slot0.kP = driveKp;
@@ -118,12 +107,11 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		return Math.min(percentage, 1.0);
 	}
 
-	/** Updates the set of inputs. */
 	@Override
 	public void updateInputs(SwerveModuleIOInputs inputs) {
 		inputs.angleAbsolutePosition_rad = getAbsoluteCancoder_rad();
 
-		inputs.drivePosition_deg = Conversions.falconToDegrees(
+		inputs.drivePosition_rad = Conversions.falconToRadians(
 			driveMotor.getSelectedSensorPosition(), driveGearRatio);
 		inputs.driveDistance_m = Conversions.falconToMeters(
 			driveMotor.getSelectedSensorPosition(),
@@ -135,39 +123,26 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 			driveGearRatio);
 		inputs.driveAppliedPercentage = driveMotor.getMotorOutputPercent();
 		inputs.driveCurrent_amp = driveMotor.getStatorCurrent();
-		// inputs.driveTempCelsius = new double[] {driveMotor.getTemperature()};
 
 		// inputs.angleAbsolutePosition_rad = angleMotorAbsoluteEncoder.getPosition();
 		inputs.anglePosition_rad = angleCancoder.getPosition();
 		inputs.angleVelocity_radps = angleCancoder.getVelocity();
 		inputs.angleAppliedPercentage = angleMotor.getAppliedOutput();
 		inputs.angleCurrent_amp = angleMotor.getOutputCurrent();
-		// inputs.angleTempCelsius = new double[] {angleMotor.getMotorTemperature()};
 	}
 
-	/** Run the drive motor at the specified percentage of full power. */
 	@Override
 	public void setDriveMotorPercentage(double percentage) {
 		driveMotor.set(ControlMode.PercentOutput, percentage);
 	}
 
-	/** Run the drive motor at the specified velocity. */
 	@Override
 	public void setDriveVelocity(double velocity) {
-		double ticksPerSecond = Conversions.mpsToFalcon(
-			velocity,
-			wheelCircumference_m,
-			driveGearRatio);
 		driveMotor.set(
 			ControlMode.Velocity,
-			ticksPerSecond,
+			Conversions.mpsToFalcon(velocity, wheelCircumference_m, driveGearRatio),
 			DemandType.ArbitraryFeedForward,
 			calculateFeedforward(velocity));
-	}
-
-	// @Override
-	public void setAnglePosition(Rotation2d angle) {
-		angleSparkPidController.setReference(angle.getRadians(), CANSparkMax.ControlType.kPosition);
 	}
 
 	@Override
@@ -175,17 +150,9 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		angleSparkPidController.setReference(voltage, CANSparkMax.ControlType.kVoltage);
 	}
 
-	/** Enable or disable brake mode on the drive motor. */
 	@Override
 	public void setDriveBrakeMode(boolean enable) {
 		driveMotor.setNeutralMode(enable ? NeutralMode.Brake : NeutralMode.Coast);
-	}
-
-	/** Enable or disable brake mode on the turn motor. */
-	@Override
-	public void setAngleBrakeMode(boolean enable) {
-		// always leave the angle motor in coast mode
-		angleMotor.setIdleMode(CANSparkMax.IdleMode.kCoast);
 	}
 
 	@Override

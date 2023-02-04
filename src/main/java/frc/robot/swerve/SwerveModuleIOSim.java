@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.simulation.RoboRioSim;
  * A simulated version of the SwerveModuleIO interface.
  *
  * The swerve module is simulated as a flywheel connected to the drive motor and another flywheel
- * connected to the turn motor.
+ * connected to the angle motor.
  */
 public class SwerveModuleIOSim implements SwerveModuleIO {
 	private FlywheelSim driveWheelSim = new FlywheelSim(DCMotor.getFalcon500(1), driveGearRatio, 0.025);
@@ -32,7 +32,6 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 	private SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(simDriveKs, simDriveKv, simDriveKa);
 	private PIDController driveController = new PIDController(simDriveKp, simDriveKi, simDriveKd);
 
-	/** Updates the set of inputs. */
 	@Override
 	public void updateInputs(SwerveModuleIOInputs inputs) {
 		// update the models
@@ -47,8 +46,8 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 		angleAbsolutePosition_rad = Conversions.angleModulus2pi(angleAbsolutePosition_rad + angleDiffRad);
 		inputs.angleAbsolutePosition_rad = angleAbsolutePosition_rad;
 
-		inputs.drivePosition_deg = inputs.drivePosition_deg
-			+ (driveWheelSim.getAngularVelocityRadPerSec() * loopPeriod_s * (180.0 / Math.PI));
+		inputs.drivePosition_rad = inputs.drivePosition_rad
+			+ driveWheelSim.getAngularVelocityRadPerSec() * loopPeriod_s;
 		inputs.driveDistance_m = inputs.driveDistance_m
 			+ (driveWheelSim.getAngularVelocityRadPerSec() * loopPeriod_s * wheelRadius_m);
 		inputs.driveVelocity_mps = driveWheelSim.getAngularVelocityRadPerSec() * wheelRadius_m;
@@ -72,7 +71,6 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 				angleWheelSim.getCurrentDrawAmps()));
 	}
 
-	/** Run the drive motor at the specified percentage of full power. */
 	@Override
 	public void setDriveMotorPercentage(double percentage) {
 		isDriveOpenLoop = true;
@@ -81,21 +79,20 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 		driveWheelSim.setInputVoltage(driveAppliedVolts);
 	}
 
-	/** Run the drive motor at the specified velocity. */
 	@Override
 	public void setDriveVelocity(double velocity) {
 		isDriveOpenLoop = false;
 		driveSetpoint_mps = velocity;
 	}
 
-	// @Override
-	// public void setAnglePosition(Rotation2d angle) {
-	// angleSetpoint_rad = angle.getRadians();
-	// }
-
 	@Override
 	public void setAngleVoltage(double voltage) {
 		angleAppliedVolts = MathUtil.clamp(voltage, -12.0, 12.0);
 		angleWheelSim.setInputVoltage(angleAppliedVolts);
+	}
+
+	@Override
+	public void close() throws Exception {
+		driveController.close();
 	}
 }

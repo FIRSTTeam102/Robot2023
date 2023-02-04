@@ -37,6 +37,7 @@ public final class Constants {
 	public static final int pigeonId = 20;
 
 	public static class SwerveConstants {
+		// FL, FR, BR, BL
 		public static final SwerveModuleConstants moduleConstants[] = {
 			new SwerveModuleConstants(21, 22, 23, 3.6954),
 			new SwerveModuleConstants(24, 25, 26, 2.5786),
@@ -53,8 +54,8 @@ public final class Constants {
 		public static final Translation2d[] moduleTranslations = {
 			new Translation2d(wheelBase_m / 2.0, trackWidth_m / 2.0),
 			new Translation2d(wheelBase_m / 2.0, -trackWidth_m / 2.0),
+			new Translation2d(-wheelBase_m / 2.0, -trackWidth_m / 2.0),
 			new Translation2d(-wheelBase_m / 2.0, trackWidth_m / 2.0),
-			new Translation2d(-wheelBase_m / 2.0, -trackWidth_m / 2.0)
 		};
 
 		/**
@@ -71,7 +72,6 @@ public final class Constants {
 		public static final double angleGearRatio = 1 / ((14.0 / 50.0) * (10.0 / 60.0));
 		public static final boolean angleInverted = true;
 		public static final IdleMode angleIdleMode = IdleMode.kCoast;
-		// todo: fix with pid or something, test once actual robot is built to see if there's any overshooting problems
 		public static final double angleMaxPercentOutput = 0.5;
 		public static final boolean encoderInverted = false;
 		public static final double angleEncoderPositionFactor_rad = (2 * Math.PI);
@@ -93,7 +93,7 @@ public final class Constants {
 		public static final double angleKd = 0.0;
 		public static final double angleKf = 0.0;
 		/* sim angle motor PID values */
-		public static final double simAngleKp = 12.0;
+		public static final double simAngleKp = 12.0; // todo: make sim use these, they need to be really ramped up
 		public static final double simAngleKi = 0.0;
 		public static final double simAngleKd = 0.0;
 		public static final double simAngleKf = 0.0;
@@ -114,7 +114,7 @@ public final class Constants {
 		public static final double driveKv = 0.016325;
 		public static final double driveKa = 0.00035285;
 		/* sim drive motor characterization values */
-		public static final double simDriveKs = 0.116970;
+		public static final double simDriveKs = 0.116970; // todo: do we need these?
 		public static final double simDriveKv = 0.133240;
 		public static final double simDriveKa = 0.0;
 

@@ -5,6 +5,7 @@ import static frc.robot.Constants.robotMode;
 import frc.robot.subsystems.Lights;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -98,6 +99,8 @@ public class Robot extends LoggedRobot {
 			case Blue -> Lights.ControlMode.DisabledBlue;
 			default -> Lights.ControlMode.DisabledRed;
 		});
+
+		robotContainer.swerve.disabledTimeStart = Timer.getFPGATimestamp();
 	}
 
 	@Override
