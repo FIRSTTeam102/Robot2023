@@ -1,53 +1,44 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.io.VisionIO;
+import frc.robot.io.VisionIO.Pipeline;
+import frc.robot.io.VisionIOInputsAutoLogged;
+
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import org.littletonrobotics.junction.Logger;
 
 public class Vision extends SubsystemBase {
 
-	public Vision() {
+	private VisionIO io = new VisionIO();
+	public VisionIOInputsAutoLogged inputs = new VisionIOInputsAutoLogged();
 
+	Timer pipelineSwitchTimer = new Timer();
+
+	public Vision() {
+		setPipeline(Pipeline.AprilTag);
+		setPipeline(Pipeline.Retroreflective);
+		setPipeline(Pipeline.ObjectDetection);
 	}
 
 	@Override
 	public void periodic() {
+		io.updateInputs(inputs);
+		Logger.getInstance().processInputs(getName(), inputs);
+	}
 
-		double v = tv.getDouble(0.0);
-		double tx = tx.getDouble(0.0);
-		double ty = ty.getDouble(0.0);
-		double ta = ta.getDouble(0.0);
-		double APID = ID.getDoubleArray(double[1]);
-		double TX = TX.getDoubleArray(double[1]);
-		double TY = TX.getDoubleArray(double[2]);
-		double TZ = TX.getDoubleArray(double[3]);
-		double RX = TX.getDoubleArray(double[4]);
-		double RY = TX.getDoubleArray(double[5]);
-		double RZ = TX.getDoubleArray(double[6]);
-		double tclass = tclass.getDouble(0.0);
+	public void setPipeline(Pipeline pipeline) {
+		pipelineSwitchTimer.reset();
+		pipelineSwitchTimer.start();
+		io.setPipeline(pipeline);
+	}
 
-		SmartDashboard.putNumber("Limelight tv", v);
-		SmartDashboard.putNumber("Limelight tx", tx);
-		SmartDashboard.putNumber("Limelight ty", ty);
-		SmartDashboard.putNumber("Limelight ta", ta);
-		SmartDashboard.putNumber("Limelight APID", APID);
-		SmartDashboard.putNumber("Limelight TX", TX);
-		SmartDashboard.putNumber("Limelight TY", TY);
-		SmartDashboard.putNumber("Limelight TZ", TZ);
-		SmartDashboard.putNumber("Limelight RX", RX);
-		SmartDashboard.putNumber("Limelight RY", RY);
-		SmartDashboard.putNumber("Limelight RZ", RZ);
-		SmartDashboard.putNumber("Limelight tclass", tclass);
-
-		System.out.println(v);
-		System.out.println(tx);
-		System.out.println(ty);
-		System.out.println(ta);
-		System.out.println(TX);
-		System.out.println(TY);
-		System.out.println(TZ);
-		System.out.println(RX);
-		System.out.println(RY);
-		System.out.println(RZ);
-		System.out.println(tclass);
+	public boolean isPipelineReady() {
+		if (pipelineSwitchTimer.hasElapsed(0.5)) {
+			pipelineSwitchTimer.stop();
+			return true;
+		}
+		return false;
 	}
 }
