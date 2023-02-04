@@ -30,16 +30,28 @@ public class AprilTagVision extends CommandBase {
 
 		switch (routine) {
 			case Left:
-				System.out.println("Left");
+				if (vision.visionInputs.targetAprilTag == 5 || vision.visionInputs.targetAprilTag == 4) {
+					System.out.println("Left Doublesubstation");
+
+				} else if (vision.visionInputs.targetAprilTag >= 0 && vision.visionInputs.targetAprilTag <= 3 || vision.visionInputs.targetAprilTag 6>= 0 && vision.visionInputs.targetAprilTag <= 8) {
+					System.out.println("Left Grid");
+				}
 				break;
 
 			case Middle:
-				System.out.println("Middle");
+				if (vision.visionInputs.targetAprilTag >= 0 && vision.visionInputs.targetAprilTag <= 3 || vision.visionInputs.targetAprilTag 6>= 0 && vision.visionInputs.targetAprilTag <= 8) {
+					System.out.println("Middle Grid");
+				}
 				break;
 
 			case Right:
-				System.out.println("Right");
-				break;
+			if (vision.visionInputs.targetAprilTag == 5 || vision.visionInputs.targetAprilTag == 4) {
+				System.out.println("Right Doublesubstation");
+
+			} else if (vision.visionInputs.targetAprilTag >= 0 && vision.visionInputs.targetAprilTag <= 3 || vision.visionInputs.targetAprilTag 6>= 0 && vision.visionInputs.targetAprilTag <= 8) {
+				System.out.println("Right Grid");
+			}
+			break;
 		}
 	}
 

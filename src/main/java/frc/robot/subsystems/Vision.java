@@ -12,7 +12,7 @@ import org.littletonrobotics.junction.Logger;
 public class Vision extends SubsystemBase {
 
 	private VisionIO io = new VisionIO();
-	public VisionIOInputsAutoLogged inputs = new VisionIOInputsAutoLogged();
+	public VisionIOInputsAutoLogged visionInputs = new VisionIOInputsAutoLogged();
 
 	Timer pipelineSwitchTimer = new Timer();
 
@@ -24,8 +24,8 @@ public class Vision extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		io.updateInputs(inputs);
-		Logger.getInstance().processInputs(getName(), inputs);
+		io.updateInputs(visionInputs);
+		Logger.getInstance().processInputs(getName(), visionInputs);
 	}
 
 	public void setPipeline(Pipeline pipeline) {
