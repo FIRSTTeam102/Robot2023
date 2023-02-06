@@ -15,12 +15,12 @@ public class VisionIO {
 		public double crosshairToTargetOffsetY_rad = 0.0;
 		public double targetArea = 0.0;
 
-		public double botposeTranslationX_m = 0.0;
-		public double botposeTranslationY_m = 0.0;
-		public double botposeTranslationZ_m = 0.0;
-		public double botposeRotationX_rad = 0.0;
-		public double botposeRotationY_rad = 0.0;
-		public double botposeRotationZ_rad = 0.0;
+		public double botpose_targetspaceTranslationX_m = 0.0;
+		public double botpose_targetspaceTranslationY_m = 0.0;
+		public double botpose_targetspaceTranslationZ_m = 0.0;
+		public double botpose_targetspaceRotationX_rad = 0.0;
+		public double botpose_targetspaceRotationY_rad = 0.0;
+		public double botpose_targetspaceRotationZ_rad = 0.0;
 
 		public double targetAprilTag = 0.0;
 		public double targetObject = 0.0;
@@ -36,8 +36,8 @@ public class VisionIO {
 	private NetworkTableEntry tyEntry = table.getEntry("ty");
 	private NetworkTableEntry taEntry = table.getEntry("ta");
 
-	private NetworkTableEntry botposEntry = table.getEntry("botpose");
-	private double[] botposeCache = new double[6];
+	private NetworkTableEntry botpose_targetspaceEntry = table.getEntry("botpose_targetspace");
+	private double[] botpose_targetspaceCache = new double[6];
 
 	private NetworkTableEntry tidEntry = table.getEntry("tid");
 	private NetworkTableEntry tclassEntry = table.getEntry("tclass");
@@ -50,13 +50,13 @@ public class VisionIO {
 		inputs.crosshairToTargetOffsetY_rad = Math.toRadians(tyEntry.getDouble(0));
 		inputs.targetArea = taEntry.getDouble(inputs.targetArea);
 
-		botposeCache = botposEntry.getDoubleArray(botposeCache);
-		inputs.botposeTranslationX_m = botposeCache[0];
-		inputs.botposeTranslationY_m = botposeCache[1];
-		inputs.botposeTranslationZ_m = botposeCache[2];
-		inputs.botposeRotationX_rad = Math.toRadians(botposeCache[3]);
-		inputs.botposeRotationY_rad = Math.toRadians(botposeCache[4]);
-		inputs.botposeRotationZ_rad = Math.toRadians(botposeCache[5]);
+		botpose_targetspaceCache = botpose_targetspaceEntry.getDoubleArray(botpose_targetspaceCache);
+		inputs.botpose_targetspaceTranslationX_m = botpose_targetspaceCache[0];
+		inputs.botpose_targetspaceTranslationY_m = botpose_targetspaceCache[1];
+		inputs.botpose_targetspaceTranslationZ_m = botpose_targetspaceCache[2];
+		inputs.botpose_targetspaceRotationX_rad = Math.toRadians(botpose_targetspaceCache[3]);
+		inputs.botpose_targetspaceRotationY_rad = Math.toRadians(botpose_targetspaceCache[4]);
+		inputs.botpose_targetspaceRotationZ_rad = Math.toRadians(botpose_targetspaceCache[5]);
 
 		inputs.targetAprilTag = tidEntry.getDouble(inputs.targetAprilTag);
 		inputs.targetObject = tclassEntry.getDouble(inputs.targetObject);
