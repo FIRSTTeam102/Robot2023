@@ -1,12 +1,13 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.ChargeStationBalance;
-import frc.robot.commands.TeleopSwerve;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
 import frc.robot.subsystems.Swerve;
+
+import frc.robot.commands.swerve.ChargeStationBalance;
+import frc.robot.commands.swerve.TeleopSwerve;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;

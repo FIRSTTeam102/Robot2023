@@ -2,7 +2,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import frc.robot.RobotContainer;
-import frc.robot.commands.TeleopSwerve;
+import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.subsystems.Swerve;
 
 import edu.wpi.first.hal.HAL;

@@ -1,4 +1,7 @@
-package frc.robot;
+package frc.robot.util;
+
+import frc.robot.BuildConstants;
+import frc.robot.Robot;
 
 import com.revrobotics.CANSparkMax;
 

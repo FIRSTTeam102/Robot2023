@@ -2,14 +2,15 @@ package frc.robot.swerve;
 
 import static frc.robot.Constants.SwerveConstants.*;
 
-import frc.robot.BuildManager;
-import frc.robot.Conversions;
+import frc.robot.util.BuildManager;
+import frc.robot.util.Conversions;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
@@ -19,9 +20,7 @@ import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.SensorTimeBase;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxAbsoluteEncoder;
+import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.SparkMaxPIDController;
 
 /**
@@ -33,12 +32,12 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 	private CANCoder angleCancoder;
 	private CANSparkMax angleMotor;
 	private SparkMaxPIDController angleSparkPidController;
-	private SparkMaxAbsoluteEncoder angleMotorAbsoluteEncoder;
-	private RelativeEncoder angleMotorRelativeEncoder;
+	// private SparkMaxAbsoluteEncoder angleMotorAbsoluteEncoder;
+	// private RelativeEncoder angleMotorRelativeEncoder;
 	private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(driveKs, driveKv, driveKa);
 	private double angleOffset_rad;
 
-	private SimpleMotorFeedforward turnFeedforward = new SimpleMotorFeedforward(turnKs, turnKv);
+	// private SimpleMotorFeedforward turnFeedforward = new SimpleMotorFeedforward(turnKs, turnKv);
 
 	/**
 	 * @param moduleConstants module config
@@ -57,28 +56,37 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		angleCancoderConfig.unitString = "rad";
 		angleCancoder.configAllSettings(angleCancoderConfig);
 
-		angleMotor = new CANSparkMax(moduleConstants.angleMotorId(), MotorType.kBrushless);
+		angleMotor = new CANSparkMax(moduleConstants.angleMotorId(), CANSparkMax.MotorType.kBrushless);
 		angleMotor.restoreFactoryDefaults();
-		angleSparkPidController = angleMotor.getPIDController();
-		angleSparkPidController.setP(angleKp);
-		angleSparkPidController.setI(angleKi);
-		angleSparkPidController.setD(angleKd);
-		angleSparkPidController.setFF(angleKf);
-		angleSparkPidController.setOutputRange(-angleMaxPercentOutput, angleMaxPercentOutput);
+		// angleSparkPidController = angleMotor.getPIDController();
+		// angleSparkPidController.setP(angleKp);
+		// angleSparkPidController.setI(angleKi);
+		// angleSparkPidController.setD(angleKd);
+		// angleSparkPidController.setFF(angleKf);
+		// angleSparkPidController.setOutputRange(-angleMaxPercentOutput, angleMaxPercentOutput);
 		angleMotor.setSmartCurrentLimit(angleCurrentLimit_amp);
 		angleMotor.setInverted(angleInverted);
 		angleMotor.setIdleMode(angleIdleMode);
 
-		angleMotorAbsoluteEncoder = angleMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
-		angleMotorAbsoluteEncoder.setPositionConversionFactor(angleEncoderPositionFactor_rad);
-		angleMotorAbsoluteEncoder.setVelocityConversionFactor(angleEncoderVelocityFactor_radps);
-		angleMotorRelativeEncoder = angleMotor.getEncoder();
-		angleSparkPidController.setFeedbackDevice(angleMotorRelativeEncoder);
+		// angleMotorAbsoluteEncoder = angleMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
+		// angleMotorAbsoluteEncoder.setPositionConversionFactor(angleEncoderPositionFactor_rad);
+		// angleMotorAbsoluteEncoder.setVelocityConversionFactor(angleEncoderVelocityFactor_radps);
+		// angleMotorRelativeEncoder = angleMotor.getEncoder();
+		// angleSparkPidController.setFeedbackDevice(angleMotorRelativeEncoder);
 
 		// wrap betwee 0 and 2pi radians
-		angleSparkPidController.setPositionPIDWrappingEnabled(true);
-		angleSparkPidController.setPositionPIDWrappingMinInput(0);
-		angleSparkPidController.setPositionPIDWrappingMaxInput(Conversions.twoPi);
+		// angleSparkPidController.setPositionPIDWrappingEnabled(true);
+		// angleSparkPidController.setPositionPIDWrappingMinInput(0);
+		// angleSparkPidController.setPositionPIDWrappingMaxInput(Conversions.twoPi);
+
+		// turn down frequency as we only log them, not needed for calculations
+		angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 40); // percent output
+		angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 40); // velocity, current
+		angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 500); // position
+		angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 500); // analog sensor
+		angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 500); // alternate encoder
+		angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 500); // duty cycle position
+		angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 500); // duty cycle velocity
 
 		BuildManager.burnSpark(angleMotor);
 
@@ -96,13 +104,16 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		driveMotor.setNeutralMode(driveNeutralMode);
 		driveMotor.setSelectedSensorPosition(0);
 		driveMotor.setInverted(driveInverted);
+		// only needed for logging
+		driveMotor.setStatusFramePeriod(StatusFrame.Status_1_General, 40);
+		driveMotor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 40);
 	}
 
 	private double getAbsoluteCancoder_rad() {
 		return Conversions.angleModulus2pi(angleCancoder.getAbsolutePosition() - angleOffset_rad);
 	}
 
-	private double calculateFeedforward(double velocity) {
+	private double calculateDriveFeedforward(double velocity) {
 		double percentage = driveFeedforward.calculate(velocity);
 		return Math.min(percentage, 1.0);
 	}
@@ -142,7 +153,7 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 			ControlMode.Velocity,
 			Conversions.mpsToFalcon(velocity, wheelCircumference_m, driveGearRatio),
 			DemandType.ArbitraryFeedForward,
-			calculateFeedforward(velocity));
+			calculateDriveFeedforward(velocity));
 	}
 
 	@Override

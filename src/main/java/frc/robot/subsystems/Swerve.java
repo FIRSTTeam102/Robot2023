@@ -41,7 +41,6 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 	public SwerveModuleState[] moduleStates = {new SwerveModuleState(), new SwerveModuleState(),
 		new SwerveModuleState(), new SwerveModuleState()};
 
-	// we can also mix in vision measurements to make it more accurate to the field
 	public SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(
 		kinematics, new Rotation2d(), modulePositions, new Pose2d());
 

@@ -1,7 +1,7 @@
 package frc.robot;
 
 import frc.robot.Constants.SwerveConstants;
-import frc.robot.commands.PathPlannerCommand;
+import frc.robot.commands.swerve.PathPlannerCommand;
 import frc.robot.subsystems.Swerve;
 
 import edu.wpi.first.wpilibj2.command.Command;

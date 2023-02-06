@@ -72,10 +72,10 @@ public final class Constants {
 		public static final double angleGearRatio = 1 / ((14.0 / 50.0) * (10.0 / 60.0));
 		public static final boolean angleInverted = true;
 		public static final IdleMode angleIdleMode = IdleMode.kCoast;
-		public static final double angleMaxPercentOutput = 0.5;
+		// public static final double angleMaxPercentOutput = 0.5;
 		public static final boolean encoderInverted = false;
-		public static final double angleEncoderPositionFactor_rad = (2 * Math.PI);
-		public static final double angleEncoderVelocityFactor_radps = (2 * Math.PI) / 60.0;
+		// public static final double angleEncoderPositionFactor_rad = (2 * Math.PI);
+		// public static final double angleEncoderVelocityFactor_radps = (2 * Math.PI) / 60.0;
 
 		public static final double maxVelocity_mps = 6380.0 /* Falcon max RPM */
 			/ 60.0 / driveGearRatio * wheelCircumference_m;
@@ -93,7 +93,7 @@ public final class Constants {
 		public static final double angleKd = 0.0;
 		public static final double angleKf = 0.0;
 		/* sim angle motor PID values */
-		public static final double simAngleKp = 12.0; // todo: make sim use these, they need to be really ramped up
+		public static final double simAngleKp = 12.0;
 		public static final double simAngleKi = 0.0;
 		public static final double simAngleKd = 0.0;
 		public static final double simAngleKf = 0.0;
@@ -114,13 +114,13 @@ public final class Constants {
 		public static final double driveKv = 0.016325;
 		public static final double driveKa = 0.00035285;
 		/* sim drive motor characterization values */
-		public static final double simDriveKs = 0.116970; // todo: do we need these?
-		public static final double simDriveKv = 0.133240;
+		public static final double simDriveKs = 0.117;
+		public static final double simDriveKv = 0.133;
 		public static final double simDriveKa = 0.0;
 
 		// V = kS + kV * v + kA * a
-		public static final double turnKs = 0.1;
-		public static final double turnKv = 0.005;
+		// public static final double turnKs = 0.1;
+		// public static final double turnKv = 0.005;
 		// public static final double turnKa = 0.000115;
 
 		/* auto path PID values */

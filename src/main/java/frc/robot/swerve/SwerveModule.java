@@ -2,7 +2,7 @@ package frc.robot.swerve;
 
 import static frc.robot.Constants.SwerveConstants.*;
 
-import frc.robot.Conversions;
+import frc.robot.util.Conversions;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -17,15 +17,20 @@ public class SwerveModule implements AutoCloseable {
 	private Rotation2d lastAngle;
 	private final SwerveModuleIO io;
 	private final SwerveModuleIOInputsAutoLogged inputs = new SwerveModuleIOInputsAutoLogged();
-	private ProfiledPIDController anglePIDController = new ProfiledPIDController(angleKp, angleKi, angleKd,
-		new TrapezoidProfile.Constraints(
-			maxAngularVelocity_radps,
-			maxAngularVelocity_radps)); // fixme:
+	private ProfiledPIDController anglePIDController;
 
 	public SwerveModule(int moduleNumber, SwerveModuleIO io) {
 		this.moduleNumber = moduleNumber;
 		this.io = io;
 
+		var isReal = io.getClass() == SwerveModuleIOReal.class;
+		anglePIDController = new ProfiledPIDController(
+			isReal ? angleKp : simAngleKp,
+			isReal ? angleKi : simAngleKi,
+			isReal ? angleKd : simAngleKd,
+			new TrapezoidProfile.Constraints(
+				maxAngularVelocity_radps,
+				maxAngularVelocity_radps));
 		anglePIDController.enableContinuousInput(0, Conversions.twoPi);
 
 		lastAngle = getState().angle;

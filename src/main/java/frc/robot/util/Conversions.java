@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.util;
 
 public class Conversions {
 	public static final double falconCountsPerRotation = 2048.0;
