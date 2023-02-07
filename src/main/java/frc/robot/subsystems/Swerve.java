@@ -187,14 +187,6 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 		}
 	}
 
-	// handle by the scheduler instead
-	// public enum Mode {
-	// normal, balance, xStance
-	// }
-	// @Getter
-	// @Setter
-	// private Mode mode = Mode.normal;
-
 	public void toggleFieldRelative() {
 		this.fieldRelative = !this.fieldRelative;
 	}
@@ -252,6 +244,19 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 		for (SwerveModule swerveModule : modules) {
 			swerveModule.setDesiredState(states[swerveModule.moduleNumber], true, true);
 		}
+	}
+
+	public void runCharacterization(double voltage) {
+		for (var mod : modules)
+			mod.runCharacterization(voltage);
+	}
+
+	// radps
+	public double getCharacterizationVelocity() {
+		double driveVelocityAverage = 0.0;
+		for (var module : modules)
+			driveVelocityAverage += module.getCharacterizationVelocity();
+		return driveVelocityAverage / modules.length;
 	}
 
 	@Override

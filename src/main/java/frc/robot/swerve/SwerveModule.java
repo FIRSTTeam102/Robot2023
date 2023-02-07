@@ -58,16 +58,19 @@ public class SwerveModule implements AutoCloseable {
 	}
 
 	/**
-	 * Set the drive motor to the specified voltage. This is only used for characterization via the
-	 * FeedForwardCharacterization command. The module will be set to 0 throughout the
-	 * characterization; as a result, the wheels don't need to be clamped to hold them straight.
+	 * Set the drive motor to the specified voltage and angle position to 0.
+	 * 
+	 * This is used for characterization by the FeedForwardCharacterization command.
 	 *
-	 * @param voltage the specified voltage for the drive motor
+	 * @param voltage specified voltage for the drive motor
 	 */
-	public void setVoltageForCharacterization(double voltage) {
-		lastAngle = Rotation2d.fromRadians(0.0);
-		// io.setAnglePosition(lastAngle); // fixme:
+	public void runCharacterization(double voltage) {
+		setDesiredState(new SwerveModuleState(0.0, new Rotation2d(0.0)), true, false);
 		io.setDriveMotorPercentage(voltage / 12.0);
+	}
+
+	public double getCharacterizationVelocity() {
+		return io.getCharacterizationVelocity();
 	}
 
 	public SwerveModuleState getState() {

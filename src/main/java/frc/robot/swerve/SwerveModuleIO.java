@@ -34,5 +34,9 @@ public interface SwerveModuleIO extends AutoCloseable {
 	/** Enable or disable brake mode on the drive motor. */
 	public default void setDriveBrakeMode(boolean enable) {}
 
+	public default double getCharacterizationVelocity() {
+		return 0.0;
+	}
+
 	public default void close() throws Exception {}
 }

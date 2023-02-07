@@ -167,6 +167,11 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 	}
 
 	@Override
+	public double getCharacterizationVelocity() {
+		return Conversions.falconToRadians(driveMotor.getSelectedSensorVelocity(), driveGearRatio);
+	}
+
+	@Override
 	public void close() throws Exception {
 		driveMotor.DestroyObject();
 		angleCancoder.DestroyObject();

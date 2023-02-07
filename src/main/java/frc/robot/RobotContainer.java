@@ -6,11 +6,11 @@ import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
 import frc.robot.subsystems.Swerve;
 
+import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.swerve.ChargeStationBalance;
 import frc.robot.commands.swerve.TeleopSwerve;
 
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -61,10 +61,13 @@ public class RobotContainer {
 		configureBindings();
 
 		// setup autos
-		autoChooser.addDefaultOption("Nothing", new InstantCommand());
-		autoChooser.addDefaultOption("PP test", Autos.pathPlannerTest(swerve));
+		autoChooser.addDefaultOption("nothing", new InstantCommand());
+		autoChooser.addOption("PP test", Autos.pathPlannerTest(swerve));
 
-		SmartDashboard.putData("do balancing", new ChargeStationBalance(swerve));
+		// for testing
+		autoChooser.addOption("drive characterization",
+			new FeedForwardCharacterization(swerve, true, swerve::runCharacterization, swerve::getCharacterizationVelocity));
+		autoChooser.addOption("do balancing", new ChargeStationBalance(swerve));
 	}
 
 	/**
