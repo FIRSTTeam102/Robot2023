@@ -133,7 +133,9 @@ public final class Constants {
 	};
 
 	public static class VisionConstants {
-		/* title */
-
+		/* apriltags */
+		public static final double zDistanceGridAprilTag_m = 0.4064;
+		public static final double xDistanceGridAprilTag_m = 0.5334;
+		public static final double maxZDistanceGridAprilTag_m = 1.778;
 	};
 }
