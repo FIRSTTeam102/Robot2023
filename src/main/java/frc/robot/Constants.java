@@ -160,11 +160,14 @@ public final class Constants {
 		// public static final double kA = 0.2;
 
 		/* sizes */
-		public static final double conversionFactor_meters_per_rotation = 1;
-		public static final double minHeight_m = 0.0;
-		public static final double maxHeight_m = Units.inchesToMeters(50);
+		public static final double conversionFactor_ft_per_rotation = 1;
+		public static final double minHeight_ft = 0.0;
+		public static final double maxHeight_ft = 50 / 12;
 		public static final double gearRatio = 1.0; // fixme:
 		public static final double carriageMass_kg = 1.0; // fixme:
 		public static final double drumRadius_m = Units.inchesToMeters(0.5);
+
+		public static final double midHeight_ft = 2;
+		public static final double highHeight_ft = 4;
 	}
 }

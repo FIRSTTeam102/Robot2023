@@ -4,8 +4,10 @@
 
 package frc.robot.commands;
 
+import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.Elevator;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
@@ -30,6 +32,7 @@ public class ManualElevatorControl extends CommandBase {
 	public void execute() {
 		double yAxis = operatorController.getLeftY();
 
+		yAxis = MathUtil.applyDeadband(yAxis, OperatorConstants.stickDeadband);
 		elevator.setSpeed(yAxis);
 	}
 

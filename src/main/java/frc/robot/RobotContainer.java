@@ -1,7 +1,9 @@
 package frc.robot;
 
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.ManualElevatorControl;
+import frc.robot.commands.SetElevatorPosition;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
@@ -51,6 +53,11 @@ public class RobotContainer {
 
 	private final ManualElevatorControl manualElevatorControl = new ManualElevatorControl(elevator, operatorController);
 
+	private final SetElevatorPosition setElevatorLow = new SetElevatorPosition(elevator, 0);
+	private final SetElevatorPosition setElevatorMid = new SetElevatorPosition(elevator, ElevatorConstants.midHeight_ft);
+	private final SetElevatorPosition setElevatorHigh = new SetElevatorPosition(elevator,
+		ElevatorConstants.highHeight_ft);
+
 	/**
 	 * The container for the robot. Contains subsystems, OI devices, and commands.
 	 */
@@ -82,6 +89,10 @@ public class RobotContainer {
 		/* operator */
 
 		operatorController.leftTrigger(.3).whileTrue(manualElevatorControl);
+
+		operatorController.a().onTrue(setElevatorLow);
+		operatorController.b().onTrue(setElevatorMid);
+		operatorController.y().onTrue(setElevatorHigh);
 
 		/*
 		 * fixme: remove later, just for testing

@@ -37,7 +37,7 @@ public class Elevator extends SubsystemBase {
 	// private ElevatorFeedforward feedforward = new ElevatorFeedforward(ElevatorConstants.kS,
 	// ElevatorConstants.kG, ElevatorConstants.kV, ElevatorConstants.kA);
 
-	private double targetPosition_m = 0.0;
+	private double targetPosition_ft = 0.0;
 
 	/** Creates a new Elevator. */
 	public Elevator() {
@@ -53,7 +53,7 @@ public class Elevator extends SubsystemBase {
 		pidController.setIZone(ElevatorConstants.kIZone);
 		pidController.setOutputRange(ElevatorConstants.kMinOuput, ElevatorConstants.kMaxOutput);
 
-		encoder.setPositionConversionFactor(ElevatorConstants.conversionFactor_meters_per_rotation);
+		encoder.setPositionConversionFactor(ElevatorConstants.conversionFactor_ft_per_rotation);
 
 		// if (Robot.isSimulation())
 		// revPhysicsSim.addSparkMax(motor, DCMotor.getNEO(1));
@@ -70,17 +70,17 @@ public class Elevator extends SubsystemBase {
 	}
 
 	public void setSpeed(double speed) {
-		pidController.setReference(speed, CANSparkMax.ControlType.kDutyCycle);
+		pidController.setReference(speed, CANSparkMax.ControlType.kDutyCycle, 0, ElevatorConstants.feedForward_V);
 	}
 
 	public void stop() {
-		pidController.setReference(0, CANSparkMax.ControlType.kDutyCycle);
+		pidController.setReference(0, CANSparkMax.ControlType.kDutyCycle, 0, ElevatorConstants.feedForward_V);
 	}
 
-	public void setPosition(double position_m) {
-		targetPosition_m = position_m;
+	public void setPosition(double position_ft) {
+		targetPosition_ft = position_ft;
 		// double feed = feedforward.calculate();
-		pidController.setReference(position_m, CANSparkMax.ControlType.kSmartMotion, 0, ElevatorConstants.feedForward_V);
+		pidController.setReference(position_ft, CANSparkMax.ControlType.kSmartMotion, 0, ElevatorConstants.feedForward_V);
 	}
 
 	@Override
@@ -90,11 +90,11 @@ public class Elevator extends SubsystemBase {
 
 		// these won't do anything in simulation
 		if (inputs.bottomSwitch)
-			encoder.setPosition(ElevatorConstants.minHeight_m);
+			encoder.setPosition(ElevatorConstants.minHeight_ft);
 		if (inputs.topSwitch)
-			encoder.setPosition(ElevatorConstants.maxHeight_m);
+			encoder.setPosition(ElevatorConstants.maxHeight_ft);
 
-		mechElevator.setLength(inputs.position_m);
+		mechElevator.setLength(inputs.position_ft);
 	}
 
 	/**
@@ -104,8 +104,8 @@ public class Elevator extends SubsystemBase {
 
 	@AutoLog
 	public static class ElevatorIOInputs {
-		public double position_m = 0.0;
-		public double velocity_mps = 0.0;
+		public double position_ft = 0.0;
+		public double velocity_ftps = 0.0;
 		public boolean topSwitch = false;
 		public boolean bottomSwitch = false;
 	}
@@ -116,8 +116,8 @@ public class Elevator extends SubsystemBase {
 		ElevatorConstants.gearRatio,
 		ElevatorConstants.carriageMass_kg,
 		ElevatorConstants.drumRadius_m,
-		ElevatorConstants.minHeight_m,
-		ElevatorConstants.maxHeight_m,
+		ElevatorConstants.minHeight_ft,
+		ElevatorConstants.maxHeight_ft,
 		false // todo: switch if we're using velocity mode
 	);
 
@@ -127,19 +127,19 @@ public class Elevator extends SubsystemBase {
 			elevatorSim.setInput(motor.get() * RobotController.getBatteryVoltage());
 			elevatorSim.update(Constants.loopPeriod_s);
 
-			inputs.position_m = elevatorSim.getPositionMeters();
-			inputs.velocity_mps = elevatorSim.getVelocityMetersPerSecond();
+			inputs.position_ft = elevatorSim.getPositionMeters();
+			inputs.velocity_ftps = elevatorSim.getVelocityMetersPerSecond();
 			inputs.topSwitch = elevatorSim.hasHitUpperLimit();
 			inputs.bottomSwitch = elevatorSim.hasHitLowerLimit();
 
-			encoder.setPosition(inputs.position_m);
+			encoder.setPosition(inputs.position_ft);
 			// motor.setVoltage(motor.get() * RobotController.getBatteryVoltage());
 			// revPhysicsSim.run();
 
 			RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(elevatorSim.getCurrentDrawAmps()));
 		} else {
-			inputs.position_m = encoder.getPosition();
-			inputs.velocity_mps = encoder.getVelocity();
+			inputs.position_ft = encoder.getPosition();
+			inputs.velocity_ftps = encoder.getVelocity();
 			inputs.topSwitch = topSwitch.isPressed();
 			inputs.bottomSwitch = bottomSwitch.isPressed();
 		}
@@ -152,7 +152,7 @@ public class Elevator extends SubsystemBase {
 	private final Mechanism2d mech = new Mechanism2d(3, 4);
 	private final MechanismRoot2d mechRoot = mech.getRoot("elevator root", 2, 0);
 	private final MechanismLigament2d mechElevator = mechRoot
-		.append(new MechanismLigament2d("elevator", inputs.position_m, 90));
+		.append(new MechanismLigament2d("elevator", inputs.position_ft, 90));
 
 	// todo: figure out livewindow vs advantagekit
 	@Override
@@ -160,6 +160,6 @@ public class Elevator extends SubsystemBase {
 		super.initSendable(builder);
 		builder.addBooleanProperty("at top", () -> inputs.topSwitch, null);
 		builder.addBooleanProperty("at bottom", () -> inputs.bottomSwitch, null);
-		builder.addDoubleProperty("position", () -> inputs.position_m, null); // todo: setter
+		builder.addDoubleProperty("position", () -> inputs.position_ft, null); // todo: setter
 	}
 }
