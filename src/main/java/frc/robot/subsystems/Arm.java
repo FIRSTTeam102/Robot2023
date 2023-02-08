@@ -59,8 +59,8 @@ public class Arm extends SubsystemBase {
 		encoder.setPositionConversionFactor(ArmConstants.conversionFactor_in_per_rotation);
 	}
 
-	public void setPosInches(double armLength) {
-		double nutDist = armDistToNutDist(armLength);
+	public void setPos(double armLength_in) {
+		double nutDist = armDistToNutDist(armLength_in);
 		nutDist = MathUtil.clamp(nutDist, 0, ArmConstants.maxNutDist_in - ArmConstants.minNutDist_in);
 
 		pidController.setReference(nutDist, CANSparkMax.ControlType.kSmartMotion);

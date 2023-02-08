@@ -4,37 +4,31 @@
 
 package frc.robot.commands;
 
-import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.Arm;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
-public class ManualArmControl extends CommandBase {
+public class MoveArm extends CommandBase {
 	private Arm arm;
-	private CommandXboxController operatorController;
+	private double speed;
 
-	/** Creates a new ManualArmControl. */
-	public ManualArmControl(Arm arm, CommandXboxController operatorController) {
+	/** Creates a new SetArmSpeed. WARNING!!! SHOULD NOT BE USED OUTSIDE OF TESTING*/
+	public MoveArm(Arm arm, double speed) {
 		this.arm = arm;
-		this.operatorController = operatorController;
+		this.speed = speed;
 		// Use addRequirements() here to declare subsystem dependencies.
 		addRequirements(arm);
 	}
 
 	// Called when the command is initially scheduled.
 	@Override
-	public void initialize() {}
+	public void initialize() {
+		arm.setSpeed(speed);
+	}
 
 	// Called every time the scheduler runs while the command is scheduled.
 	@Override
-	public void execute() {
-		double xAxis = operatorController.getRightX();
-		xAxis = MathUtil.applyDeadband(xAxis, OperatorConstants.stickDeadband);
-
-		arm.setSpeed(xAxis);
-	}
+	public void execute() {}
 
 	// Called once the command ends or is interrupted.
 	@Override
