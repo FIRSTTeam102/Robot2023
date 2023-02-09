@@ -5,7 +5,6 @@ import frc.robot.io.VisionIO;
 import frc.robot.io.VisionIO.Pipeline;
 import frc.robot.io.VisionIOInputsAutoLogged;
 
-import edu.wpi.first.math.Vector2;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Timer;
@@ -24,14 +23,6 @@ public class Vision extends SubsystemBase {
 		setPipeline(Pipeline.AprilTag);
 		setPipeline(Pipeline.Retroreflective);
 		setPipeline(Pipeline.ObjectDetection);
-	}
-
-	private double zGoTo;
-	private double xGoTo;
-
-	public Vector2 getGoToPostition() {
-		Vector2 position = new Vector2(zGoTo, xGoTo);
-		return;
 	}
 
 	@Override

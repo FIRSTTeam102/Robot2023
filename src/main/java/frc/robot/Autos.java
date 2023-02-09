@@ -32,7 +32,7 @@ public final class Autos {
 		eventMap.put("start", new PrintCommand("put block down"));
 
 		return new FollowPathWithEvents(
-			new PathPlannerCommand(pathGroup.get(0), swerve, true),
+			new PathPlannerCommand(pathGroup.get(0), swerve, true, true),
 			pathGroup.get(0).getMarkers(),
 			eventMap);
 	}

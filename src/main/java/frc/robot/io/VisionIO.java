@@ -25,7 +25,7 @@ public class VisionIO {
 		public double targetAprilTag = 0.0;
 		public double targetObject = 0.0;
 
-		public int pipeline = 0;
+		public long pipeline = 0;
 	}
 
 	private NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
