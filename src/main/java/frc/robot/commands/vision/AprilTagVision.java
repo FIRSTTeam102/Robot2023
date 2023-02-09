@@ -50,37 +50,123 @@ public class AprilTagVision extends CommandBase {
 
 		switch (routine) {
 			case Left:
-				if (vision.inputs.targetAprilTag == 5 || vision.inputs.targetAprilTag == 4) {
-					System.out.println("Left Doublesubstation");
-					xDistanceGoTo_m = ;
-					yDistanceGoTo_m = ;
-				} else if (vision.inputs.targetAprilTag >= 1 && vision.inputs.targetAprilTag <= 3
-					|| vision.inputs.targetAprilTag >= 6 && vision.inputs.targetAprilTag <= 8) {
-					System.out.println("Left Grid");
-					xDistanceGoTo_m = ;
-					yDistanceGoTo_m = ;
+				if (vision.inputs.targetAprilTag == 5) {
+					System.out.println("Blue Doublesubstation Left");
+					xDistanceGoTo_m = 0.70;
+					yDistanceGoTo_m = 6.13;
+				}
+				if (vision.inputs.targetAprilTag == 4) {
+					System.out.println("Red Doublesubstation Left");
+					xDistanceGoTo_m = 15.84;
+					yDistanceGoTo_m = 7.33;
+				}
+
+				if (vision.inputs.targetAprilTag == 6) {
+					System.out.println("Blue Grid 1 Left");
+					xDistanceGoTo_m = 1.80;
+					yDistanceGoTo_m = 3.87;
+				}
+				if (vision.inputs.targetAprilTag == 7) {
+					System.out.println("Blue Grid 2 Left");
+					xDistanceGoTo_m = 1.80;
+					yDistanceGoTo_m = 2.19;
+				}
+				if (vision.inputs.targetAprilTag == 8) {
+					System.out.println("Blue Grid 3 Left");
+					xDistanceGoTo_m = 1.80;
+					yDistanceGoTo_m = 0.51;
+				}
+				if (vision.inputs.targetAprilTag == 3) {
+					System.out.println("Red Grid 1 Left");
+					xDistanceGoTo_m = 14.73;
+					yDistanceGoTo_m = 4.97;
+				}
+				if (vision.inputs.targetAprilTag == 2) {
+					System.out.println("Red Grid 2 Left");
+					xDistanceGoTo_m = 14.73;
+					yDistanceGoTo_m = 3.29;
+				}
+				if (vision.inputs.targetAprilTag == 1) {
+					System.out.println("Red Grid 3 Left");
+					xDistanceGoTo_m = 14.73;
+					yDistanceGoTo_m = 1.61;
 				}
 				break;
 
 			case Middle:
-				if (vision.inputs.targetAprilTag >= 1 && vision.inputs.targetAprilTag <= 3
-					|| vision.inputs.targetAprilTag >= 6 && vision.inputs.targetAprilTag <= 8) {
-					System.out.println("Middle Grid");
-					xDistanceGoTo_m = ;
-					yDistanceGoTo_m = ;
+				if (vision.inputs.targetAprilTag == 6) {
+					System.out.println("Blue Grid 1 Middle");
+					xDistanceGoTo_m = 1.80;
+					yDistanceGoTo_m = 4.42;
+				}
+				if (vision.inputs.targetAprilTag == 7) {
+					System.out.println("Blue Grid 2 Middle");
+					xDistanceGoTo_m = 1.80;
+					yDistanceGoTo_m = 2.75;
+				}
+				if (vision.inputs.targetAprilTag == 8) {
+					System.out.println("Blue Grid 3 Middle");
+					xDistanceGoTo_m = 1.80;
+					yDistanceGoTo_m = 1.06;
+				}
+				if (vision.inputs.targetAprilTag == 3) {
+					System.out.println("Red Grid 1 Middle");
+					xDistanceGoTo_m = 14.73;
+					yDistanceGoTo_m = 4.40;
+				}
+				if (vision.inputs.targetAprilTag == 2) {
+					System.out.println("Red Grid 2 Middle");
+					xDistanceGoTo_m = 14.73;
+					yDistanceGoTo_m = 2.74;
+				}
+				if (vision.inputs.targetAprilTag == 1) {
+					System.out.println("Red Grid 3 Middle");
+					xDistanceGoTo_m = 14.73;
+					yDistanceGoTo_m = 1.05;
 				}
 				break;
 
 			case Right:
-				if (vision.inputs.targetAprilTag == 5 || vision.inputs.targetAprilTag == 4) {
-					System.out.println("Right Doublesubstation");
-					xDistanceGoTo_m = ;
-					yDistanceGoTo_m = ;
-				} else if (vision.inputs.targetAprilTag >= 1 && vision.inputs.targetAprilTag <= 3
-					|| vision.inputs.targetAprilTag >= 6 && vision.inputs.targetAprilTag <= 8) {
-					System.out.println("Right Grid");
-					xDistanceGoTo_m = ;
-					yDistanceGoTo_m = ;
+				if (vision.inputs.targetAprilTag == 5) {
+					System.out.println("Blue Doublesubstation Right");
+					xDistanceGoTo_m = 0.70;
+					yDistanceGoTo_m = 7.47;
+				}
+				if (vision.inputs.targetAprilTag == 4) {
+					System.out.println("Red Doublesubstation Right");
+					xDistanceGoTo_m = 15.84;
+					yDistanceGoTo_m = 6.00;
+				}
+
+				if (vision.inputs.targetAprilTag == 6) {
+					System.out.println("Blue Grid 1 Right");
+					xDistanceGoTo_m = 1.80;
+					yDistanceGoTo_m = 4.98;
+				}
+				if (vision.inputs.targetAprilTag == 7) {
+					System.out.println("Blue Grid 2 Right");
+					xDistanceGoTo_m = 1.80;
+					yDistanceGoTo_m = 3.86;
+				}
+				if (vision.inputs.targetAprilTag == 8) {
+					System.out.println("Blue Grid 3 Right");
+					xDistanceGoTo_m = 1.80;
+					yDistanceGoTo_m = 1.62;
+				}
+				if (vision.inputs.targetAprilTag == 3) {
+					System.out.println("Red Grid 1 Right");
+					xDistanceGoTo_m = 14.73;
+					yDistanceGoTo_m = 3.85;
+				}
+				if (vision.inputs.targetAprilTag == 2) {
+					System.out.println("Red Grid 2 Right");
+					xDistanceGoTo_m = 14.73;
+					yDistanceGoTo_m = 2.17;
+				}
+				if (vision.inputs.targetAprilTag == 1) {
+					System.out.println("Red Grid 3 Right");
+					xDistanceGoTo_m = 14.73;
+					yDistanceGoTo_m = 0.49;
 				}
 				break;
 
