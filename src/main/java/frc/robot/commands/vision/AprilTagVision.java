@@ -20,8 +20,8 @@ public class AprilTagVision extends CommandBase {
 	private Vision vision;
 	private Routine routine;
 	private boolean shouldRegeneratePaths = true;
-	private double zDistanceGoTo_m;
 	private double xDistanceGoTo_m;
+	private double yDistanceGoTo_m;
 	private PathPlannerCommand ppCommand;
 	private Swerve swerve;
 
@@ -52,13 +52,13 @@ public class AprilTagVision extends CommandBase {
 			case Left:
 				if (vision.inputs.targetAprilTag == 5 || vision.inputs.targetAprilTag == 4) {
 					System.out.println("Left Doublesubstation");
-					zDistanceGoTo_m = Constants.VisionConstants.zDistanceSubstationAprilTag_m;
-					xDistanceGoTo_m = -Constants.VisionConstants.xDistanceSubstationAprilTag_m;
+					xDistanceGoTo_m = ;
+					yDistanceGoTo_m = ;
 				} else if (vision.inputs.targetAprilTag >= 1 && vision.inputs.targetAprilTag <= 3
 					|| vision.inputs.targetAprilTag >= 6 && vision.inputs.targetAprilTag <= 8) {
 					System.out.println("Left Grid");
-					zDistanceGoTo_m = Constants.VisionConstants.zDistanceGridAprilTag_m;
-					xDistanceGoTo_m = -Constants.VisionConstants.xDistanceGridAprilTag_m;
+					xDistanceGoTo_m = ;
+					yDistanceGoTo_m = ;
 				}
 				break;
 
@@ -66,21 +66,21 @@ public class AprilTagVision extends CommandBase {
 				if (vision.inputs.targetAprilTag >= 1 && vision.inputs.targetAprilTag <= 3
 					|| vision.inputs.targetAprilTag >= 6 && vision.inputs.targetAprilTag <= 8) {
 					System.out.println("Middle Grid");
-					zDistanceGoTo_m = Constants.VisionConstants.zDistanceGridAprilTag_m;
-					xDistanceGoTo_m = 0;
+					xDistanceGoTo_m = ;
+					yDistanceGoTo_m = ;
 				}
 				break;
 
 			case Right:
 				if (vision.inputs.targetAprilTag == 5 || vision.inputs.targetAprilTag == 4) {
 					System.out.println("Right Doublesubstation");
-					zDistanceGoTo_m = Constants.VisionConstants.zDistanceSubstationAprilTag_m;
-					xDistanceGoTo_m = Constants.VisionConstants.xDistanceSubstationAprilTag_m;
+					xDistanceGoTo_m = ;
+					yDistanceGoTo_m = ;
 				} else if (vision.inputs.targetAprilTag >= 1 && vision.inputs.targetAprilTag <= 3
 					|| vision.inputs.targetAprilTag >= 6 && vision.inputs.targetAprilTag <= 8) {
 					System.out.println("Right Grid");
-					zDistanceGoTo_m = Constants.VisionConstants.zDistanceGridAprilTag_m;
-					xDistanceGoTo_m = Constants.VisionConstants.xDistanceGridAprilTag_m;
+					xDistanceGoTo_m = ;
+					yDistanceGoTo_m = ;
 				}
 				break;
 
@@ -91,7 +91,7 @@ public class AprilTagVision extends CommandBase {
 		PathPlannerTrajectory trajectory = PathPlanner.generatePath(
 			new PathConstraints(Constants.AutoConstants.maxVelocity_mps, Constants.AutoConstants.maxAcceleration_mps2),
 			new PathPoint(swerve.getPose().getTranslation(), swerve.getPose().getRotation()), // start at current pos
-			new PathPoint(new Translation2d(zDistanceGoTo_m, xDistanceGoTo_m),
+			new PathPoint(new Translation2d(xDistanceGoTo_m, yDistanceGoTo_m),
 				Rotation2d.fromRadians(0)));
 
 		cancelPPCommand();
