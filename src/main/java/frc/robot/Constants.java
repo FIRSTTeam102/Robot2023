@@ -93,7 +93,7 @@ public final class Constants {
 		public static final double angleKd = 0.0;
 		public static final double angleKf = 0.0;
 		/* sim angle motor PID values */
-		public static final double simAngleKp = 12.0;
+		public static final double simAngleKp = 18.0;
 		public static final double simAngleKi = 0.0;
 		public static final double simAngleKd = 0.0;
 		public static final double simAngleKf = 0.0;

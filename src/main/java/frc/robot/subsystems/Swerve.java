@@ -30,6 +30,7 @@ import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 
 import org.littletonrobotics.junction.Logger;
 
+import lombok.Getter;
 import lombok.Setter;
 
 public class Swerve extends SubsystemBase implements AutoCloseable {
@@ -49,6 +50,7 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 	public Pose2d[] modulePoses = {new Pose2d(), new Pose2d(), new Pose2d(), new Pose2d()};
 	public Field2d fieldSim = new Field2d();
 
+	@Getter
 	private Translation2d centerRotation = new Translation2d(0, 0); // position the robot rotates around
 
 	// used for pose estimation
@@ -96,11 +98,13 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 	}
 
 	public void setModuleStates(SwerveModuleState[] desiredStates) {
-		SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, maxVelocity_mps);
+		setModuleStates(desiredStates, false, false);
+	}
 
-		for (SwerveModule mod : modules) {
-			mod.setDesiredState(desiredStates[mod.moduleNumber], false, false);
-		}
+	public void setModuleStates(SwerveModuleState[] desiredStates, boolean isOpenLoop, boolean forceAngle) {
+		SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, maxVelocity_mps);
+		for (SwerveModule mod : modules)
+			mod.setDesiredState(desiredStates[mod.moduleNumber], isOpenLoop, forceAngle);
 	}
 
 	public void setChasisSpeeds(ChassisSpeeds chassisSpeeds) {
@@ -231,23 +235,6 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 		chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
 		SwerveModuleState[] states = kinematics.toSwerveModuleStates(chassisSpeeds, centerRotation);
 		setModuleStates(states);
-	}
-
-	/**
-	 * Sets the swerve modules in the x-stance orientation. In this orientation the wheels are aligned
-	 * to make an 'X', which makes it more difficult for other robots to push the robot.
-	 */
-	// todo: move to command
-	private void setXStance() {
-		chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
-		SwerveModuleState[] states = kinematics.toSwerveModuleStates(chassisSpeeds, centerRotation);
-		states[0].angle = new Rotation2d(Math.PI / 2 - Math.atan(trackWidth_m / wheelBase_m));
-		states[1].angle = new Rotation2d(Math.PI / 2 + Math.atan(trackWidth_m / wheelBase_m));
-		states[2].angle = new Rotation2d(Math.PI / 2 + Math.atan(trackWidth_m / wheelBase_m));
-		states[3].angle = new Rotation2d(Math.PI * 3.0 / 2.0 - Math.atan(trackWidth_m / wheelBase_m));
-		for (SwerveModule swerveModule : modules) {
-			swerveModule.setDesiredState(states[swerveModule.moduleNumber], true, true);
-		}
 	}
 
 	public void runCharacterization(double voltage) {

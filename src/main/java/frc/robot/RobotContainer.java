@@ -10,6 +10,7 @@ import frc.robot.subsystems.Vision;
 import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.swerve.ChargeStationBalance;
 import frc.robot.commands.swerve.TeleopSwerve;
+import frc.robot.commands.swerve.XStance;
 import frc.robot.commands.vision.AprilTagVision;
 import frc.robot.commands.vision.ObjectDetectionVision;
 import frc.robot.commands.vision.RetroreflectiveVision;
@@ -89,6 +90,7 @@ public class RobotContainer {
 		/* driver */
 		driverController.a().onTrue(new InstantCommand(() -> swerve.toggleFieldRelative()));
 		driverController.b().onTrue(new InstantCommand(() -> swerve.zeroYaw()));
+		driverController.x().whileTrue(new XStance(swerve));
 
 		/* operator */
 		operatorController.povLeft().and(operatorController.x())
