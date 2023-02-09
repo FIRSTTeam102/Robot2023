@@ -5,10 +5,14 @@ import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
 import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.Vision;
 
 import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.swerve.ChargeStationBalance;
 import frc.robot.commands.swerve.TeleopSwerve;
+import frc.robot.commands.vision.AprilTagVision;
+import frc.robot.commands.vision.ObjectDetectionVision;
+import frc.robot.commands.vision.RetroreflectiveVision;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -42,6 +46,7 @@ public class RobotContainer {
 	 * Subsystems
 	 */
 	public final Swerve swerve = new Swerve(gyro);
+	public final Vision vision = new Vision();
 
 	public final CommandXboxController driverController = new CommandXboxController(
 		OperatorConstants.driverControllerPort);
@@ -63,7 +68,7 @@ public class RobotContainer {
 
 		// setup autos
 		autoChooser.addDefaultOption("nothing", new InstantCommand());
-		autoChooser.addOption("PP test", Autos.pathPlannerTest(swerve));
+		autoChooser.addOption("PP test", Autos.simpleWall(swerve));
 
 		// for testing
 		autoChooser.addOption("drive characterization",
@@ -86,6 +91,20 @@ public class RobotContainer {
 		driverController.b().onTrue(new InstantCommand(() -> swerve.zeroYaw()));
 
 		/* operator */
+		operatorController.povLeft().and(operatorController.x())
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Left, vision, swerve));
+		operatorController.povLeft().and(operatorController.a())
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Middle, vision, swerve));
+		operatorController.povLeft().and(operatorController.b())
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Right, vision, swerve));
+
+		operatorController.povDown().and(operatorController.a())
+			.whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Middle, vision, swerve));
+		operatorController.povDown().and(operatorController.y())
+			.whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Top, vision, swerve));
+
+		operatorController.povRight().and(operatorController.a())
+			.whileTrue(new ObjectDetectionVision(ObjectDetectionVision.Routine.Ground, vision, swerve));
 	}
 
 	/**

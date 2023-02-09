@@ -11,7 +11,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.ejml.interfaces.decomposition.QRDecomposition;
+import Jama.Matrix;
+import Jama.QRDecomposition;
 
 /**
  * @see https://github.com/Mechanical-Advantage/RobotCode2023/blob/main/src/main/java/org/littletonrobotics/frc2023/commands/FeedForwardCharacterization.java
