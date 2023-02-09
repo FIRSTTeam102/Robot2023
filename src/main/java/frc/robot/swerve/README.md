@@ -10,3 +10,8 @@ Motor communication is abstracted through [SwerveModuleIO](./SwerveModuleIO.java
 * the origin of the field to the lower left corner (driver's right)
 * zero is away from the driver
 * angle increases in the CCW direction
+
+# Rotations
+* pitch = rotating around side-to-side axis
+* yaw = rotating around vertical axis
+* roll = rotating around front-to-back axis

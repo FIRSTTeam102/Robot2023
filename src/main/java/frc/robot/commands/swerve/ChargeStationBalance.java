@@ -4,9 +4,13 @@ import frc.robot.Constants.SwerveConstants;
 import frc.robot.subsystems.Swerve;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class ChargeStationBalance extends CommandBase {
+	private final double maxSpeed = 0.2 * SwerveConstants.maxVelocity_mps;
+	private final double maxTurn = 0.2 * SwerveConstants.maxAngularVelocity_radps;
+
 	Swerve swerve;
 
 	public ChargeStationBalance(Swerve swerve) {
@@ -19,7 +23,7 @@ public class ChargeStationBalance extends CommandBase {
 
 	@Override
 	public void initialize() {
-		state = State.turn;
+		state = State.turn; // always reset state
 		swerve.stop();
 	}
 
@@ -28,16 +32,7 @@ public class ChargeStationBalance extends CommandBase {
 		turn, balance
 	}
 
-	State state;
-
-	/**
-	 * pitch = rotating around side-to-side axis
-	 * yaw = rotating around vertical axis
-	 * roll = rotating around front-to-back axis
-	 */
-	private enum Dimension {
-		pitch, yaw, roll
-	}
+	State state = State.turn;
 
 	private boolean withinDeadband(double input, double deadband) {
 		return Math.abs(input) < deadband;
@@ -53,6 +48,7 @@ public class ChargeStationBalance extends CommandBase {
 
 	@Override
 	public void execute() {
+		// angles are between +/- pi
 		pitch_rad = swerve.getPitch_rad();
 		roll_rad = swerve.getRoll_rad();
 
@@ -65,8 +61,11 @@ public class ChargeStationBalance extends CommandBase {
 
 		double shortestDistance = (Math.abs(pitch_rad) < Math.abs(roll_rad)) ? pitch_rad : roll_rad;
 
-		// todo: pid? to better aim isntead of constant speed
+		// todo: pid? to better aim instead of constant speed
 		// todo: move side to side to take up left space
+		// will these move in the right direction?
+		// do we have to deal with field orientation?
+		// track which way we came up? or see which direction yaw is pointed in?
 
 		switch (state) {
 			case turn:
@@ -74,8 +73,7 @@ public class ChargeStationBalance extends CommandBase {
 					// move on
 					state = State.balance;
 				else {
-					swerve.drive(new Translation2d(0, 0),
-						SwerveConstants.maxAngularVelocity_radps * 0.2 * sign(shortestDistance));
+					swerve.drive(new Translation2d(0, 0), maxTurn * sign(shortestDistance));
 					break;
 				}
 			case balance:
@@ -86,17 +84,26 @@ public class ChargeStationBalance extends CommandBase {
 				double x = pitchZeroed ? 0.0 : -sign(pitch_rad),
 					y = rollZeroed ? 0.0 : -sign(roll_rad);
 
-				swerve.drive(new Translation2d(
-					SwerveConstants.maxVelocity_mps * 0.2 * x,
-					SwerveConstants.maxVelocity_mps * 0.2 * y), 0.0);
+				swerve.drive(new Translation2d(maxSpeed * x, maxSpeed * y), 0.0);
 		}
 	}
 
 	@Override
-	public void end(boolean interrupted) {}
+	public void end(boolean interrupted) {
+		swerve.stop();
+	}
 
 	@Override
 	public boolean isFinished() {
 		return false;
+	}
+
+	@Override
+	public void initSendable(SendableBuilder builder) {
+		super.initSendable(builder);
+		// these won't be seen in the ui but you can see them in the tree
+		builder.addStringProperty("state", () -> state.toString(), null);
+		builder.addDoubleProperty("pitch", () -> swerve.getPitch_rad(), null);
+		builder.addDoubleProperty("roll", () -> swerve.getRoll_rad(), null);
 	}
 }

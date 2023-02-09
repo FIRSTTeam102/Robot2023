@@ -11,6 +11,7 @@ import frc.robot.commands.swerve.ChargeStationBalance;
 import frc.robot.commands.swerve.TeleopSwerve;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -67,7 +68,8 @@ public class RobotContainer {
 		// for testing
 		autoChooser.addOption("drive characterization",
 			new FeedForwardCharacterization(swerve, true, swerve::runCharacterization, swerve::getCharacterizationVelocity));
-		autoChooser.addOption("do balancing", new ChargeStationBalance(swerve));
+
+		SmartDashboard.putData("do balancing", new ChargeStationBalance(swerve));
 	}
 
 	/**
