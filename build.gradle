@@ -77,8 +77,10 @@ dependencies {
 	testCompileOnly 'org.projectlombok:lombok:1.18.24'
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
 
+	implementation 'gov.nist.math:jama:1.0.3'
+
 	// keep version in sync with AdvantageKit version
-	annotationProcessor "org.littletonrobotics.akit.junction:junction-autolog:2.1.1"
+	annotationProcessor 'org.littletonrobotics.akit.junction:junction-autolog:2.1.1'
 }
 
 test {

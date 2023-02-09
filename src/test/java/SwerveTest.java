@@ -2,8 +2,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import frc.robot.RobotContainer;
-import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.Swerve;
+
+import frc.robot.commands.swerve.TeleopSwerve;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -44,13 +45,13 @@ public class SwerveTest {
 		assertTrue(teleopSwerve.isScheduled());
 
 		// just run it a bunch of times so the modules get there
-		for (int i = 0; i <= 10; i++) {
+		for (int i = 0; i <= 20; i++) {
 			CommandScheduler.getInstance().run();
 			// Timer.delay(Constants.loopPeriod_s);
 		}
 
 		final var states = swerve.getStates();
-		final var angles = new double[] {-Math.PI / 4, Math.PI / 4, Math.PI / 4, -Math.PI / 4};
+		final var angles = new double[] {7 * Math.PI / 4, Math.PI / 4, 7 * Math.PI / 4, Math.PI / 4};
 		for (int i = 0; i < states.length; i++)
 			assertEquals(angles[i], states[i].angle.getRadians(), measurementDelta);
 

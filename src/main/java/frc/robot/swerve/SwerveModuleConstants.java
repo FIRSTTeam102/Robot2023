@@ -6,12 +6,12 @@ public record SwerveModuleConstants(
 	int driveMotorId,
 	int angleMotorId,
 	int encoderId,
-	double angleOffset_deg) {
-	public double angleOffset_rad() {
-		return Math.toRadians(this.angleOffset_deg);
+	double angleOffset_rad) {
+	public double angleOffset_deg() {
+		return Math.toDegrees(this.angleOffset_rad);
 	}
 
 	public Rotation2d angleOffset_2d() {
-		return Rotation2d.fromDegrees(this.angleOffset_deg);
+		return Rotation2d.fromRadians(this.angleOffset_rad);
 	}
 }

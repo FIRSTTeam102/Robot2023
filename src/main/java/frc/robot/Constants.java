@@ -31,30 +31,31 @@ public final class Constants {
 	public static class OperatorConstants {
 		public static final int driverControllerPort = 0;
 		public static final int operatorControllerPort = 1;
-		public static final double stickDeadband = 0.02;
+		public static final double stickDeadband = 0.1;
 	}
 
 	public static final int pigeonId = 20;
 
 	public static class SwerveConstants {
+		// FL, FR, BR, BL
 		public static final SwerveModuleConstants moduleConstants[] = {
-			new SwerveModuleConstants(21, 22, 23, 0.0),
-			new SwerveModuleConstants(24, 25, 26, .0),
-			new SwerveModuleConstants(27, 28, 29, 0.0),
-			new SwerveModuleConstants(30, 31, 32, 0.0)
+			new SwerveModuleConstants(21, 22, 23, 3.6954),
+			new SwerveModuleConstants(24, 25, 26, 2.5786),
+			new SwerveModuleConstants(27, 28, 29, 3.0173),
+			new SwerveModuleConstants(30, 31, 32, 2.2473)
 		};
 
 		// the left-to-right distance between the drivetrain wheels, should be measured from center to center
-		public static final double trackWidth_m = 1.0;
+		public static final double trackWidth_m = 0.502;
 		// the front-to-back distance between the drivetrain wheels, should be measured from center to center
-		public static final double wheelBase_m = 1.0;
+		public static final double wheelBase_m = 0.502;
 
 		// indexes must match moduleConstants
 		public static final Translation2d[] moduleTranslations = {
 			new Translation2d(wheelBase_m / 2.0, trackWidth_m / 2.0),
 			new Translation2d(wheelBase_m / 2.0, -trackWidth_m / 2.0),
+			new Translation2d(-wheelBase_m / 2.0, -trackWidth_m / 2.0),
 			new Translation2d(-wheelBase_m / 2.0, trackWidth_m / 2.0),
-			new Translation2d(-wheelBase_m / 2.0, -trackWidth_m / 2.0)
 		};
 
 		/**
@@ -71,15 +72,15 @@ public final class Constants {
 		public static final double angleGearRatio = 1 / ((14.0 / 50.0) * (10.0 / 60.0));
 		public static final boolean angleInverted = true;
 		public static final IdleMode angleIdleMode = IdleMode.kCoast;
-		// todo: fix with pid or something, test once actual robot is built to see if there's any overshooting problems
-		public static final double angleMaxPercentOutput = 0.5;
+		// public static final double angleMaxPercentOutput = 0.5;
 		public static final boolean encoderInverted = false;
-		public static final double angleEncoderPositionFactor_rad = (2 * Math.PI);
-		public static final double angleEncoderVelocityFactor_radps = (2 * Math.PI) / 60.0;
+		// public static final double angleEncoderPositionFactor_rad = (2 * Math.PI);
+		// public static final double angleEncoderVelocityFactor_radps = (2 * Math.PI) / 60.0;
 
 		public static final double maxVelocity_mps = 6380.0 /* Falcon max RPM */
 			/ 60.0 / driveGearRatio * wheelCircumference_m;
-		public static final double maxAngularVelocity_radps = maxVelocity_mps
+		public static final double maxAngularVelocity_radps = 5676 /* NEO max RPM */
+			/ 60.0 / angleGearRatio
 			/ Math.hypot(trackWidth_m / 2.0, wheelBase_m / 2.0);
 		public static final double maxCoastVelocity_mps = 0.05;
 
@@ -87,9 +88,9 @@ public final class Constants {
 		public static final double closedLoopRamp = 0.0;
 
 		/* angle motor PID values */
-		public static final double angleKp = 0.01; // todo: calibrate
+		public static final double angleKp = 4.0; // todo: calibrate
 		public static final double angleKi = 0.0;
-		public static final double angleKd = 0.005;
+		public static final double angleKd = 0.0;
 		public static final double angleKf = 0.0;
 		/* sim angle motor PID values */
 		public static final double simAngleKp = 12.0;
@@ -109,13 +110,18 @@ public final class Constants {
 		public static final double simDriveKf = 0.0;
 
 		/* drive motor characterization values (feed forward) */
-		public static final double driveKs = (0.667 / 12); // divide by 12 to convert from volts to percent output for CTRE
-		public static final double driveKv = (2.44 / 12);
-		public static final double driveKa = (0.27 / 12);
+		public static final double driveKs = 0.0029032;
+		public static final double driveKv = 0.016325;
+		public static final double driveKa = 0.00035285;
 		/* sim drive motor characterization values */
-		public static final double simDriveKs = 0.116970;
-		public static final double simDriveKv = 0.133240;
+		public static final double simDriveKs = 0.117;
+		public static final double simDriveKv = 0.133;
 		public static final double simDriveKa = 0.0;
+
+		// V = kS + kV * v + kA * a
+		// public static final double turnKs = 0.1;
+		// public static final double turnKv = 0.005;
+		// public static final double turnKa = 0.000115;
 
 		/* auto path PID values */
 		public static final double autoDriveKp = 5.0;
@@ -126,8 +132,7 @@ public final class Constants {
 		public static final double autoTurnKd = 0.0;
 
 		/* current limiting */
-		// public static final SupplyCurrentLimitConfiguration angleCurrentLimit = new SupplyCurrentLimitConfiguration(
-		// true, 25, 40, 0.1);
+		public static final int angleCurrentLimit_amp = 25;
 		public static final SupplyCurrentLimitConfiguration driveCurrentLimit = new SupplyCurrentLimitConfiguration(
 			true, 35, 60, 0.1);
 	};

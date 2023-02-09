@@ -1,9 +1,13 @@
-package frc.robot;
+package frc.robot.util;
 
 public class Conversions {
 	public static final double falconCountsPerRotation = 2048.0;
 	public static final double cancoderCountsPerRotation = 4096.0;
 	public static final double twoPi = 2 * Math.PI;
+
+	public static double angleModulus2pi(double angle) {
+		return ((angle % twoPi) + twoPi) % twoPi;
+	}
 
 	/**
 	 * @param counts Falcon counts
@@ -12,6 +16,15 @@ public class Conversions {
 	 */
 	public static double falconToDegrees(double counts, double gearRatio) {
 		return counts * 360.0 / (gearRatio * falconCountsPerRotation);
+	}
+
+	/**
+	 * @param counts Falcon counts
+	 * @param gearRatio gear ratio between Falcon and mechanism
+	 * @return radians of rotation of mechanism
+	 */
+	public static double falconToRadians(double counts, double gearRatio) {
+		return counts / falconCountsPerRotation * twoPi / gearRatio;
 	}
 
 	/**
