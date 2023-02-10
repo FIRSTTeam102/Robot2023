@@ -17,19 +17,19 @@ import com.revrobotics.SparkMaxPIDController;
 import java.util.Map;
 
 public class Arm extends SubsystemBase {
-	private CANSparkMax motor = new CANSparkMax(motorPort, MotorType.kBrushless);
+	private CANSparkMax motor = new CANSparkMax(motorId, MotorType.kBrushless);
 
 	private SparkMaxPIDController pidController = motor.getPIDController();
 	private RelativeEncoder encoder = motor.getEncoder();
 	private SparkMaxLimitSwitch frontLimitSwitch = motor.getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);
 	private SparkMaxLimitSwitch backLimitSwitch = motor.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);
 
-	private GenericEntry shuffleboardArmEntry;
+	private GenericEntry shuffleboardLength;
 
 	public Arm() {
 		var armGroup = Shuffleboard.getTab("Drive").getLayout("Arm");
-		shuffleboardArmEntry = armGroup
-			.add("arm length", 0)
+		shuffleboardLength = armGroup
+			.add("length", 0)
 			.withWidget(BuiltInWidgets.kNumberBar)
 			.withProperties(Map.of("min", 0, "max", 40))
 			.getEntry();
@@ -70,7 +70,7 @@ public class Arm extends SubsystemBase {
 		if (frontLimitSwitch.isPressed())
 			encoder.setPosition(0);
 
-		shuffleboardArmEntry.setDouble(nutDistToArmDist(encoder.getPosition()));
+		shuffleboardLength.setDouble(nutDistToArmDist(encoder.getPosition()));
 	}
 
 	public static double armDistToNutDist(double armDistance_m) {

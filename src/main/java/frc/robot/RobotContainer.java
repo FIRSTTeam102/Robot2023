@@ -3,11 +3,13 @@ package frc.robot;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.constants.ElevatorConstants;
+import frc.robot.constants.GrabberConstants;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
 
@@ -16,6 +18,7 @@ import frc.robot.commands.arm.ManualArmControl;
 import frc.robot.commands.arm.SetArmPosition;
 import frc.robot.commands.elevator.ManualElevatorControl;
 import frc.robot.commands.elevator.SetElevatorPosition;
+import frc.robot.commands.grabber.OpenGrabber;
 import frc.robot.commands.swerve.ChargeStationBalance;
 import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.swerve.XStance;
@@ -56,6 +59,7 @@ public class RobotContainer {
 	public final Vision vision = new Vision();
 	public final Arm arm = new Arm();
 	public final Elevator elevator = new Elevator();
+	public final Grabber grabber = new Grabber();
 
 	public final CommandXboxController driverController = new CommandXboxController(
 		OperatorConstants.driverControllerPort);
@@ -125,6 +129,8 @@ public class RobotContainer {
 		operatorController.a().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.lowHeight_m)); // low
 		operatorController.b().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.midHeight_m)); // mid
 		operatorController.y().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.highHeight_m)); // high
+
+		operatorController.leftBumper().onTrue(new OpenGrabber(grabber, GrabberConstants.openingTime_s));
 	}
 
 	/**

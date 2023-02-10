@@ -27,7 +27,7 @@ import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends SubsystemBase {
-	private CANSparkMax motor = new CANSparkMax(motorPort, MotorType.kBrushless);
+	private CANSparkMax motor = new CANSparkMax(motorId, MotorType.kBrushless);
 	private SparkMaxPIDController pidController = motor.getPIDController();
 	private RelativeEncoder encoder = motor.getEncoder();
 	private SparkMaxLimitSwitch topSwitch = motor.getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);

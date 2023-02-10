@@ -10,7 +10,7 @@ public final class ElevatorConstants {
 	public static final double highHeight_m = 1;
 
 	/* ports */
-	public static final int motorPort = 21;
+	public static final int motorId = 10;
 	public static final int topSwitchPort = 1;
 	public static final int bottomSwitchPort = 2;
 
