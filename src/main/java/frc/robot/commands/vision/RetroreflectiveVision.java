@@ -31,6 +31,9 @@ public class RetroreflectiveVision extends CommandBase {
 		if (!vision.isPipelineReady())
 			return;
 
+		// Copy Limelight.cpp stuff from last year, (PID calculating motor speed from)
+		// Copy YawToTarget.cpp stuff from last year (sending information to swerve)
+
 		switch (routine) {
 			case Middle:
 				System.out.println("Middle");
@@ -43,10 +46,13 @@ public class RetroreflectiveVision extends CommandBase {
 	}
 
 	@Override
-	public void end(boolean interrupted) {}
+	public void end(boolean interrupted) {
+		// Copy YawToTarget.cpp stuff from last year, (stopping information to swerve)
+	}
 
 	@Override
 	public boolean isFinished() {
+		// Copy Limelight.cpp [check function definition] stuff from last year, (check to see if tx is within bounds)
 		return false;
 	}
 }
