@@ -4,6 +4,7 @@ import static frc.robot.constants.ArmConstants.*;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -27,7 +28,7 @@ public class Arm extends SubsystemBase {
 	private GenericEntry shuffleboardLength;
 
 	public Arm() {
-		var armGroup = Shuffleboard.getTab("Drive").getLayout("Arm");
+		var armGroup = Shuffleboard.getTab("Drive").getLayout("Arm", BuiltInLayouts.kList);
 		shuffleboardLength = armGroup
 			.add("length", 0)
 			.withWidget(BuiltInWidgets.kNumberBar)

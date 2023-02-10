@@ -2,17 +2,23 @@ package frc.robot.subsystems;
 
 import static frc.robot.constants.GrabberConstants.*;
 
+import frc.robot.Robot;
+
 import frc.robot.commands.grabber.CloseGrabber;
 
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.CANSparkMax;
 
-public class Grabber extends SubsystemBase {
+import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.Logger;
+
+public class Grabber extends SubsystemBase implements AutoCloseable {
 	private CANSparkMax motor = new CANSparkMax(motorId, CANSparkMax.MotorType.kBrushless);
 	private DigitalInput closedSensor = new DigitalInput(closedSensorPin);
 	private DigitalInput objectSensor = new DigitalInput(objectSensorPin);
@@ -20,7 +26,7 @@ public class Grabber extends SubsystemBase {
 	private GenericEntry shuffleboardClosed;
 
 	public Grabber() {
-		var shuffleboardGroup = Shuffleboard.getTab("Drive").getLayout("Grabber");
+		var shuffleboardGroup = Shuffleboard.getTab("Drive").getLayout("Grabber", BuiltInLayouts.kList);
 		shuffleboardClosed = shuffleboardGroup
 			.add("closed", false)
 			.withWidget(BuiltInWidgets.kBooleanBox)
@@ -28,11 +34,11 @@ public class Grabber extends SubsystemBase {
 	}
 
 	public boolean objectDetected() {
-		return objectSensor.get();
+		return inputs.objectDetected;
 	}
 
 	public boolean isClosed() {
-		return closedSensor.get();
+		return inputs.closed;
 	}
 
 	public void moveInward() {
@@ -51,9 +57,45 @@ public class Grabber extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		if (objectDetected() && !closeGrabber.isScheduled())
+		updateInputs(inputs);
+		Logger.getInstance().processInputs(getName(), inputs);
+
+		if (inputs.objectDetected && !inputs.closed && !closeGrabber.isScheduled())
 			closeGrabber.schedule();
 
-		shuffleboardClosed.setBoolean(isClosed());
+		shuffleboardClosed.setBoolean(inputs.closed);
+	}
+
+	/**
+	 * inputs
+	 */
+	@AutoLog
+	public static class GrabberIOInputs {
+		public boolean objectDetected = false;
+		public boolean closed = false;
+		public double percentOutput = 0.0;
+	}
+
+	public GrabberIOInputsAutoLogged inputs = new GrabberIOInputsAutoLogged();
+
+	private void updateInputs(GrabberIOInputs inputs) {
+		inputs.percentOutput = motor.get(); // getAppliedOutput(); ?
+
+		if (Robot.isReal()) {
+			inputs.objectDetected = objectSensor.get();
+			inputs.closed = closedSensor.get();
+		} else {
+			inputs.closed = inputs.percentOutput > 0 ? false
+				: inputs.percentOutput < 0 ? true
+					: inputs.closed;
+		}
+	}
+
+	@Override
+	public void close() {
+		motor.close();
+		objectSensor.close();
+		closedSensor.close();
+		closeGrabber.cancel();
 	}
 }
