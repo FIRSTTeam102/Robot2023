@@ -5,10 +5,13 @@ import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
 
 import frc.robot.commands.FeedForwardCharacterization;
+import frc.robot.commands.arm.ManualArmControl;
+import frc.robot.commands.arm.SetArmPosition;
 import frc.robot.commands.swerve.ChargeStationBalance;
 import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.swerve.XStance;
@@ -44,11 +47,10 @@ public class RobotContainer {
 		? new GyroIOPigeon2(Constants.pigeonId)
 		: new GyroIOSim();
 
-	/**
-	 * Subsystems
-	 */
+	/* subsystems */
 	public final Swerve swerve = new Swerve(gyro);
 	public final Vision vision = new Vision();
+	public final Arm arm = new Arm();
 
 	public final CommandXboxController driverController = new CommandXboxController(
 		OperatorConstants.driverControllerPort);
@@ -108,6 +110,10 @@ public class RobotContainer {
 
 		operatorController.povRight().and(operatorController.a())
 			.whileTrue(new ObjectDetectionVision(ObjectDetectionVision.Routine.Ground, vision, swerve));
+
+		operatorController.rightTrigger(0.3).whileTrue(new ManualArmControl(arm, operatorController));
+		// todo: will this conflict with the pov stuff, is there an exclusive bind?
+		operatorController.a().onTrue(new SetArmPosition(arm)); // reset arm
 	}
 
 	/**
