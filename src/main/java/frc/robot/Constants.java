@@ -143,6 +143,10 @@ public final class Constants {
 
 		/* apriltag substation */
 		public static final double maxZDistanceSubstationAprilTag_m = 3.048;
+
+		/* retroreflective PD */
+		public static final double visionTurnkP = 0.01851851852;
+		public static final double visionTurnkD = 0.55;
 	};
 
 	public static class AutoConstants {

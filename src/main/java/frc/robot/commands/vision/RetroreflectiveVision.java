@@ -1,5 +1,6 @@
 package frc.robot.commands.vision;
 
+import frc.robot.Constants;
 import frc.robot.io.VisionIO.Pipeline;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
@@ -10,6 +11,7 @@ public class RetroreflectiveVision extends CommandBase {
 	private Routine routine;
 	private Vision vision;
 	private Swerve swerve;
+	private double motorPower;
 
 	public enum Routine {
 		Middle, Top
@@ -30,6 +32,14 @@ public class RetroreflectiveVision extends CommandBase {
 	public void execute() {
 		if (!vision.isPipelineReady())
 			return;
+
+		if (vision.inputs.crosshairToTargetOffsetX_rad < -2.0) {
+			motorPower = Constants.VisionConstants.visionTurnkP * vision.inputs.crosshairToTargetOffsetX_rad
+				- Constants.VisionConstants.visionTurnkD;
+		} else if (vision.inputs.crosshairToTargetOffsetX_rad > 2.0) {
+			motorPower = Constants.VisionConstants.visionTurnkP * vision.inputs.crosshairToTargetOffsetX_rad
+				+ Constants.VisionConstants.visionTurnkD;
+		}
 
 		// Copy Limelight.cpp stuff from last year, (PID calculating motor speed from)
 		// Copy YawToTarget.cpp stuff from last year (sending information to swerve)
