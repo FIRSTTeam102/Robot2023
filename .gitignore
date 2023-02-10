@@ -164,4 +164,4 @@ simgui*.json
 !simgui-ds.json
 
 # Automatically generated when building
-src/main/java/frc/robot/BuildConstants.java
+src/main/java/frc/robot/constants/BuildConstants.java

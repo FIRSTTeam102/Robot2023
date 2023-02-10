@@ -1,7 +1,8 @@
 package frc.robot;
 
-import static frc.robot.Constants.robotMode;
+import static frc.robot.constants.Constants.robotMode;
 
+import frc.robot.constants.BuildConstants;
 import frc.robot.subsystems.Lights;
 
 import edu.wpi.first.wpilibj.DriverStation;

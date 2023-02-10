@@ -138,7 +138,7 @@ configurations.all {
 // https://github.com/lessthanoptimal/gversion-plugin
 gversion {
 	srcDir = "src/main/java/"
-	classPackage = "frc.robot"
+	classPackage = "frc.robot.constants"
 	className = "BuildConstants"
 	timeZone = "America/New_York"
 }

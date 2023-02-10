@@ -1,6 +1,6 @@
 package frc.robot.swerve;
 
-import static frc.robot.Constants.SwerveConstants.*;
+import static frc.robot.constants.SwerveConstants.*;
 
 import frc.robot.util.BuildManager;
 import frc.robot.util.Conversions;
@@ -49,7 +49,7 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		angleCancoder = new CANCoder(moduleConstants.encoderId());
 		var angleCancoderConfig = new CANCoderConfiguration();
 		angleCancoderConfig.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
-		angleCancoderConfig.sensorDirection = encoderInverted;
+		angleCancoderConfig.sensorDirection = angleEncoderInverted;
 		angleCancoderConfig.initializationStrategy = SensorInitializationStrategy.BootToAbsolutePosition;
 		angleCancoderConfig.sensorTimeBase = SensorTimeBase.PerSecond;
 		angleCancoderConfig.sensorCoefficient = Conversions.twoPi / Conversions.cancoderCountsPerRotation;
@@ -98,8 +98,8 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		driveMotorConfig.slot0.kF = driveKf;
 		driveMotorConfig.supplyCurrLimit = driveCurrentLimit;
 		driveMotorConfig.initializationStrategy = SensorInitializationStrategy.BootToZero;
-		driveMotorConfig.openloopRamp = openLoopRamp;
-		driveMotorConfig.closedloopRamp = closedLoopRamp;
+		driveMotorConfig.openloopRamp = driveOpenLoopRamp;
+		driveMotorConfig.closedloopRamp = driveClosedLoopRamp;
 		driveMotor.configAllSettings(driveMotorConfig);
 		driveMotor.setNeutralMode(driveNeutralMode);
 		driveMotor.setSelectedSensorPosition(0);

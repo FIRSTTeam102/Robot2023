@@ -4,8 +4,8 @@
 
 package frc.robot.commands.swerve;
 
-import frc.robot.Constants.OperatorConstants;
-import frc.robot.Constants.SwerveConstants;
+import frc.robot.constants.Constants.OperatorConstants;
+import frc.robot.constants.SwerveConstants;
 import frc.robot.subsystems.Swerve;
 
 import edu.wpi.first.math.MathUtil;
@@ -45,8 +45,15 @@ public class TeleopSwerve extends CommandBase {
 		super.end(interrupted);
 	}
 
+	private static final double cubicWeight = 0.5;
+	private static final double weightExponent = 5.0;
+
 	private static double modifyAxis(double value) {
 		value = MathUtil.applyDeadband(value, OperatorConstants.stickDeadband);
-		return Math.copySign(value * value, value);
+		// return Math.copySign(value * value, value);
+
+		// custom input scaling
+		// @see https://desmos.com/calculator/7wy4gmgdpv
+		return Math.copySign(cubicWeight * Math.pow(value, weightExponent) + (1 - cubicWeight) * value, value);
 	}
 }

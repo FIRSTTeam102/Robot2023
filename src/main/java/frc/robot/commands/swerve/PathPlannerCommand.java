@@ -1,5 +1,6 @@
 package frc.robot.commands.swerve;
 
+import frc.robot.Autos;
 import frc.robot.subsystems.Swerve;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -36,9 +37,9 @@ public class PathPlannerCommand extends PPSwerveControllerCommand {
 			trajectory,
 			swerve::getPose,
 			swerve.kinematics,
-			swerve.autoXController,
-			swerve.autoYController,
-			swerve.autoRotationController,
+			Autos.ppXController,
+			Autos.ppYController,
+			Autos.ppRotationController,
 			swerve::setModuleStates,
 			transformForAlliance,
 			swerve);
@@ -58,11 +59,11 @@ public class PathPlannerCommand extends PPSwerveControllerCommand {
 		if (resetOdometry)
 			swerve.resetOdometry(trajectory.getInitialState());
 
-		// reset the theta controller such that old accumulated ID values aren't used with the new path
-		// this doesn't matter if only the P value is non-zero, which is the current behavior
-		swerve.autoXController.reset();
-		swerve.autoYController.reset();
-		swerve.autoRotationController.reset();
+		// reset controller such that old accumulated PID values aren't used with the new path
+		// this doesn't matter if only the P value is non-zero
+		Autos.ppXController.reset();
+		Autos.ppYController.reset();
+		Autos.ppRotationController.reset();
 	}
 
 	@Override

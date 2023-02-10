@@ -1,6 +1,6 @@
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.SwerveConstants.*;
+import static frc.robot.constants.SwerveConstants.*;
 
 import frc.robot.Robot;
 import frc.robot.io.GyroIO;
@@ -10,7 +10,6 @@ import frc.robot.swerve.SwerveModuleIOReal;
 import frc.robot.swerve.SwerveModuleIOSim;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -65,10 +64,6 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 	public GyroIO gyroIO;
 	public GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
 	private double gyroOffset_deg = 0.0;
-
-	public final PIDController autoXController = new PIDController(autoDriveKp, autoDriveKi, autoDriveKd);
-	public final PIDController autoYController = new PIDController(autoDriveKp, autoDriveKi, autoDriveKd);
-	public final PIDController autoRotationController = new PIDController(autoTurnKp, autoTurnKi, autoTurnKd);
 
 	public Swerve(GyroIO gyroIO) {
 		modules = new SwerveModule[moduleConstants.length];
@@ -168,6 +163,7 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 	}
 
 	/** turn off brake mode if we're disabled for long enough and not moving */
+	// todo:
 	private void updateBrakeMode() {
 		if (DriverStation.isEnabled() && !brakeMode) {
 			setBrakeMode(true);

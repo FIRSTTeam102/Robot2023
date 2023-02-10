@@ -1,6 +1,7 @@
 package frc.robot;
 
-import frc.robot.Constants.OperatorConstants;
+import frc.robot.constants.Constants;
+import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;

@@ -1,10 +1,12 @@
 package frc.robot;
 
-import frc.robot.Constants.SwerveConstants;
+import static frc.robot.constants.AutoConstants.*;
+
 import frc.robot.subsystems.Swerve;
 
 import frc.robot.commands.swerve.PathPlannerCommand;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 
@@ -21,9 +23,13 @@ public final class Autos {
 	// return Commands.sequence(subsystem.exampleMethodCommand(), new ExampleCommand(subsystem));
 	// }
 
+	public static final PIDController ppXController = new PIDController(autoDriveKp, autoDriveKi, autoDriveKd);
+	public static final PIDController ppYController = new PIDController(autoDriveKp, autoDriveKi, autoDriveKd);
+	public static final PIDController ppRotationController = new PIDController(autoAngleKp, autoAngleKi, autoAngleKd);
+
 	public static Command simpleWall(Swerve swerve) {
 		List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup("simple wall",
-			new PathConstraints(SwerveConstants.maxVelocity_mps, 3.0));
+			new PathConstraints(maxVelocity_mps, maxAcceleration_mps2));
 
 		if (pathGroup == null)
 			return new PrintCommand("no path group");
