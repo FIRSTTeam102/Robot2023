@@ -1,20 +1,23 @@
 package frc.robot.constants;
 
+import edu.wpi.first.math.util.Units;
+
 public final class ArmConstants {
 	public static final int motorPort = 10;
 
 	public static final double sectionCount = 4;
-	public static final double maxNutDist_in = 13.5;
-	public static final double minNutDist_in = 2.441;
-	public static final double armSectionLength_in = 13.75;
-	public static final double conversionFactor_in_per_rotation = -0.3333;
+	public static final double maxNutDist_m = Units.inchesToMeters(13.5);
+	public static final double minNutDist_m = Units.inchesToMeters(2.441);
+	public static final double armSectionLength_m = Units.inchesToMeters(13.75);
+	public static final double conversionFactor_m_per_rotation = Units.inchesToMeters(-0.3333);
 
-	public static final double kP = 0;
-	public static final double kD = 0;
+	// todo: tuning
+	public static final double kP = 1.0;
 	public static final double kI = 0;
+	public static final double kD = 0;
 	public static final double kIZone = 0;
 	public static final double kF = 0;
 
-	public static final double kMinOutput = -1;
-	public static final double kMaxOutput = 1;
+	public static final double minOutput = -1;
+	public static final double maxOutput = 1;
 }

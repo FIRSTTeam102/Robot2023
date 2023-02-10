@@ -43,16 +43,15 @@ public class Arm extends SubsystemBase {
 		pidController.setIZone(kIZone);
 		pidController.setFF(kF);
 
-		pidController.setOutputRange(kMinOutput, kMaxOutput);
+		pidController.setOutputRange(minOutput, maxOutput);
 
-		encoder.setPositionConversionFactor(conversionFactor_in_per_rotation);
+		encoder.setPositionConversionFactor(conversionFactor_m_per_rotation);
 	}
 
-	public void setPosition(double armLength_in) {
-		double nutDist = armDistToNutDist(armLength_in);
-		nutDist = MathUtil.clamp(nutDist, 0, maxNutDist_in - minNutDist_in);
-
-		pidController.setReference(nutDist, CANSparkMax.ControlType.kSmartMotion);
+	public void setPosition(double armLength_m) {
+		pidController.setReference(
+			MathUtil.clamp(armDistToNutDist(armLength_m), 0, maxNutDist_m - minNutDist_m),
+			CANSparkMax.ControlType.kSmartMotion);
 	}
 
 	public void setSpeed(double speed) {
@@ -66,7 +65,7 @@ public class Arm extends SubsystemBase {
 	@Override
 	public void periodic() {
 		if (backLimitSwitch.isPressed())
-			encoder.setPosition(maxNutDist_in - minNutDist_in);
+			encoder.setPosition(maxNutDist_m - minNutDist_m);
 
 		if (frontLimitSwitch.isPressed())
 			encoder.setPosition(0);
@@ -74,13 +73,12 @@ public class Arm extends SubsystemBase {
 		shuffleboardArmEntry.setDouble(nutDistToArmDist(encoder.getPosition()));
 	}
 
-	public static double armDistToNutDist(double armDistance) {
-		return Math.sqrt(Math.pow(armSectionLength_in, 2) - Math.pow(armDistance / sectionCount, 2))
-			- minNutDist_in;
+	public static double armDistToNutDist(double armDistance_m) {
+		return Math.sqrt(Math.pow(armSectionLength_m, 2) - Math.pow(armDistance_m / sectionCount, 2))
+			- minNutDist_m;
 	}
 
-	public static double nutDistToArmDist(double nutDistance) {
-		return sectionCount *
-			Math.sqrt(Math.pow(armSectionLength_in, 2) - Math.pow(nutDistance + minNutDist_in, 2));
+	public static double nutDistToArmDist(double nutDistance_m) {
+		return sectionCount * Math.sqrt(Math.pow(armSectionLength_m, 2) - Math.pow(nutDistance_m + minNutDist_m, 2));
 	}
 }
