@@ -1,24 +1,25 @@
-package frc.robot.commands.arm;
+package frc.robot.commands.elevator;
 
-import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Elevator;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 /** @deprecated should not be used outside of testing */
 @Deprecated
-public class MoveArm extends CommandBase {
-	private Arm arm;
+public class MoveElevator extends CommandBase {
+	private Elevator elevator;
 	private double speed;
 
-	public MoveArm(Arm arm, double speed) {
-		this.arm = arm;
+	public MoveElevator(Elevator elevator, double speed) {
+		this.elevator = elevator;
 		this.speed = speed;
-		addRequirements(arm);
+
+		addRequirements(elevator);
 	}
 
 	@Override
 	public void initialize() {
-		arm.setSpeed(speed);
+		elevator.setSpeed(speed);
 	}
 
 	@Override
@@ -26,7 +27,7 @@ public class MoveArm extends CommandBase {
 
 	@Override
 	public void end(boolean interrupted) {
-		arm.stop();
+		elevator.setSpeed(0);
 	}
 
 	@Override
