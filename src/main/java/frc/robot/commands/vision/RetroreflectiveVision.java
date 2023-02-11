@@ -1,6 +1,6 @@
 package frc.robot.commands.vision;
 
-import frc.robot.Constants;
+import frc.robot.constants.VisionConstants;
 import frc.robot.io.VisionIO.Pipeline;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
@@ -36,16 +36,16 @@ public class RetroreflectiveVision extends CommandBase {
 
 		// Outputs a motorPower that updates every 0.02s for the motor. kP, kI, kP must be tuned and can not be calculated
 		// in a spreadsheet as vision.errorSum and vision.errorDifference are based on the last 0.02s
-		// Constants.VisionConstants.visionTurnkP * vision.inputs.crosshairToTargetOffsetX_rad. We will not know what this
+		// VisionConstants.visionTurnkP * vision.inputs.crosshairToTargetOffsetX_rad. We will not know what this
 		// data will be for the last 0.02s on a spreadsheet because we do not know what the motorPower was the last 0.02s.
 		if (vision.inputs.crosshairToTargetOffsetX_rad < -2.0) {
-			motorPower = Constants.VisionConstants.visionTurnkP * vision.inputs.crosshairToTargetOffsetX_rad
-				- Constants.VisionConstants.visionTurnkI * vision.errorSum
-				- Constants.VisionConstants.visionTurnkD * vision.errorDifference;
+			motorPower = VisionConstants.visionTurnkP * vision.inputs.crosshairToTargetOffsetX_rad
+				- VisionConstants.visionTurnkI * vision.errorSum
+				- VisionConstants.visionTurnkD * vision.errorDifference;
 		} else if (vision.inputs.crosshairToTargetOffsetX_rad > 2.0) {
-			motorPower = Constants.VisionConstants.visionTurnkP * vision.inputs.crosshairToTargetOffsetX_rad
-				+ Constants.VisionConstants.visionTurnkI * vision.errorSum
-				+ Constants.VisionConstants.visionTurnkD * vision.errorDifference;
+			motorPower = VisionConstants.visionTurnkP * vision.inputs.crosshairToTargetOffsetX_rad
+				+ VisionConstants.visionTurnkI * vision.errorSum
+				+ VisionConstants.visionTurnkD * vision.errorDifference;
 		}
 
 		// Copy Limelight.cpp stuff from last year, (PID calculating motor speed from)

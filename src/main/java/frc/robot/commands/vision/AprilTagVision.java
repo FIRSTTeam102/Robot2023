@@ -41,15 +41,15 @@ public class AprilTagVision extends CommandBase {
 		// Sets pipeline to Apriltag
 		vision.setPipeline(Pipeline.AprilTag);
 
-		// If we are too far away Constants.VisionConstants.maxZDistanceAprilTag_m from the Apriltag, AprilTagVision will
+		// If we are too far away VisionConstants.maxZDistanceAprilTag_m from the Apriltag, AprilTagVision will
 		// not execute
-		shouldRegeneratePaths = vision.inputs.botpose_targetspaceTranslationZ_m < Constants.VisionConstants.maxZDistanceAprilTag_m;
+		shouldRegeneratePaths = vision.inputs.botpose_targetspaceTranslationZ_m < VisionConstants.maxZDistanceAprilTag_m;
 		cancelPPCommand();
 	}
 
 	@Override
 	public void execute() {
-		// If pipeline switch time error has been reached and we are within Constants.VisionConstants.maxZDistanceAprilTag_m
+		// If pipeline switch time error has been reached and we are within VisionConstants.maxZDistanceAprilTag_m
 		// from the Apriltag, begin execute
 		if (!vision.isPipelineReady() || !shouldRegeneratePaths) {
 			return;

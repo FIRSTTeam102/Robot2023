@@ -18,16 +18,6 @@ public final class SwerveConstants {
 		new SwerveModuleConstants(30, 31, 32, 2.2473)
 	};
 
-<<<<<<< HEAD:src/main/java/frc/robot/Constants.java
-	public static class VisionConstants {
-		/* apriltag grid and substation */
-		public static final double maxZDistanceAprilTag_m = 1.778;
-
-		/* retroreflective PID */
-		public static final double visionTurnkP = 0.01851851852;
-		public static final double visionTurnkI = 1;
-		public static final double visionTurnkD = 0.55;
-=======
 	// the left-to-right distance between the drivetrain wheels, should be measured from center to center
 	public static final double trackWidth_m = 0.502;
 	// the front-to-back distance between the drivetrain wheels, should be measured from center to center
@@ -39,7 +29,6 @@ public final class SwerveConstants {
 		new Translation2d(wheelBase_m / 2.0, -trackWidth_m / 2.0),
 		new Translation2d(-wheelBase_m / 2.0, -trackWidth_m / 2.0),
 		new Translation2d(-wheelBase_m / 2.0, trackWidth_m / 2.0),
->>>>>>> scoring:src/main/java/frc/robot/constants/SwerveConstants.java
 	};
 
 	/**

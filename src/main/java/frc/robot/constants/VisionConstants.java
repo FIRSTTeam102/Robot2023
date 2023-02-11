@@ -1,13 +1,11 @@
 package frc.robot.constants;
 
 public final class VisionConstants {
-	/* apriltag grid */
-	public static final double zDistanceGridAprilTag_m = 0.4064;
-	public static final double xDistanceGridAprilTag_m = 0.5334;
-	public static final double maxZDistanceGridAprilTag_m = 1.778;
+	/* apriltag grid and substation */
+	public static final double maxZDistanceAprilTag_m = 1.778;
 
-	/* apriltag substation */
-	public static final double zDistanceSubstationAprilTag_m = 0.4064;
-	public static final double xDistanceSubstationAprilTag_m = 1.016;
-	public static final double maxZDistanceSubstationAprilTag_m = 3.048;
+	/* retroreflective PID */
+	public static final double visionTurnkP = 0.01851851852;
+	public static final double visionTurnkI = 1;
+	public static final double visionTurnkD = 0.55;
 };
