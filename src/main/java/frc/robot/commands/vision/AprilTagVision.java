@@ -1,8 +1,10 @@
 package frc.robot.commands.vision;
 
 import frc.robot.constants.AutoConstants;
+import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.io.VisionIO.Pipeline;
+import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
 
@@ -19,6 +21,7 @@ import com.pathplanner.lib.PathPoint;
 
 public class AprilTagVision extends CommandBase {
 	private Vision vision;
+	private Elevator elevator;
 	private Routine routine;
 	private boolean shouldRegeneratePaths = true;
 	private double xDistanceGoTo_m;
@@ -30,10 +33,12 @@ public class AprilTagVision extends CommandBase {
 		Left, Middle, Right
 	}
 
-	public AprilTagVision(Routine routine, Vision vision, Swerve swerve) {
+	public AprilTagVision(Routine routine, Vision vision, Elevator elevator, Swerve swerve) {
 		this.routine = routine;
 		this.vision = vision;
+		this.elevator = elevator;
 		this.swerve = swerve;
+		addRequirements(elevator);
 	}
 
 	@Override
@@ -60,14 +65,18 @@ public class AprilTagVision extends CommandBase {
 		switch (routine) {
 			case Left:
 				if (vision.inputs.targetAprilTag == 5) {
-					System.out.println("Blue Doublesubstation Left"); // Blue. Doublesubstation. Robot POV left.
+					System.out.println("Blue Doublesubstation Left + Elevator Doublesubstation"); // Blue. Doublesubstation. Robot
+																																												// POV left.
 					xDistanceGoTo_m = 0.70;
 					yDistanceGoTo_m = 6.13;
+					elevator.setPosition(ElevatorConstants.doubleSubstationHeight_m);
 				}
 				if (vision.inputs.targetAprilTag == 4) {
-					System.out.println("Red Doublesubstation Left"); // Red. Doublesubstation. Robot POV left.
+					System.out.println("Red Doublesubstation Left + Elevator Doublesubstation"); // Red. Doublesubstation. Robot
+																																												// POV left.
 					xDistanceGoTo_m = 15.84;
 					yDistanceGoTo_m = 7.33;
+					elevator.setPosition(ElevatorConstants.doubleSubstationHeight_m);
 				}
 
 				if (vision.inputs.targetAprilTag == 6) {
@@ -140,11 +149,13 @@ public class AprilTagVision extends CommandBase {
 					System.out.println("Blue Doublesubstation Right"); // Blue. Doublesubstation. Robot POV right.
 					xDistanceGoTo_m = 0.70;
 					yDistanceGoTo_m = 7.47;
+					elevator.setPosition(ElevatorConstants.doubleSubstationHeight_m);
 				}
 				if (vision.inputs.targetAprilTag == 4) {
 					System.out.println("Red Doublesubstation Right"); // Red. Doublesubstation. Robot POV right.
 					xDistanceGoTo_m = 15.84;
 					yDistanceGoTo_m = 6.00;
+					elevator.setPosition(ElevatorConstants.doubleSubstationHeight_m);
 				}
 
 				if (vision.inputs.targetAprilTag == 6) {

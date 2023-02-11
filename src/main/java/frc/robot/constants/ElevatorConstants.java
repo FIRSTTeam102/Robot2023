@@ -5,9 +5,10 @@ import edu.wpi.first.math.util.Units;
 public final class ElevatorConstants {
 	/* target heights */
 	// fixme: actual values
-	public static final double lowHeight_m = 0;
-	public static final double midHeight_m = 0.5;
-	public static final double highHeight_m = 1;
+	public static final double resetHeight_m = 0;
+	public static final double midNodeHeight_m = 0.5;
+	public static final double topNodeHeight_m = 1;
+	public static final double doubleSubstationHeight_m = 1;
 
 	/* ports */
 	public static final int motorId = 10;

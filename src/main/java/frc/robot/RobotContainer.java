@@ -99,38 +99,47 @@ public class RobotContainer {
 	 * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
 	 */
 	private void configureBindings() {
-		/* driver */
-		driverController.a().onTrue(new InstantCommand(() -> swerve.toggleFieldRelative()));
-		driverController.b().onTrue(new InstantCommand(() -> swerve.zeroYaw()));
-		driverController.x().whileTrue(new XStance(swerve));
+		/* driver controller */
 
-		/* operator */
-		operatorController.povLeft().and(operatorController.x())
-			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Left, vision, swerve));
-		operatorController.povLeft().and(operatorController.a())
-			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Middle, vision, swerve));
-		operatorController.povLeft().and(operatorController.b())
-			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Right, vision, swerve));
+		// drive modes
+		driverController.start().onTrue(new InstantCommand(() -> swerve.toggleFieldRelative()));
+		driverController.back().onTrue(new InstantCommand(() -> swerve.zeroYaw()));
+		driverController.leftStick().whileTrue(new XStance(swerve));
 
-		operatorController.povDown().and(operatorController.a())
+		// vision modes
+		driverController.povLeft().and(driverController.x())
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Left, vision, elevator, swerve));
+		driverController.povLeft().and(driverController.a())
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Middle, vision, elevator, swerve));
+		driverController.povLeft().and(driverController.b())
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Right, vision, elevator, swerve));
+
+		driverController.povDown().and(driverController.a())
 			.whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Middle, vision, swerve));
-		operatorController.povDown().and(operatorController.y())
+		driverController.povDown().and(driverController.y())
 			.whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Top, vision, swerve));
 
-		operatorController.povRight().and(operatorController.a())
+		driverController.povRight().and(driverController.a())
 			.whileTrue(new ObjectDetectionVision(ObjectDetectionVision.Routine.Ground, vision, swerve));
 
-		// todo: will using normal buttons conflict with the pov stuff? is there an exclusive bind?
+		// arm modes
+		driverController.rightTrigger(0.3).whileTrue(new ManualArmControl(arm, operatorController));
+		driverController.rightTrigger().and(driverController.x())
+			.onTrue(new SetArmPosition(arm));
 
-		operatorController.rightTrigger(0.3).whileTrue(new ManualArmControl(arm, operatorController));
-		operatorController.a().onTrue(new SetArmPosition(arm)); // reset arm
+		// elevator modes
+		driverController.leftTrigger(.3).whileTrue(new ManualElevatorControl(elevator, operatorController));
+		driverController.rightTrigger().and(driverController.x())
+			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.resetHeight_m));
+		driverController.rightTrigger().and(driverController.a())
+			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.midNodeHeight_m));
+		driverController.rightTrigger().and(driverController.y())
+			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.topNodeHeight_m));
 
-		operatorController.leftTrigger(.3).whileTrue(new ManualElevatorControl(elevator, operatorController));
-		operatorController.a().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.lowHeight_m)); // low
-		operatorController.b().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.midHeight_m)); // mid
-		operatorController.y().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.highHeight_m)); // high
+		// grabber modes
+		driverController.a().onTrue(new OpenGrabber(grabber, GrabberConstants.openingTime_s));
 
-		operatorController.leftBumper().onTrue(new OpenGrabber(grabber, GrabberConstants.openingTime_s));
+		/* operator controller */
 	}
 
 	/**

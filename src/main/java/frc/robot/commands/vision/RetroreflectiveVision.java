@@ -54,11 +54,11 @@ public class RetroreflectiveVision extends CommandBase {
 		// When we see a grid retroreflective, we will rotate to it and put elevator up
 		switch (routine) {
 			case Middle:
-				System.out.println("Middle");
+				System.out.println("Rotate: " + vision.inputs.crosshairToTargetOffsetX_rad + "Elevator Middle Node");
 				break;
 
 			case Top:
-				System.out.println("Top");
+				System.out.println("Rotate: " + vision.inputs.crosshairToTargetOffsetX_rad + "Elevator Top Node");
 				break;
 		}
 	}
