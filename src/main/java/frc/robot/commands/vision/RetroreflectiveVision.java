@@ -25,6 +25,7 @@ public class RetroreflectiveVision extends CommandBase {
 
 	@Override
 	public void initialize() {
+		// Sets pipeline to Retroreflective
 		vision.setPipeline(Pipeline.Retroreflective);
 	}
 
@@ -33,17 +34,24 @@ public class RetroreflectiveVision extends CommandBase {
 		if (!vision.isPipelineReady())
 			return;
 
+		// Outputs a motorPower that updates every 0.02s for the motor. kP, kI, kP must be tuned and can not be calculated
+		// in a spreadsheet as vision.errorSum and vision.errorDifference are based on the last 0.02s
+		// Constants.VisionConstants.visionTurnkP * vision.inputs.crosshairToTargetOffsetX_rad. We will not know what this
+		// data will be for the last 0.02s on a spreadsheet because we do not know what the motorPower was the last 0.02s.
 		if (vision.inputs.crosshairToTargetOffsetX_rad < -2.0) {
 			motorPower = Constants.VisionConstants.visionTurnkP * vision.inputs.crosshairToTargetOffsetX_rad
-				- Constants.VisionConstants.visionTurnkD;
+				- Constants.VisionConstants.visionTurnkI * vision.errorSum
+				- Constants.VisionConstants.visionTurnkD * vision.errorDifference;
 		} else if (vision.inputs.crosshairToTargetOffsetX_rad > 2.0) {
 			motorPower = Constants.VisionConstants.visionTurnkP * vision.inputs.crosshairToTargetOffsetX_rad
-				+ Constants.VisionConstants.visionTurnkD;
+				+ Constants.VisionConstants.visionTurnkI * vision.errorSum
+				+ Constants.VisionConstants.visionTurnkD * vision.errorDifference;
 		}
 
 		// Copy Limelight.cpp stuff from last year, (PID calculating motor speed from)
 		// Copy YawToTarget.cpp stuff from last year (sending information to swerve)
 
+		// When we see a grid retroreflective, we will rotate to it and put elevator up
 		switch (routine) {
 			case Middle:
 				System.out.println("Middle");

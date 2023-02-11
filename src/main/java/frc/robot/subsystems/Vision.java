@@ -12,12 +12,19 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import org.littletonrobotics.junction.Logger;
 
+import java.util.LinkedList;
+
 public class Vision extends SubsystemBase {
 
 	private VisionIO io = new VisionIO();
 	public VisionIOInputsAutoLogged inputs = new VisionIOInputsAutoLogged();
+	public double errorSum;
+	private double errorCount;
+	public double errorDifference;
 
 	Timer pipelineSwitchTimer = new Timer();
+	LinkedList<Double> errorTotalHistory = new LinkedList<Double>();
+	LinkedList<Double> errorLastTwoHistory = new LinkedList<Double>();
 
 	public Vision() {
 		setPipeline(Pipeline.AprilTag);
@@ -27,21 +34,40 @@ public class Vision extends SubsystemBase {
 
 	@Override
 	public void periodic() {
+
+		// Every 0.02s, updating networktable variables
 		io.updateInputs(inputs);
 		Logger.getInstance().processInputs(getName(), inputs);
 
+		// Every 0.02s, updating pose2d
 		if (inputs.pipeline == Pipeline.AprilTag.value && isPipelineReady())
 			RobotContainer.getInstance().swerve.addVisionMeasurement(
 				new Pose2d(inputs.botpose_targetspaceTranslationX_m, inputs.botpose_targetspaceTranslationY_m,
 					new Rotation2d(inputs.botpose_targetspaceRotationZ_rad)));
+
+		// Getting total crosshairToTargetOffsetX_rad sum every 0.02s
+		errorTotalHistory.add(inputs.crosshairToTargetOffsetX_rad);
+		errorSum += errorTotalHistory.getLast();
+
+		// Getting difference between crosshairToTargetoffsetX_rad within the last 0.02s
+		errorLastTwoHistory.add(inputs.crosshairToTargetOffsetX_rad);
+		errorCount += 1;
+		if (errorCount == 2) {
+			errorDifference = errorLastTwoHistory.getLast() - errorLastTwoHistory.getFirst();
+			errorLastTwoHistory.removeFirst();
+			errorCount -= 1;
+		}
+
 	}
 
+	// Creates set pipeline
 	public void setPipeline(Pipeline pipeline) {
 		pipelineSwitchTimer.reset();
 		pipelineSwitchTimer.start();
 		io.setPipeline(pipeline);
 	}
 
+	// Allows AprilTag commands to begin after pipeline switch time error
 	public boolean isPipelineReady() {
 		if (pipelineSwitchTimer.hasElapsed(0.5)) {
 			pipelineSwitchTimer.stop();

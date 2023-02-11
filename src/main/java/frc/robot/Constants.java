@@ -138,14 +138,12 @@ public final class Constants {
 	};
 
 	public static class VisionConstants {
-		/* apriltag grid */
-		public static final double maxZDistanceGridAprilTag_m = 1.778;
+		/* apriltag grid and substation */
+		public static final double maxZDistanceAprilTag_m = 1.778;
 
-		/* apriltag substation */
-		public static final double maxZDistanceSubstationAprilTag_m = 3.048;
-
-		/* retroreflective PD */
+		/* retroreflective PID */
 		public static final double visionTurnkP = 0.01851851852;
+		public static final double visionTurnkI = 1;
 		public static final double visionTurnkD = 0.55;
 	};
 

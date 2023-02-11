@@ -23,6 +23,7 @@ public class ObjectDetectionVision extends CommandBase {
 
 	@Override
 	public void initialize() {
+		// Sets pipeline to ObjectDetection
 		vision.setPipeline(Pipeline.ObjectDetection);
 	}
 

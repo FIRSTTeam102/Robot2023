@@ -37,17 +37,25 @@ public class AprilTagVision extends CommandBase {
 
 	@Override
 	public void initialize() {
+		// Sets pipeline to Apriltag
 		vision.setPipeline(Pipeline.AprilTag);
-		shouldRegeneratePaths = vision.inputs.botpose_targetspaceTranslationZ_m < Constants.VisionConstants.maxZDistanceGridAprilTag_m;
+
+		// If we are too far away Constants.VisionConstants.maxZDistanceAprilTag_m from the Apriltag, AprilTagVision will
+		// not execute
+		shouldRegeneratePaths = vision.inputs.botpose_targetspaceTranslationZ_m < Constants.VisionConstants.maxZDistanceAprilTag_m;
 		cancelPPCommand();
 	}
 
 	@Override
 	public void execute() {
+		// If pipeline switch time error has been reached and we are within Constants.VisionConstants.maxZDistanceAprilTag_m
+		// from the Apriltag, begin execute
 		if (!vision.isPipelineReady() || !shouldRegeneratePaths) {
 			return;
 		}
 
+		// When we see a substation apriltag, we will position to it and rotate to alliance color's side and put elevator up
+		// When we see a grid apriltag, we will position to it and rotate to alliance color's side
 		switch (routine) {
 			case Left:
 				if (vision.inputs.targetAprilTag == 5) {
@@ -174,6 +182,7 @@ public class AprilTagVision extends CommandBase {
 				return;
 		}
 
+		// Generate a path using from "Every 0.02s, updating pose2d" to "substation apriltag" or "grid apriltag"
 		PathPlannerTrajectory trajectory = PathPlanner.generatePath(
 			new PathConstraints(Constants.AutoConstants.maxVelocity_mps, Constants.AutoConstants.maxAcceleration_mps2),
 			new PathPoint(swerve.getPose().getTranslation(), swerve.getPose().getRotation()), // start at current pos
@@ -192,7 +201,7 @@ public class AprilTagVision extends CommandBase {
 
 	@Override
 	public boolean isFinished() {
-		// don't end automatically if subcommand is running
+		// AprilTag Vision command does not end automatically if subcommand is running
 		if (ppCommand != null && !ppCommand.isFinished())
 			return false;
 
