@@ -7,6 +7,7 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class RetroreflectiveVision extends CommandBase {
@@ -56,13 +57,13 @@ public class RetroreflectiveVision extends CommandBase {
 		switch (routine) {
 			case Middle:
 				System.out.println("Rotate: " + vision.inputs.crosshairToTargetErrorX_rad + "Elevator Middle Node");
-				swerve.drive(0, robotVelocity_mpers);
+				swerve.drive(new Translation2d(0, 0), robotVelocity_mpers);
 				elevator.setPosition(ElevatorConstants.middleNodeHeight_m);
 				break;
 
 			case Top:
 				System.out.println("Rotate: " + vision.inputs.crosshairToTargetErrorX_rad + "Elevator Top Node");
-				swerve.drive(0, robotVelocity_mpers);
+				swerve.drive(new Translation2d(0, 0), robotVelocity_mpers);
 				elevator.setPosition(ElevatorConstants.topNodeHeight_m);
 				break;
 		}
