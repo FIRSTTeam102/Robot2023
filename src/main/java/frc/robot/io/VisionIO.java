@@ -11,8 +11,8 @@ public class VisionIO {
 	public static class VisionIOInputs {
 		public double target = 0.0;
 
-		public double crosshairToTargetOffsetX_rad = 0.0;
-		public double crosshairToTargetOffsetY_rad = 0.0;
+		public double crosshairToTargetErrorX_rad = 0.0;
+		public double crosshairToTargetErrorY_rad = 0.0;
 		public double targetArea = 0.0;
 
 		public double botpose_targetspaceTranslationX_m = 0.0;
@@ -46,8 +46,8 @@ public class VisionIO {
 	public void updateInputs(VisionIOInputs inputs) {
 		inputs.target = tvEntry.getDouble(inputs.target);
 
-		inputs.crosshairToTargetOffsetX_rad = Math.toRadians(txEntry.getDouble(0));
-		inputs.crosshairToTargetOffsetY_rad = Math.toRadians(tyEntry.getDouble(0));
+		inputs.crosshairToTargetErrorX_rad = Math.toRadians(txEntry.getDouble(0));
+		inputs.crosshairToTargetErrorY_rad = Math.toRadians(tyEntry.getDouble(0));
 		inputs.targetArea = taEntry.getDouble(inputs.targetArea);
 
 		botpose_targetspaceCache = botpose_targetspaceEntry.getDoubleArray(botpose_targetspaceCache);

@@ -115,9 +115,9 @@ public class RobotContainer {
 			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Right, vision, elevator, swerve));
 
 		driverController.povDown().and(driverController.a())
-			.whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Middle, vision, swerve));
+			.whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Middle, vision, elevator, swerve));
 		driverController.povDown().and(driverController.y())
-			.whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Top, vision, swerve));
+			.whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Top, vision, elevator, swerve));
 
 		driverController.povRight().and(driverController.a())
 			.whileTrue(new ObjectDetectionVision(ObjectDetectionVision.Routine.Ground, vision, swerve));
@@ -132,7 +132,7 @@ public class RobotContainer {
 		driverController.rightTrigger().and(driverController.x())
 			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.resetHeight_m));
 		driverController.rightTrigger().and(driverController.a())
-			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.midNodeHeight_m));
+			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.middleNodeHeight_m));
 		driverController.rightTrigger().and(driverController.y())
 			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.topNodeHeight_m));
 

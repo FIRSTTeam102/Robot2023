@@ -16,7 +16,6 @@ import org.littletonrobotics.junction.Logger;
 import java.util.LinkedList;
 
 public class Vision extends SubsystemBase {
-
 	private VisionIO io = new VisionIO();
 	public VisionIOInputsAutoLogged inputs = new VisionIOInputsAutoLogged();
 	private double errorSum;
@@ -49,12 +48,12 @@ public class Vision extends SubsystemBase {
 					new Rotation2d(inputs.botpose_targetspaceRotationZ_rad)));
 
 		// Getting total crosshairToTargetOffsetX_rad sum every 0.02s
-		errorTotalHistory.add(inputs.crosshairToTargetOffsetX_rad);
+		errorTotalHistory.add(inputs.crosshairToTargetErrorX_rad);
 		errorSum += errorTotalHistory.getLast();
 		errorIntegral = errorSum * VisionConstants.periodicTime_s;
 
 		// Getting difference between crosshairToTargetoffsetX_rad within the last 0.02s
-		errorLastTwoHistory.add(inputs.crosshairToTargetOffsetX_rad);
+		errorLastTwoHistory.add(inputs.crosshairToTargetErrorX_rad);
 		errorCount += 1;
 		if (errorCount == 2) {
 			errorDifference = errorLastTwoHistory.getLast() - errorLastTwoHistory.getFirst();

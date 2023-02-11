@@ -20,14 +20,14 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
 
 public class AprilTagVision extends CommandBase {
+	private Routine routine;
 	private Vision vision;
 	private Elevator elevator;
-	private Routine routine;
+	private Swerve swerve;
+	private PathPlannerCommand ppCommand;
 	private boolean shouldRegeneratePaths = true;
 	private double xDistanceGoTo_m;
 	private double yDistanceGoTo_m;
-	private PathPlannerCommand ppCommand;
-	private Swerve swerve;
 
 	public enum Routine {
 		Left, Middle, Right

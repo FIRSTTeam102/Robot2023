@@ -6,7 +6,7 @@ public final class ElevatorConstants {
 	/* target heights */
 	// fixme: actual values
 	public static final double resetHeight_m = 0;
-	public static final double midNodeHeight_m = 0.5;
+	public static final double middleNodeHeight_m = 0.5;
 	public static final double topNodeHeight_m = 1;
 	public static final double doubleSubstationHeight_m = 1;
 
