@@ -1,6 +1,6 @@
 package frc.robot.commands.swerve;
 
-import frc.robot.Constants.SwerveConstants;
+import frc.robot.constants.SwerveConstants;
 import frc.robot.subsystems.Swerve;
 
 import edu.wpi.first.math.geometry.Translation2d;

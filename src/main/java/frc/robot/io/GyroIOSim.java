@@ -1,7 +1,7 @@
 package frc.robot.io;
 
-import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import frc.robot.constants.Constants;
 import frc.robot.subsystems.Swerve;
 
 public class GyroIOSim implements GyroIO {

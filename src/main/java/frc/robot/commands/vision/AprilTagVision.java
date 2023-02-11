@@ -1,6 +1,7 @@
 package frc.robot.commands.vision;
 
-import frc.robot.Constants;
+import frc.robot.constants.AutoConstants;
+import frc.robot.constants.VisionConstants;
 import frc.robot.io.VisionIO.Pipeline;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
@@ -184,7 +185,7 @@ public class AprilTagVision extends CommandBase {
 
 		// Generate a path using from "Every 0.02s, updating pose2d" to "substation apriltag" or "grid apriltag"
 		PathPlannerTrajectory trajectory = PathPlanner.generatePath(
-			new PathConstraints(Constants.AutoConstants.maxVelocity_mps, Constants.AutoConstants.maxAcceleration_mps2),
+			new PathConstraints(AutoConstants.maxVelocity_mps, AutoConstants.maxAcceleration_mps2),
 			new PathPoint(swerve.getPose().getTranslation(), swerve.getPose().getRotation()), // start at current pos
 			new PathPoint(new Translation2d(xDistanceGoTo_m, yDistanceGoTo_m),
 				Rotation2d.fromRadians(0)));

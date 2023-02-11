@@ -1,6 +1,6 @@
 package frc.robot.swerve;
 
-import static frc.robot.Constants.SwerveConstants.*;
+import static frc.robot.constants.SwerveConstants.*;
 
 import frc.robot.util.Conversions;
 

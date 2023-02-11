@@ -31,7 +31,7 @@ public class SwerveTest {
 
 	@AfterEach
 	public void shutdown() throws Exception {
-		swerve.close();
+		// swerve.close();
 	}
 
 	@Test

@@ -1,7 +1,8 @@
 package frc.robot;
 
-import static frc.robot.Constants.robotMode;
+import static frc.robot.constants.Constants.robotMode;
 
+import frc.robot.constants.BuildConstants;
 import frc.robot.subsystems.Lights;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -161,5 +162,7 @@ public class Robot extends LoggedRobot {
 
 	/** This function is called periodically whilst in simulation. */
 	@Override
-	public void simulationPeriodic() {}
+	public void simulationPeriodic() {
+		// REVPhysicsSim.getInstance().run();
+	}
 }
