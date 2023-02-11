@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import frc.robot.RobotContainer;
+import frc.robot.constants.VisionConstants;
 import frc.robot.io.VisionIO;
 import frc.robot.io.VisionIO.Pipeline;
 import frc.robot.io.VisionIOInputsAutoLogged;
@@ -18,9 +19,11 @@ public class Vision extends SubsystemBase {
 
 	private VisionIO io = new VisionIO();
 	public VisionIOInputsAutoLogged inputs = new VisionIOInputsAutoLogged();
-	public double errorSum;
+	private double errorSum;
+	public double errorIntegral;
 	private double errorCount;
-	public double errorDifference;
+	private double errorDifference;
+	public double errorDerivative;
 
 	Timer pipelineSwitchTimer = new Timer();
 	LinkedList<Double> errorTotalHistory = new LinkedList<Double>();
@@ -48,12 +51,14 @@ public class Vision extends SubsystemBase {
 		// Getting total crosshairToTargetOffsetX_rad sum every 0.02s
 		errorTotalHistory.add(inputs.crosshairToTargetOffsetX_rad);
 		errorSum += errorTotalHistory.getLast();
+		errorIntegral = errorSum * VisionConstants.periodicTime_s;
 
 		// Getting difference between crosshairToTargetoffsetX_rad within the last 0.02s
 		errorLastTwoHistory.add(inputs.crosshairToTargetOffsetX_rad);
 		errorCount += 1;
 		if (errorCount == 2) {
 			errorDifference = errorLastTwoHistory.getLast() - errorLastTwoHistory.getFirst();
+			errorDerivative = errorDifference / VisionConstants.periodicTime_s;
 			errorLastTwoHistory.removeFirst();
 			errorCount -= 1;
 		}

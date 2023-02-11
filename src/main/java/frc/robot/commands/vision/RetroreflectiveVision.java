@@ -35,17 +35,17 @@ public class RetroreflectiveVision extends CommandBase {
 			return;
 
 		// Outputs a motorPower that updates every 0.02s for the motor. kP, kI, kP must be tuned and can not be calculated
-		// in a spreadsheet as vision.errorSum and vision.errorDifference are based on the last 0.02s
+		// in a spreadsheet as vision.errorIntegral and vision.errorDerivative are based on the last 0.02s
 		// VisionConstants.visionTurnkP * vision.inputs.crosshairToTargetOffsetX_rad. We will not know what this
 		// data will be for the last 0.02s on a spreadsheet because we do not know what the motorPower was the last 0.02s.
 		if (vision.inputs.crosshairToTargetOffsetX_rad < -2.0) {
 			motorPower = VisionConstants.visionTurnkP * vision.inputs.crosshairToTargetOffsetX_rad
-				- VisionConstants.visionTurnkI * vision.errorSum
-				- VisionConstants.visionTurnkD * vision.errorDifference;
+				- VisionConstants.visionTurnkI * vision.errorIntegral
+				- VisionConstants.visionTurnkD * vision.errorDerivative;
 		} else if (vision.inputs.crosshairToTargetOffsetX_rad > 2.0) {
 			motorPower = VisionConstants.visionTurnkP * vision.inputs.crosshairToTargetOffsetX_rad
-				+ VisionConstants.visionTurnkI * vision.errorSum
-				+ VisionConstants.visionTurnkD * vision.errorDifference;
+				+ VisionConstants.visionTurnkI * vision.errorIntegral
+				+ VisionConstants.visionTurnkD * vision.errorDerivative;
 		}
 
 		// Copy Limelight.cpp stuff from last year, (PID calculating motor speed from)

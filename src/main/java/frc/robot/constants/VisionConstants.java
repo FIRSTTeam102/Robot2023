@@ -8,4 +8,5 @@ public final class VisionConstants {
 	public static final double visionTurnkP = 0.01851851852;
 	public static final double visionTurnkI = 1;
 	public static final double visionTurnkD = 0.55;
+	public static final double periodicTime_s = 0.02;
 };
