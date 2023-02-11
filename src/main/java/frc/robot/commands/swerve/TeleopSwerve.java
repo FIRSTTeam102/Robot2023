@@ -41,8 +41,8 @@ public class TeleopSwerve extends CommandBase {
 		super.end(interrupted);
 	}
 
-	private static final double cubicWeight = 0.5;
-	private static final double weightExponent = 5.0;
+	private static final double cubicWeight = 0.4;
+	private static final double weightExponent = 3.5;
 
 	private static double modifyAxis(double value) {
 		value = MathUtil.applyDeadband(value, OperatorConstants.stickDeadband);

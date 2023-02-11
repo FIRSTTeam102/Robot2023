@@ -162,6 +162,7 @@ bin/
 *-window.json
 simgui*.json
 !simgui-ds.json
+networktables.json
 
 # Automatically generated when building
 src/main/java/frc/robot/constants/BuildConstants.java
