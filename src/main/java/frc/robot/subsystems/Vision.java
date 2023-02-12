@@ -18,15 +18,23 @@ import java.util.LinkedList;
 public class Vision extends SubsystemBase {
 	private VisionIO io = new VisionIO();
 	public VisionIOInputsAutoLogged inputs = new VisionIOInputsAutoLogged();
-	private double errorSum;
-	public double errorIntegral;
-	private double errorCount;
-	private double errorDifference;
-	public double errorDerivative;
+	private double rotateErrorSum;
+	public double rotateErrorIntegral;
+	private double rotateErrorCount;
+	private double rotateErrorDifference;
+	public double rotateErrorDerivative;
+
+	private double translateErrorSum;
+	public double translateErrorIntegral;
+	private double translateErrorCount;
+	private double translateErrorDifference;
+	public double translateErrorDerivative;
 
 	Timer pipelineSwitchTimer = new Timer();
-	LinkedList<Double> errorTotalHistory = new LinkedList<Double>();
-	LinkedList<Double> errorLastTwoHistory = new LinkedList<Double>();
+	LinkedList<Double> rotateErrorTotalHistory = new LinkedList<Double>();
+	LinkedList<Double> rotateErrorLastTwoHistory = new LinkedList<Double>();
+	LinkedList<Double> translateErrorTotalHistory = new LinkedList<Double>();
+	LinkedList<Double> translateErrorLastTwoHistory = new LinkedList<Double>();
 
 	public Vision() {
 		setPipeline(Pipeline.AprilTag);
@@ -48,18 +56,33 @@ public class Vision extends SubsystemBase {
 					new Rotation2d(inputs.botpose_targetspaceRotationZ_rad)));
 
 		// Getting total crosshairToTargetOffsetX_rad sum every 0.02s
-		errorTotalHistory.add(inputs.crosshairToTargetErrorX_rad);
-		errorSum += errorTotalHistory.getLast();
-		errorIntegral = errorSum * VisionConstants.periodicTime_s;
+		rotateErrorTotalHistory.add(inputs.crosshairToTargetErrorX_rad);
+		rotateErrorSum += rotateErrorTotalHistory.getLast();
+		rotateErrorIntegral = rotateErrorSum * VisionConstants.periodicTime_s;
 
 		// Getting difference between crosshairToTargetoffsetX_rad within the last 0.02s
-		errorLastTwoHistory.add(inputs.crosshairToTargetErrorX_rad);
-		errorCount += 1;
-		if (errorCount == 2) {
-			errorDifference = errorLastTwoHistory.getLast() - errorLastTwoHistory.getFirst();
-			errorDerivative = errorDifference / VisionConstants.periodicTime_s;
-			errorLastTwoHistory.removeFirst();
-			errorCount -= 1;
+		rotateErrorLastTwoHistory.add(inputs.crosshairToTargetErrorX_rad);
+		rotateErrorCount += 1;
+		if (rotateErrorCount == 2) {
+			rotateErrorDifference = rotateErrorLastTwoHistory.getLast() - rotateErrorLastTwoHistory.getFirst();
+			rotateErrorDerivative = rotateErrorDifference / VisionConstants.periodicTime_s;
+			rotateErrorLastTwoHistory.removeFirst();
+			rotateErrorCount -= 1;
+		}
+
+		// Getting total botpose_targetspaceTranslationZ_m sum every 0.02s
+		translateErrorTotalHistory.add(inputs.botpose_targetspaceRotationZ_rad);
+		translateErrorSum += translateErrorTotalHistory.getLast();
+		translateErrorIntegral = translateErrorSum * VisionConstants.periodicTime_s;
+
+		// Getting difference between botpose_targetspaceTranslationZ_m within the last 0.02s
+		translateErrorLastTwoHistory.add(inputs.botpose_targetspaceRotationZ_rad);
+		translateErrorCount += 1;
+		if (translateErrorCount == 2) {
+			translateErrorDifference = translateErrorLastTwoHistory.getLast() - translateErrorLastTwoHistory.getFirst();
+			translateErrorDerivative = translateErrorDifference / VisionConstants.periodicTime_s;
+			translateErrorLastTwoHistory.removeFirst();
+			translateErrorCount -= 1;
 		}
 
 	}

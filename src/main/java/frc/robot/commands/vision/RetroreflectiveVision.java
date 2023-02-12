@@ -15,7 +15,7 @@ public class RetroreflectiveVision extends CommandBase {
 	private Vision vision;
 	private Elevator elevator;
 	private Swerve swerve;
-	private double robotVelocity_mpers;
+	private double robotRotateVelocity_mpers;
 
 	public enum Routine {
 		Middle, Top
@@ -39,31 +39,32 @@ public class RetroreflectiveVision extends CommandBase {
 		if (!vision.isPipelineReady())
 			return;
 
-		// Outputs a robotVelocity_mpers that updates every 0.02s for the motor. kP, kI, kP must be tuned and can not be
-		// calculated in a spreadsheet as vision.errorIntegral and vision.errorDerivative are based on the last 0.02s
-		// VisionConstants.visionTurnkP * vision.inputs.crosshairToTargetOffsetX_rad. We will not know what this data will
-		// be for the last 0.02s on a spreadsheet because we do not know what the robotVelocity_mpers was the last 0.02s.
-		if (vision.inputs.crosshairToTargetErrorX_rad < -VisionConstants.crosshairTargetBoundX_rad) {
-			robotVelocity_mpers = VisionConstants.visionTurnKp * vision.inputs.crosshairToTargetErrorX_rad
-				- VisionConstants.visionTurnKi * vision.errorIntegral
-				- VisionConstants.visionTurnKd * vision.errorDerivative;
-		} else if (vision.inputs.crosshairToTargetErrorX_rad > VisionConstants.crosshairTargetBoundX_rad) {
-			robotVelocity_mpers = VisionConstants.visionTurnKp * vision.inputs.crosshairToTargetErrorX_rad
-				+ VisionConstants.visionTurnKi * vision.errorIntegral
-				+ VisionConstants.visionTurnKd * vision.errorDerivative;
+		// Outputs a robotRotateVelocity_mpers that updates every 0.02s for the motor. rotateKp, rotateKi, rotateKd must be
+		// tuned and can not be calculated in a spreadsheet as vision.rotateErrorIntegral and vision.rotateErrorDerivative
+		// are based on the last 0.02s VisionConstants.rotatekP * vision.inputs.crosshairToTargetOffsetX_rad. We will not
+		// know what this data will be for the last 0.02s on a spreadsheet because we do not know what the
+		// robotRotateVelocity_mpers was the last 0.02s.
+		if (vision.inputs.crosshairToTargetErrorX_rad < -VisionConstants.crosshairTargetBoundRotateX_rad) {
+			robotRotateVelocity_mpers = VisionConstants.rotateKp * vision.inputs.crosshairToTargetErrorX_rad
+				- VisionConstants.rotateKi * vision.rotateErrorIntegral
+				- VisionConstants.rotateKd * vision.rotateErrorDerivative;
+		} else if (vision.inputs.crosshairToTargetErrorX_rad > VisionConstants.crosshairTargetBoundRotateX_rad) {
+			robotRotateVelocity_mpers = VisionConstants.rotateKp * vision.inputs.crosshairToTargetErrorX_rad
+				+ VisionConstants.rotateKi * vision.rotateErrorIntegral
+				+ VisionConstants.rotateKd * vision.rotateErrorDerivative;
 		}
 
 		// When we see a grid retroreflective, we will rotate to it and put elevator up
 		switch (routine) {
 			case Middle:
 				System.out.println("Rotate: " + vision.inputs.crosshairToTargetErrorX_rad + "Elevator Middle Node");
-				swerve.drive(new Translation2d(0, 0), robotVelocity_mpers);
+				swerve.drive(new Translation2d(0, 0), robotRotateVelocity_mpers);
 				elevator.setPosition(ElevatorConstants.middleNodeHeight_m);
 				break;
 
 			case Top:
 				System.out.println("Rotate: " + vision.inputs.crosshairToTargetErrorX_rad + "Elevator Top Node");
-				swerve.drive(new Translation2d(0, 0), robotVelocity_mpers);
+				swerve.drive(new Translation2d(0, 0), robotRotateVelocity_mpers);
 				elevator.setPosition(ElevatorConstants.topNodeHeight_m);
 				break;
 		}
@@ -78,7 +79,7 @@ public class RetroreflectiveVision extends CommandBase {
 	// Feedback loop for PID
 	@Override
 	public boolean isFinished() {
-		return ((-VisionConstants.crosshairTargetBoundX_rad < vision.inputs.crosshairToTargetErrorX_rad)
-			&& (vision.inputs.crosshairToTargetErrorX_rad < VisionConstants.crosshairTargetBoundX_rad));
+		return ((-VisionConstants.crosshairTargetBoundRotateX_rad < vision.inputs.crosshairToTargetErrorX_rad)
+			&& (vision.inputs.crosshairToTargetErrorX_rad < VisionConstants.crosshairTargetBoundRotateX_rad));
 	}
 }

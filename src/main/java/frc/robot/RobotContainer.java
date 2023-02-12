@@ -1,5 +1,6 @@
 package frc.robot;
 
+import frc.robot.constants.ArmConstants;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.constants.ElevatorConstants;
@@ -120,12 +121,12 @@ public class RobotContainer {
 			.whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Top, vision, elevator, swerve));
 
 		driverController.povRight().and(driverController.a())
-			.whileTrue(new ObjectDetectionVision(ObjectDetectionVision.Routine.Ground, vision, swerve));
+			.whileTrue(new ObjectDetectionVision(ObjectDetectionVision.Routine.Ground, vision, elevator, arm, swerve));
 
 		// arm modes
 		driverController.rightTrigger(0.3).whileTrue(new ManualArmControl(arm, operatorController));
 		driverController.rightTrigger().and(driverController.x())
-			.onTrue(new SetArmPosition(arm));
+			.onTrue(new SetArmPosition(arm, ArmConstants.resetLength_m));
 
 		// elevator modes
 		driverController.leftTrigger(.3).whileTrue(new ManualElevatorControl(elevator, operatorController));
