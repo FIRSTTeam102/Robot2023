@@ -6,4 +6,6 @@ public final class GrabberConstants {
 	public static final int closedSensorPin = 5;
 	public static final double speed = 0.5;
 	public static final double openingTime_s = 0.25;
+
+	public static final double currentLimit_A = 1;
 }

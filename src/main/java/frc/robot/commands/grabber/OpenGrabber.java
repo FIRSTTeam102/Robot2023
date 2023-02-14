@@ -9,19 +9,21 @@ public class OpenGrabber extends CommandBase {
 	private Grabber grabber;
 	private Timer timer = new Timer();
 	private double runTime_s;
+	private double speed;
 
 	/**
 	 * @param time_s how long to close
 	*/
-	public OpenGrabber(Grabber grabber, double runTime_s) {
+	public OpenGrabber(Grabber grabber, double speed, double runTime_s) {
 		this.grabber = grabber;
+		this.speed = speed;
 		this.runTime_s = runTime_s;
 		addRequirements(grabber);
 	}
 
 	@Override
 	public void initialize() {
-		grabber.moveOutward();
+		grabber.move(-speed);
 		timer.reset();
 		timer.start();
 	}

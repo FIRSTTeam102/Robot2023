@@ -18,6 +18,7 @@ import frc.robot.commands.arm.ManualArmControl;
 import frc.robot.commands.arm.SetArmPosition;
 import frc.robot.commands.elevator.ManualElevatorControl;
 import frc.robot.commands.elevator.SetElevatorPosition;
+import frc.robot.commands.grabber.CloseGrabber;
 import frc.robot.commands.grabber.OpenGrabber;
 import frc.robot.commands.swerve.ChargeStationBalance;
 import frc.robot.commands.swerve.TeleopSwerve;
@@ -130,7 +131,8 @@ public class RobotContainer {
 		operatorController.b().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.midHeight_m)); // mid
 		operatorController.y().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.highHeight_m)); // high
 
-		operatorController.leftBumper().onTrue(new OpenGrabber(grabber, GrabberConstants.openingTime_s));
+		operatorController.leftBumper().onTrue(new OpenGrabber(grabber, .4, GrabberConstants.openingTime_s));
+		operatorController.rightBumper().onTrue(new CloseGrabber(grabber, .5));
 	}
 
 	/**
