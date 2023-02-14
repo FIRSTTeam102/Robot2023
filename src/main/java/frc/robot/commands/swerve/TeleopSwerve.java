@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.commands.swerve;
 
 import frc.robot.constants.Constants.OperatorConstants;
@@ -45,8 +41,8 @@ public class TeleopSwerve extends CommandBase {
 		super.end(interrupted);
 	}
 
-	private static final double cubicWeight = 0.5;
-	private static final double weightExponent = 5.0;
+	private static final double cubicWeight = 0.4;
+	private static final double weightExponent = 3.5;
 
 	private static double modifyAxis(double value) {
 		value = MathUtil.applyDeadband(value, OperatorConstants.stickDeadband);

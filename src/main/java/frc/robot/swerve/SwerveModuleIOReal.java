@@ -58,7 +58,7 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 
 		angleMotor = new CANSparkMax(moduleConstants.angleMotorId(), CANSparkMax.MotorType.kBrushless);
 		angleMotor.restoreFactoryDefaults();
-		// angleSparkPidController = angleMotor.getPIDController();
+		angleSparkPidController = angleMotor.getPIDController();
 		// angleSparkPidController.setP(angleKp);
 		// angleSparkPidController.setI(angleKi);
 		// angleSparkPidController.setD(angleKd);

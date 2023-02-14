@@ -23,9 +23,13 @@ public final class Autos {
 	// return Commands.sequence(subsystem.exampleMethodCommand(), new ExampleCommand(subsystem));
 	// }
 
+	// used by pathplanner
 	public static final PIDController ppXController = new PIDController(autoDriveKp, autoDriveKi, autoDriveKd);
 	public static final PIDController ppYController = new PIDController(autoDriveKp, autoDriveKi, autoDriveKd);
-	public static final PIDController ppRotationController = new PIDController(autoAngleKp, autoAngleKi, autoAngleKd);
+	public static final PIDController ppRotationController = new PIDController(autoAngleKp, autoAngleKi, autoAngleKd); // rad
+	static {
+		ppRotationController.enableContinuousInput(-Math.PI, Math.PI);
+	}
 
 	public static Command simpleWall(Swerve swerve) {
 		List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup("simple wall",
