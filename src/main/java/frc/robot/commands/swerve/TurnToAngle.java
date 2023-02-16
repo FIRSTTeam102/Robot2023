@@ -16,5 +16,11 @@ public class TurnToAngle extends PIDCommand {
 			() -> angle_rad,
 			(double output) -> swerve.drive(zeroTranslation, output),
 			swerve);
+		m_controller.setTolerance(0.01, 0.01);
+	}
+
+	@Override
+	public boolean isFinished() {
+		return m_controller.atSetpoint();
 	}
 }
