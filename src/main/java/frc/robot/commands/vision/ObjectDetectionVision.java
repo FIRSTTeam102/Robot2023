@@ -49,10 +49,10 @@ public class ObjectDetectionVision extends CommandBase {
 		// are based on the last 0.02s VisionConstants.rotatekP * vision.inputs.crosshairToTargetOffsetX_rad. We will not
 		// know what this data will be for the last 0.02s on a spreadsheet because we do not know what the
 		// robotRotateVelocity_mpers was the last 0.02s.
-		if (vision.inputs.crosshairToTargetErrorX_rad < -VisionConstants.crosshairTargetBoundRotateX_rad) {
+		if (vision.inputs.crosshairToTargetErrorX_rad < -VisionConstants.crosshairObjectBoundRotateX_rad) {
 			robotRotateVelocity_mpers = VisionConstants.rotateKp * vision.inputs.crosshairToTargetErrorX_rad
 				- VisionConstants.rotateKd * vision.translateErrorDerivative;
-		} else if (vision.inputs.crosshairToTargetErrorX_rad > VisionConstants.crosshairTargetBoundRotateX_rad) {
+		} else if (vision.inputs.crosshairToTargetErrorX_rad > VisionConstants.crosshairObjectBoundRotateX_rad) {
 			robotRotateVelocity_mpers = VisionConstants.rotateKp * vision.inputs.crosshairToTargetErrorX_rad
 				+ VisionConstants.rotateKi * vision.translateErrorIntegral
 				+ VisionConstants.rotateKd * vision.translateErrorDerivative;
@@ -63,7 +63,7 @@ public class ObjectDetectionVision extends CommandBase {
 		// vision.translateErrorDerivative are based on the last 0.02s VisionConstants.translatekP *
 		// vision.inputs.botpose_targetspaceTranslationZ_m. We will not know what this data will be for the last 0.02s on a
 		// spreadsheet because we do not know what the robotTranslateVelocity_mpers was the last 0.02s.
-		if (vision.inputs.botpose_targetspaceTranslationZ_m < VisionConstants.crosshairTargetBoundTranslateZ_m) {
+		if (vision.inputs.botpose_targetspaceTranslationZ_m < VisionConstants.crosshairObjectBoundTranslateZ_m) {
 			robotTranslateVelocity_mpers = VisionConstants.translateKp * vision.inputs.botpose_targetspaceTranslationZ_m
 				- VisionConstants.translateKd * vision.translateErrorDerivative;
 		}
@@ -73,7 +73,7 @@ public class ObjectDetectionVision extends CommandBase {
 		switch (routine) {
 			case Ground:
 				System.out.println("Translate: " + vision.inputs.botpose_targetspaceRotationZ_rad + " Rotate: "
-					+ vision.inputs.crosshairToTargetErrorX_rad + "Elevator Middle Node");
+					+ vision.inputs.crosshairToTargetErrorX_rad + "Swerve Object + Elevator Object + Arm Object + Arm Object");
 				swerve.drive(new Translation2d(0, robotTranslateVelocity_mpers), robotRotateVelocity_mpers);
 				elevator.setPosition(ElevatorConstants.resetHeight_m);
 				arm.setPosition(ArmConstants.groundObjectLength_m);
@@ -85,13 +85,15 @@ public class ObjectDetectionVision extends CommandBase {
 	@Override
 	public void end(boolean interrupted) {
 		swerve.stop();
+		// Sets pipeline back to Apriltag
+		vision.setPipeline(Pipeline.AprilTag);
 	}
 
 	// Feedback loop for PID
 	@Override
 	public boolean isFinished() {
-		return ((-VisionConstants.crosshairTargetBoundRotateX_rad < vision.inputs.crosshairToTargetErrorX_rad)
-			&& (vision.inputs.crosshairToTargetErrorX_rad < VisionConstants.crosshairTargetBoundRotateX_rad))
-			&& (vision.inputs.botpose_targetspaceRotationZ_rad < VisionConstants.crosshairTargetBoundTranslateZ_m);
+		return ((-VisionConstants.crosshairObjectBoundRotateX_rad < vision.inputs.crosshairToTargetErrorX_rad)
+			&& (vision.inputs.crosshairToTargetErrorX_rad < VisionConstants.crosshairObjectBoundRotateX_rad))
+			&& (vision.inputs.botpose_targetspaceRotationZ_rad < VisionConstants.crosshairObjectBoundTranslateZ_m);
 	}
 }

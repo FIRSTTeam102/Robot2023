@@ -15,5 +15,6 @@ public final class VisionConstants {
 	public static final double translateKp = 0;
 	public static final double translateKi = 0;
 	public static final double translateKd = 0;
-	public static final double crosshairTargetBoundTranslateZ_m = 0.559;
+	public static final double crosshairObjectBoundTranslateZ_m = 0.559;
+	public static final double crosshairObjectBoundRotateX_rad = 0.035;
 };

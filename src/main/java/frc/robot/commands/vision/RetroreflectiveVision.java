@@ -36,6 +36,7 @@ public class RetroreflectiveVision extends CommandBase {
 
 	@Override
 	public void execute() {
+		// If isPipelineReady true, begin execute
 		if (!vision.isPipelineReady())
 			return;
 
@@ -70,13 +71,14 @@ public class RetroreflectiveVision extends CommandBase {
 		}
 	}
 
-	// Stop swerve isFinished
+	// Stop swerve and sets pipeline back to Apriltag
 	@Override
 	public void end(boolean interrupted) {
 		swerve.stop();
+		vision.setPipeline(Pipeline.AprilTag);
 	}
 
-	// Feedback loop for PID
+	// Feedback loop for PID until we meet crosshairTargetBoundRotateX_rad
 	@Override
 	public boolean isFinished() {
 		return ((-VisionConstants.crosshairTargetBoundRotateX_rad < vision.inputs.crosshairToTargetErrorX_rad)
