@@ -41,9 +41,7 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 	// return inputs.closed;
 	// }
 
-	public boolean currentLimitReached() {
-		return (motor.getOutputCurrent() >= GrabberConstants.currentLimit_A);
-	}
+	public boolean currentLimitReached = false;
 
 	public void move(double speed) {
 		motor.set(speed);
@@ -60,12 +58,15 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 		updateInputs(inputs);
 		Logger.getInstance().processInputs(getName(), inputs);
 
+		// Read current once every cycle so results don't change during a cycle
+		currentLimitReached = (motor.getOutputCurrent() >= GrabberConstants.currentLimit_A);
+
 		// if (inputs.objectDetected && !inputs.closed && !closeGrabber.isScheduled())
 		// closeGrabber.schedule();
 
 		// shuffleboardClosed.setBoolean(inputs.closed);
 
-		if (currentLimitReached()) {
+		if (currentLimitReached) {
 			stop();
 		}
 	}

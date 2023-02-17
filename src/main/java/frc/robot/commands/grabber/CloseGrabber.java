@@ -24,7 +24,7 @@ public class CloseGrabber extends CommandBase {
 
 	@Override
 	public boolean isFinished() {
-		return grabber.currentLimitReached();
+		return grabber.currentLimitReached;
 	}
 
 	@Override
