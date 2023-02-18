@@ -131,8 +131,8 @@ public class RobotContainer {
 		operatorController.b().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.midHeight_m)); // mid
 		operatorController.y().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.highHeight_m)); // high
 
-		operatorController.leftBumper().onTrue(new OpenGrabber(grabber, .4, GrabberConstants.openingTime_s));
-		operatorController.rightBumper().onTrue(new CloseGrabber(grabber, .5));
+		operatorController.leftBumper().toggleOnTrue(new OpenGrabber(grabber, .4, GrabberConstants.openingTime_s));
+		operatorController.rightBumper().toggleOnTrue(new CloseGrabber(grabber, .5));
 	}
 
 	/**
