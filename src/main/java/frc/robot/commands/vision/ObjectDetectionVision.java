@@ -18,8 +18,8 @@ public class ObjectDetectionVision extends CommandBase {
 	private Elevator elevator;
 	private Arm arm;
 	private Swerve swerve;
-	private double robotRotateVelocity_mpers;
-	private double robotTranslateVelocity_mpers;
+	private double robotRotateVelocity_mps;
+	private double robotTranslateVelocity_mps;
 
 	public enum Routine {
 		Ground
@@ -45,25 +45,25 @@ public class ObjectDetectionVision extends CommandBase {
 		if (!vision.isPipelineReady())
 			return;
 
-		// Outputs a robotRotateVelocity_mpers that updates every 0.02s for the motor. rotateKp, rotateKi, rotateKd must be
+		// Outputs a robotRotateVelocity_mps that updates every 0.02s for the motor. rotateKp, rotateKi, rotateKd must be
 		// tuned and can not be calculated in a spreadsheet as rotateErrorIntegral and rotateErrorDerivative are based on
 		// the last 0.02s VisionConstants.rotatekP * crosshairToTargetOffsetX_rad. We will not know what this data will be
-		// for the last 0.02s on a spreadsheet because we do not know what the robotRotateVelocity_mpers was the last 0.02s.
+		// for the last 0.02s on a spreadsheet because we do not know what the robotRotateVelocity_mps was the last 0.02s.
 		if (vision.inputs.crosshairToTargetErrorX_rad < -VisionConstants.crosshairObjectBoundRotateX_rad) {
-			robotRotateVelocity_mpers = VisionConstants.rotateKp * vision.inputs.crosshairToTargetErrorX_rad
+			robotRotateVelocity_mps = VisionConstants.rotateKp * vision.inputs.crosshairToTargetErrorX_rad
 				- VisionConstants.rotateKd * vision.translateErrorDerivative;
 		} else if (vision.inputs.crosshairToTargetErrorX_rad > VisionConstants.crosshairObjectBoundRotateX_rad) {
-			robotRotateVelocity_mpers = VisionConstants.rotateKp * vision.inputs.crosshairToTargetErrorX_rad
+			robotRotateVelocity_mps = VisionConstants.rotateKp * vision.inputs.crosshairToTargetErrorX_rad
 				+ VisionConstants.rotateKi * vision.translateErrorIntegral
 				+ VisionConstants.rotateKd * vision.translateErrorDerivative;
 		}
 
-		// Outputs a robotRotateVelocity_mpers that updates every 0.02s for the motor. rotateKp, rotateKi, rotateKd must be
+		// Outputs a robotRotateVelocity_mps that updates every 0.02s for the motor. rotateKp, rotateKi, rotateKd must be
 		// tuned and can not be calculated in a spreadsheet as rotateErrorIntegral and rotateErrorDerivative are based on
 		// the last 0.02s VisionConstants.rotatekP * crosshairToTargetOffsetX_rad. We will not know what this data will be
-		// for the last 0.02s on a spreadsheet because we do not know what the robotRotateVelocity_mpers was the last 0.02s.
+		// for the last 0.02s on a spreadsheet because we do not know what the robotRotateVelocity_mps was the last 0.02s.
 		if (vision.inputs.botpose_targetspaceTranslationZ_m < VisionConstants.crosshairObjectBoundTranslateZ_m) {
-			robotTranslateVelocity_mpers = VisionConstants.translateKp * vision.inputs.botpose_targetspaceTranslationZ_m
+			robotTranslateVelocity_mps = VisionConstants.translateKp * vision.inputs.botpose_targetspaceTranslationZ_m
 				- VisionConstants.translateKd * vision.translateErrorDerivative;
 		}
 
@@ -73,7 +73,7 @@ public class ObjectDetectionVision extends CommandBase {
 			case Ground:
 				System.out.println("Translate: " + vision.inputs.botpose_targetspaceRotationZ_rad + " Rotate: "
 					+ vision.inputs.crosshairToTargetErrorX_rad + "Swerve Object + Elevator Object + Arm Object + Arm Object");
-				swerve.drive(new Translation2d(0, robotTranslateVelocity_mpers), robotRotateVelocity_mpers);
+				swerve.drive(new Translation2d(0, robotTranslateVelocity_mps), robotRotateVelocity_mps, true);
 				elevator.setPosition(ElevatorConstants.resetHeight_m);
 				arm.setPosition(ArmConstants.groundObjectLength_m);
 				break;
