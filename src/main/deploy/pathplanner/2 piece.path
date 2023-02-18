@@ -51,21 +51,12 @@
     },
     {
       "anchorPoint": {
-<<<<<<< Updated upstream:src/main/deploy/pathplanner/2 piece.path
         "x": 1.8778355388379817,
         "y": 3.876620249674165
       },
       "prevControl": {
         "x": 1.7291745853106537,
         "y": 5.100214251783711
-=======
-        "x": 15.084074168148335,
-        "y": 6.971279799702457
-      },
-      "prevControl": {
-        "x": 12.914432222026837,
-        "y": 6.537351410478157
->>>>>>> Stashed changes:src/main/deploy/pathplanner/test across the field.path
       },
       "nextControl": null,
       "holonomicAngle": 180.0,

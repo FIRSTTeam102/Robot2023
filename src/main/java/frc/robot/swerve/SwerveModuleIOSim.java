@@ -92,6 +92,11 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 	}
 
 	@Override
+	public double getCharacterizationVelocity() {
+		return driveWheelSim.getAngularVelocityRadPerSec();
+	}
+
+	@Override
 	public void close() throws Exception {
 		driveController.close();
 	}
