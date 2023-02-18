@@ -39,10 +39,9 @@ public final class ElevatorConstants {
 	// public static final double kA = 0.2;
 
 	/* sizes */
-	public static final double gearRatio = 1 / 12;
-	// per rotation of main shaft, carriage moves 8.9cm
+	public static final double gearRatio = 12; // motor rotations per main shaft rotation
 	public static final double conversionFactor_m_per_rotation = 1 /* rotation of motor */
-		* gearRatio /* rotation/rotation of main shaft */
+		* (1 / gearRatio) /* rotation/rotation of main shaft */
 		* 0.089; /* m/rotation */
 	public static final double minHeight_m = Units.inchesToMeters(0);
 	public static final double maxHeight_m = Units.inchesToMeters(50);

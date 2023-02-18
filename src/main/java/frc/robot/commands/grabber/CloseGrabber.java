@@ -6,15 +6,17 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class CloseGrabber extends CommandBase {
 	private Grabber grabber;
+	private double speed;
 
-	public CloseGrabber(Grabber grabber) {
+	public CloseGrabber(Grabber grabber, double speed) {
 		this.grabber = grabber;
+		this.speed = speed;
 		addRequirements(grabber);
 	}
 
 	@Override
 	public void initialize() {
-		grabber.moveInward();
+		grabber.move(speed);
 	}
 
 	@Override
@@ -22,7 +24,7 @@ public class CloseGrabber extends CommandBase {
 
 	@Override
 	public boolean isFinished() {
-		return grabber.isClosed();
+		return grabber.currentLimitReached;
 	}
 
 	@Override

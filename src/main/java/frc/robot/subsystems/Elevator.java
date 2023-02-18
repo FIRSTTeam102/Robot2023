@@ -40,7 +40,7 @@ public class Elevator extends SubsystemBase {
 
 	public Elevator() {
 		// todo: do we want to fall back down when not being told to hold?
-		motor.setIdleMode(IdleMode.kCoast);
+		motor.setIdleMode(IdleMode.kBrake);
 
 		topSwitch.enableLimitSwitch(true);
 		bottomSwitch.enableLimitSwitch(true);
