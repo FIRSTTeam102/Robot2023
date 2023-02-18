@@ -15,6 +15,11 @@ public class Lights {
 	private static SerialPort serial = new SerialPort(9600, SerialPort.Port.kMXP,
 		8, SerialPort.Parity.kNone, SerialPort.StopBits.kOne);
 
+	static {
+		serial.setWriteBufferMode(SerialPort.WriteBufferMode.kFlushOnAccess);
+		serial.setWriteBufferSize(1);
+	}
+
 	private Lights() {}
 
 	public enum Subsystem {
@@ -54,8 +59,9 @@ public class Lights {
 			throw new RuntimeException("invalid lights status message");
 		Integer message = (status << 4) ^ subsystem;
 		System.out.println("Lights serial message: " + message);
-		if (Robot.isReal())
+		if (Robot.isReal()) {
 			serial.write(new byte[] {message.byteValue()}, 1);
+		}
 	}
 
 	public static void setStatus(Subsystem subsystem, Status status) {

@@ -2,6 +2,7 @@ package frc.robot;
 
 import frc.robot.constants.ArmConstants;
 import frc.robot.constants.Constants;
+import frc.robot.constants.Constants.CameraConstants;
 import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.GrabberConstants;
@@ -27,7 +28,12 @@ import frc.robot.commands.vision.AprilTagVision;
 import frc.robot.commands.vision.ObjectDetectionVision;
 import frc.robot.commands.vision.RetroreflectiveVision;
 
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.MjpegServer;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.SendableCameraWrapper;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -51,6 +57,11 @@ public class RobotContainer {
 		return instance;
 	}
 
+	public final CommandXboxController driverController = new CommandXboxController(
+		OperatorConstants.driverControllerPort);
+	public final CommandXboxController operatorController = new CommandXboxController(
+		OperatorConstants.operatorControllerPort);
+
 	public final GyroIO gyro = Robot.isReal()
 		? new GyroIOPigeon2(Constants.pigeonId)
 		: new GyroIOSim();
@@ -62,10 +73,7 @@ public class RobotContainer {
 	public final Elevator elevator = new Elevator();
 	public final Grabber grabber = new Grabber();
 
-	public final CommandXboxController driverController = new CommandXboxController(
-		OperatorConstants.driverControllerPort);
-	public final CommandXboxController operatorController = new CommandXboxController(
-		OperatorConstants.operatorControllerPort);
+	private final TeleopSwerve teleopSwerve = new TeleopSwerve(swerve, driverController.getHID());
 
 	private LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto mode");
 
@@ -76,7 +84,7 @@ public class RobotContainer {
 		DriverStation.silenceJoystickConnectionWarning(true);
 
 		// will be automatically scheduled when no other scheduled commands require swerve
-		swerve.setDefaultCommand(new TeleopSwerve(swerve, driverController.getHID()));
+		swerve.setDefaultCommand(teleopSwerve);
 
 		configureBindings();
 
@@ -89,6 +97,32 @@ public class RobotContainer {
 			new FeedForwardCharacterization(swerve, true, swerve::runCharacterization, swerve::getCharacterizationVelocity));
 
 		SmartDashboard.putData("do balancing", new ChargeStationBalance(swerve));
+
+		// camera
+		try {
+			var camera = CameraServer.startAutomaticCapture("arm", 0);
+			// camera.setConnectVerbose(0);
+			camera.setFPS(CameraConstants.fps);
+			camera.setResolution(CameraConstants.width, CameraConstants.height);
+
+			// camera server is evil
+
+			// var cameraServer = CameraServer.addSwitchedCamera("camera");
+			// var cameraServer = CameraServer.startAutomaticCapture(camera);
+			var cameraServer = (MjpegServer) CameraServer.getServer();
+			cameraServer.setFPS(CameraConstants.fps);
+			cameraServer.setResolution(CameraConstants.width, CameraConstants.height);
+			cameraServer.setCompression(CameraConstants.compression);
+			cameraServer.setDefaultCompression(CameraConstants.compression);
+
+			Shuffleboard.getTab("Drive")
+				.add("camera", SendableCameraWrapper.wrap(camera))
+				// .addCamera("camera", "arm", cameraServ
+				.withWidget(BuiltInWidgets.kCameraStream)
+				.withSize(5, 4);
+		} catch (edu.wpi.first.cscore.VideoException e) {
+			DriverStation.reportError("Failed to get camera: " + e.toString(), e.getStackTrace());
+		}
 	}
 
 	/**
@@ -100,47 +134,48 @@ public class RobotContainer {
 	 * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
 	 */
 	private void configureBindings() {
-		/* driver controller */
+		/*
+         * driver
+         */
+		driverController.a().onTrue(teleopSwerve.toggleFieldRelativeCommand());
+		driverController.b().onTrue(new InstantCommand(() -> swerve.zeroYaw()));
+		driverController.x().whileTrue(new XStance(swerve));
 
-		// drive modes
-		driverController.start().onTrue(new InstantCommand(() -> swerve.toggleFieldRelative()));
-		driverController.back().onTrue(new InstantCommand(() -> swerve.zeroYaw()));
-		driverController.leftStick().whileTrue(new XStance(swerve));
-
-		// vision modes
-		driverController.povLeft().and(driverController.x())
+		/*
+         * operator
+         */
+		// vision
+		operatorController.povLeft().and(operatorController.x())
 			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Left, vision, elevator, swerve));
-		driverController.povLeft().and(driverController.a())
+		operatorController.povLeft().and(operatorController.a())
 			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Middle, vision, elevator, swerve));
-		driverController.povLeft().and(driverController.b())
+		operatorController.povLeft().and(operatorController.b())
 			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Right, vision, elevator, swerve));
 
-		driverController.povDown().and(driverController.a())
+		operatorController.povDown().and(operatorController.a())
 			.whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Middle, vision, elevator, swerve));
-		driverController.povDown().and(driverController.y())
+		operatorController.povDown().and(operatorController.y())
 			.whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Top, vision, elevator, swerve));
 
-		driverController.povRight().and(driverController.a())
+		operatorController.povRight().and(operatorController.a())
 			.whileTrue(new ObjectDetectionVision(ObjectDetectionVision.Routine.Ground, vision, elevator, arm, swerve));
 
-		// arm modes
-		driverController.rightTrigger(0.3).whileTrue(new ManualArmControl(arm, operatorController));
-		driverController.rightTrigger().and(driverController.x())
+		// arm
+		operatorController.rightTrigger(0.3).whileTrue(new ManualArmControl(arm, operatorController));
+		operatorController.rightTrigger().and(operatorController.x())
 			.onTrue(new SetArmPosition(arm, ArmConstants.resetLength_m));
 
 		// elevator modes
-		driverController.leftTrigger(.3).whileTrue(new ManualElevatorControl(elevator, operatorController));
-		driverController.rightTrigger().and(driverController.x())
+		operatorController.leftTrigger(.3).whileTrue(new ManualElevatorControl(elevator, operatorController));
+		operatorController.rightTrigger().and(operatorController.x())
 			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.resetHeight_m));
-		driverController.rightTrigger().and(driverController.a())
+		operatorController.rightTrigger().and(operatorController.a())
 			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.middleNodeHeight_m));
-		driverController.rightTrigger().and(driverController.y())
+		operatorController.rightTrigger().and(operatorController.y())
 			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.topNodeHeight_m));
 
 		// grabber modes
-		driverController.a().onTrue(new OpenGrabber(grabber, GrabberConstants.openingTime_s));
-
-		/* operator controller */
+		operatorController.a().onTrue(new OpenGrabber(grabber, GrabberConstants.openingTime_s));
 	}
 
 	/**
