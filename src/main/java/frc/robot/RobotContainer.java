@@ -16,7 +16,12 @@ import frc.robot.commands.vision.AprilTagVision;
 import frc.robot.commands.vision.ObjectDetectionVision;
 import frc.robot.commands.vision.RetroreflectiveVision;
 
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.MjpegServer;
+import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -57,6 +62,9 @@ public class RobotContainer {
 
 	private LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto mode");
 
+	private UsbCamera camera;
+	private MjpegServer cameraServer;
+
 	/**
 	 * The container for the robot. Contains subsystems, OI devices, and commands.
 	 */
@@ -77,6 +85,20 @@ public class RobotContainer {
 			new FeedForwardCharacterization(swerve, true, swerve::runCharacterization, swerve::getCharacterizationVelocity));
 
 		SmartDashboard.putData("do balancing", new ChargeStationBalance(swerve));
+
+		camera = CameraServer.startAutomaticCapture("Viewer", 0);
+		camera.setFPS(15);
+		camera.setResolution(320, 240);
+
+		cameraServer = CameraServer.addSwitchedCamera("Camera");
+		cameraServer.setFPS(15);
+		cameraServer.setResolution(320, 240);
+		cameraServer.setCompression(70);
+		cameraServer.setSource(camera);
+
+		Shuffleboard.getTab("Drive").addCamera("Camera", "Camera", cameraServer.getListenAddress())
+			.withWidget(BuiltInWidgets.kCameraStream)
+			.withSize(5, 4);
 	}
 
 	/**
