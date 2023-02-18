@@ -1,6 +1,7 @@
 package frc.robot;
 
 import frc.robot.constants.Constants;
+import frc.robot.constants.Constants.CameraConstants;
 import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
@@ -18,9 +19,9 @@ import frc.robot.commands.vision.RetroreflectiveVision;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.MjpegServer;
-import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.SendableCameraWrapper;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -62,9 +63,6 @@ public class RobotContainer {
 
 	private LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto mode");
 
-	private UsbCamera camera;
-	private MjpegServer cameraServer;
-
 	/**
 	 * The container for the robot. Contains subsystems, OI devices, and commands.
 	 */
@@ -86,19 +84,31 @@ public class RobotContainer {
 
 		SmartDashboard.putData("do balancing", new ChargeStationBalance(swerve));
 
-		camera = CameraServer.startAutomaticCapture("Viewer", 0);
-		camera.setFPS(15);
-		camera.setResolution(320, 240);
+		// camera
+		try {
+			var camera = CameraServer.startAutomaticCapture("arm", 0);
+			// camera.setConnectVerbose(0);
+			camera.setFPS(CameraConstants.fps);
+			camera.setResolution(CameraConstants.width, CameraConstants.height);
 
-		cameraServer = CameraServer.addSwitchedCamera("Camera");
-		cameraServer.setFPS(15);
-		cameraServer.setResolution(320, 240);
-		cameraServer.setCompression(70);
-		cameraServer.setSource(camera);
+			// camera server is evil
 
-		Shuffleboard.getTab("Drive").addCamera("Camera", "Camera", cameraServer.getListenAddress())
-			.withWidget(BuiltInWidgets.kCameraStream)
-			.withSize(5, 4);
+			// var cameraServer = CameraServer.addSwitchedCamera("camera");
+			// var cameraServer = CameraServer.startAutomaticCapture(camera);
+			var cameraServer = (MjpegServer) CameraServer.getServer();
+			cameraServer.setFPS(CameraConstants.fps);
+			cameraServer.setResolution(CameraConstants.width, CameraConstants.height);
+			cameraServer.setCompression(CameraConstants.compression);
+			cameraServer.setDefaultCompression(CameraConstants.compression);
+
+			Shuffleboard.getTab("Drive")
+				.add("camera", SendableCameraWrapper.wrap(camera))
+				// .addCamera("camera", "arm", cameraServ
+				.withWidget(BuiltInWidgets.kCameraStream)
+				.withSize(5, 4);
+		} catch (edu.wpi.first.cscore.VideoException e) {
+			DriverStation.reportError("Failed to get camera: " + e.toString(), e.getStackTrace());
+		}
 	}
 
 	/**
