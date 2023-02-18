@@ -134,48 +134,47 @@ public class RobotContainer {
 	 * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
 	 */
 	private void configureBindings() {
-		/*
-         * driver
-         */
-		driverController.a().onTrue(teleopSwerve.toggleFieldRelativeCommand());
-		driverController.b().onTrue(new InstantCommand(() -> swerve.zeroYaw()));
-		driverController.x().whileTrue(new XStance(swerve));
+		/* driver controller */
 
-		/*
-         * operator
-         */
-		// vision
-		operatorController.povLeft().and(operatorController.x())
+		// drive modes
+		driverController.start().onTrue(new InstantCommand(() -> swerve.toggleFieldRelative()));
+		driverController.back().onTrue(new InstantCommand(() -> swerve.zeroYaw()));
+		driverController.leftStick().whileTrue(new XStance(swerve));
+
+		// vision modes
+		driverController.povLeft().and(driverController.x())
 			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Left, vision, elevator, swerve));
-		operatorController.povLeft().and(operatorController.a())
+		driverController.povLeft().and(driverController.a())
 			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Middle, vision, elevator, swerve));
-		operatorController.povLeft().and(operatorController.b())
+		driverController.povLeft().and(driverController.b())
 			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Right, vision, elevator, swerve));
 
-		operatorController.povDown().and(operatorController.a())
+		driverController.povDown().and(driverController.a())
 			.whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Middle, vision, elevator, swerve));
-		operatorController.povDown().and(operatorController.y())
+		driverController.povDown().and(driverController.y())
 			.whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Top, vision, elevator, swerve));
 
-		operatorController.povRight().and(operatorController.a())
+		driverController.povRight().and(driverController.a())
 			.whileTrue(new ObjectDetectionVision(ObjectDetectionVision.Routine.Ground, vision, elevator, arm, swerve));
 
-		// arm
-		operatorController.rightTrigger(0.3).whileTrue(new ManualArmControl(arm, operatorController));
-		operatorController.rightTrigger().and(operatorController.x())
+		// arm modes
+		driverController.rightTrigger(0.3).whileTrue(new ManualArmControl(arm, operatorController));
+		driverController.rightTrigger().and(driverController.x())
 			.onTrue(new SetArmPosition(arm, ArmConstants.resetLength_m));
 
 		// elevator modes
-		operatorController.leftTrigger(.3).whileTrue(new ManualElevatorControl(elevator, operatorController));
-		operatorController.rightTrigger().and(operatorController.x())
+		driverController.leftTrigger(.3).whileTrue(new ManualElevatorControl(elevator, operatorController));
+		driverController.rightTrigger().and(driverController.x())
 			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.resetHeight_m));
-		operatorController.rightTrigger().and(operatorController.a())
+		driverController.rightTrigger().and(driverController.a())
 			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.middleNodeHeight_m));
-		operatorController.rightTrigger().and(operatorController.y())
+		driverController.rightTrigger().and(driverController.y())
 			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.topNodeHeight_m));
 
 		// grabber modes
-		operatorController.a().onTrue(new OpenGrabber(grabber, GrabberConstants.openingTime_s));
+		driverController.a().onTrue(new OpenGrabber(grabber, GrabberConstants.openingTime_s));
+
+		/* operator controller */
 	}
 
 	/**

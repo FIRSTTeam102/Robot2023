@@ -87,7 +87,7 @@ public class ObjectDetectionVision extends CommandBase {
 		vision.setPipeline(Pipeline.AprilTag);
 	}
 
-	// Feedback loop for PID until we meet crosshairObjectBoundTranslateZ_m
+	// Feedback loop for PID until we meet crosshairTargetBoundRotateX_rad and crosshairObjectBoundTranslateZ_m
 	@Override
 	public boolean isFinished() {
 		return ((-VisionConstants.crosshairObjectBoundRotateX_rad < vision.inputs.crosshairToTargetErrorX_rad)
