@@ -176,8 +176,8 @@ public class RobotContainer {
 			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.topNodeHeight_m));
 
 		// grabber modes
-		driverController.a().toggleOnTrue(new OpenGrabber(grabber, .4, GrabberConstants.openingTime_s));
-		driverController.b().toggleOnTrue(new CloseGrabber(grabber, .5, GrabberConstants.closingTime_s));
+		driverController.a().toggleOnTrue(new CloseGrabber(grabber, .5, GrabberConstants.closingTime_s));
+		driverController.b().toggleOnTrue(new OpenGrabber(grabber, .4, GrabberConstants.openingTime_s));
 	}
 
 	/**
