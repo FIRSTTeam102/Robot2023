@@ -11,9 +11,9 @@ public class ManualElevatorControl extends CommandBase {
 	private Elevator elevator;
 	private CommandXboxController operatorController;
 
-	public ManualElevatorControl(Elevator elevator, CommandXboxController operatorcController) {
+	public ManualElevatorControl(Elevator elevator, CommandXboxController operatorController) {
 		this.elevator = elevator;
-		this.operatorController = operatorcController;
+		this.operatorController = operatorController;
 		addRequirements(elevator);
 	}
 

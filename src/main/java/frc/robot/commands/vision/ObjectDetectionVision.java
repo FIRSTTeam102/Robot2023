@@ -2,12 +2,18 @@ package frc.robot.commands.vision;
 
 import frc.robot.constants.ArmConstants;
 import frc.robot.constants.ElevatorConstants;
+import frc.robot.constants.GrabberConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.io.VisionIO.Pipeline;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
+
+import frc.robot.commands.arm.SetArmPosition;
+import frc.robot.commands.elevator.SetElevatorPosition;
+import frc.robot.commands.grabber.CloseGrabber;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -17,6 +23,7 @@ public class ObjectDetectionVision extends CommandBase {
 	private Vision vision;
 	private Elevator elevator;
 	private Arm arm;
+	private Grabber grabber;
 	private Swerve swerve;
 	private double robotRotateVelocity_mps;
 	private double robotTranslateVelocity_mps;
@@ -25,11 +32,13 @@ public class ObjectDetectionVision extends CommandBase {
 		Ground
 	}
 
-	public ObjectDetectionVision(Routine routine, Vision vision, Elevator elevator, Arm arm, Swerve swerve) {
+	public ObjectDetectionVision(Routine routine, Vision vision, Elevator elevator, Arm arm, Grabber grabber,
+		Swerve swerve) {
 		this.routine = routine;
 		this.vision = vision;
 		this.elevator = elevator;
 		this.arm = arm;
+		this.grabber = grabber;
 		this.swerve = swerve;
 	}
 
@@ -74,8 +83,9 @@ public class ObjectDetectionVision extends CommandBase {
 				System.out.println("Translate: " + vision.inputs.botpose_targetspaceRotationZ_rad + " Rotate: "
 					+ vision.inputs.crosshairToTargetErrorX_rad + "Swerve Object + Elevator Object + Arm Object + Arm Object");
 				swerve.drive(new Translation2d(0, robotTranslateVelocity_mps), robotRotateVelocity_mps, true);
-				elevator.setPosition(ElevatorConstants.resetHeight_m);
-				arm.setPosition(ArmConstants.groundObjectLength_m);
+				new SetElevatorPosition(elevator, ElevatorConstants.resetHeight_m);
+				new SetArmPosition(arm, ArmConstants.groundObjectLength_m);
+				new CloseGrabber(grabber, .5, GrabberConstants.closingTime_s);
 				break;
 		}
 	}

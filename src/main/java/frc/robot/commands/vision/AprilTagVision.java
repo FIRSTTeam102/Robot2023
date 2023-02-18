@@ -8,6 +8,7 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
 
+import frc.robot.commands.elevator.SetElevatorPosition;
 import frc.robot.commands.swerve.PathPlannerCommand;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -30,7 +31,7 @@ public class AprilTagVision extends CommandBase {
 	private double yDistanceGoTo_m;
 
 	public enum Routine {
-		Left, Middle, Right
+		LeftGridDoublesubstation, MiddleGrid, RightGridDoublesubstation
 	}
 
 	public AprilTagVision(Routine routine, Vision vision, Elevator elevator, Swerve swerve) {
@@ -57,21 +58,20 @@ public class AprilTagVision extends CommandBase {
 			return;
 		}
 
-		// When we see a substation apriltag, we will position and rotate to alliance color's side and put elevator up
 		// When we see a grid apriltag, we will position and rotate to alliance color's side
 		switch (routine) {
-			case Left:
+			case LeftGridDoublesubstation:
 				if (vision.inputs.targetAprilTag == 5) {
-					System.out.println("Swerve BlueDoublesubstationLeft + Elevator Doublesubstation");
+					System.out.println("Swerve BlueDoublesubstationLeft");
 					xDistanceGoTo_m = 0.70;
 					yDistanceGoTo_m = 6.13;
-					elevator.setPosition(ElevatorConstants.doubleSubstationHeight_m);
+					new SetElevatorPosition(elevator, ElevatorConstants.doubleSubstationHeight_m);
 				}
 				if (vision.inputs.targetAprilTag == 4) {
-					System.out.println("Swerve RedDoublesubstationLeft + Elevator Doublesubstation");
+					System.out.println("Swerve RedDoublesubstationLeft");
 					xDistanceGoTo_m = 15.84;
 					yDistanceGoTo_m = 7.33;
-					elevator.setPosition(ElevatorConstants.doubleSubstationHeight_m);
+					new SetElevatorPosition(elevator, ElevatorConstants.doubleSubstationHeight_m);
 				}
 
 				if (vision.inputs.targetAprilTag == 6) {
@@ -106,7 +106,7 @@ public class AprilTagVision extends CommandBase {
 				}
 				break;
 
-			case Middle:
+			case MiddleGrid:
 				if (vision.inputs.targetAprilTag == 6) {
 					System.out.println("Swerve BlueGrid1Middle");
 					xDistanceGoTo_m = 1.80;
@@ -139,18 +139,18 @@ public class AprilTagVision extends CommandBase {
 				}
 				break;
 
-			case Right:
+			case RightGridDoublesubstation:
 				if (vision.inputs.targetAprilTag == 5) {
-					System.out.println("Swerve BlueDoublesubstationRight + ElevatorDoublesubstation");
+					System.out.println("Swerve BlueDoublesubstationRight");
 					xDistanceGoTo_m = 0.70;
 					yDistanceGoTo_m = 7.47;
-					elevator.setPosition(ElevatorConstants.doubleSubstationHeight_m);
+					new SetElevatorPosition(elevator, ElevatorConstants.doubleSubstationHeight_m);
 				}
 				if (vision.inputs.targetAprilTag == 4) {
-					System.out.println("Swerve RedDoublesubstationRight + ElevatorDoublesubstation");
+					System.out.println("Swerve RedDoublesubstationRight");
 					xDistanceGoTo_m = 15.84;
 					yDistanceGoTo_m = 6.00;
-					elevator.setPosition(ElevatorConstants.doubleSubstationHeight_m);
+					new SetElevatorPosition(elevator, ElevatorConstants.doubleSubstationHeight_m);
 				}
 
 				if (vision.inputs.targetAprilTag == 6) {

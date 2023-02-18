@@ -144,19 +144,20 @@ public class RobotContainer {
 
 		// vision modes
 		driverController.povLeft().and(driverController.x())
-			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Left, vision, elevator, swerve));
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.LeftGridDoublesubstation, vision, elevator, swerve));
 		driverController.povLeft().and(driverController.a())
-			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Middle, vision, elevator, swerve));
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.MiddleGrid, vision, elevator, swerve));
 		driverController.povLeft().and(driverController.b())
-			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Right, vision, elevator, swerve));
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.RightGridDoublesubstation, vision, elevator, swerve));
 
 		driverController.povDown().and(driverController.a())
-			.whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Middle, vision, elevator, swerve));
+			.whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.MiddleGrid, vision, elevator, swerve));
 		driverController.povDown().and(driverController.y())
-			.whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Top, vision, elevator, swerve));
+			.whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.TopGrid, vision, elevator, swerve));
 
 		driverController.povRight().and(driverController.a())
-			.whileTrue(new ObjectDetectionVision(ObjectDetectionVision.Routine.Ground, vision, elevator, arm, swerve));
+			.whileTrue(
+				new ObjectDetectionVision(ObjectDetectionVision.Routine.Ground, vision, elevator, arm, grabber, swerve));
 
 		// arm modes
 		driverController.rightTrigger(0.3).whileTrue(new ManualArmControl(arm, operatorController));
@@ -169,11 +170,14 @@ public class RobotContainer {
 			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.resetHeight_m));
 		driverController.rightTrigger().and(driverController.a())
 			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.middleNodeHeight_m));
+		driverController.rightTrigger().and(driverController.b())
+			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.doubleSubstationHeight_m));
 		driverController.rightTrigger().and(driverController.y())
 			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.topNodeHeight_m));
 
-		driverController.leftBumper().toggleOnTrue(new OpenGrabber(grabber, .4, GrabberConstants.openingTime_s));
-		driverController.rightBumper().toggleOnTrue(new CloseGrabber(grabber, .5));
+		// grabber modes
+		driverController.a().toggleOnTrue(new OpenGrabber(grabber, .4, GrabberConstants.openingTime_s));
+		driverController.b().toggleOnTrue(new CloseGrabber(grabber, .5, GrabberConstants.closingTime_s));
 	}
 
 	/**
