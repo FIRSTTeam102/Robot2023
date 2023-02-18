@@ -41,14 +41,14 @@ public class ObjectDetectionVision extends CommandBase {
 
 	@Override
 	public void execute() {
+		// If isPipelineReady true, begin execute
 		if (!vision.isPipelineReady())
 			return;
 
 		// Outputs a robotRotateVelocity_mpers that updates every 0.02s for the motor. rotateKp, rotateKi, rotateKd must be
-		// tuned and can not be calculated in a spreadsheet as vision.rotateErrorIntegral and vision.rotateErrorDerivative
-		// are based on the last 0.02s VisionConstants.rotatekP * vision.inputs.crosshairToTargetOffsetX_rad. We will not
-		// know what this data will be for the last 0.02s on a spreadsheet because we do not know what the
-		// robotRotateVelocity_mpers was the last 0.02s.
+		// tuned and can not be calculated in a spreadsheet as rotateErrorIntegral and rotateErrorDerivative are based on
+		// the last 0.02s VisionConstants.rotatekP * crosshairToTargetOffsetX_rad. We will not know what this data will be
+		// for the last 0.02s on a spreadsheet because we do not know what the robotRotateVelocity_mpers was the last 0.02s.
 		if (vision.inputs.crosshairToTargetErrorX_rad < -VisionConstants.crosshairObjectBoundRotateX_rad) {
 			robotRotateVelocity_mpers = VisionConstants.rotateKp * vision.inputs.crosshairToTargetErrorX_rad
 				- VisionConstants.rotateKd * vision.translateErrorDerivative;
@@ -58,11 +58,10 @@ public class ObjectDetectionVision extends CommandBase {
 				+ VisionConstants.rotateKd * vision.translateErrorDerivative;
 		}
 
-		// Outputs a robotTranslateVelocity_mpers that updates every 0.02s for the motor. translateKp, translateKi,
-		// translateKd must be tuned and can not be calculated in a spreadsheet as vision.translateErrorIntegral and
-		// vision.translateErrorDerivative are based on the last 0.02s VisionConstants.translatekP *
-		// vision.inputs.botpose_targetspaceTranslationZ_m. We will not know what this data will be for the last 0.02s on a
-		// spreadsheet because we do not know what the robotTranslateVelocity_mpers was the last 0.02s.
+		// Outputs a robotRotateVelocity_mpers that updates every 0.02s for the motor. rotateKp, rotateKi, rotateKd must be
+		// tuned and can not be calculated in a spreadsheet as rotateErrorIntegral and rotateErrorDerivative are based on
+		// the last 0.02s VisionConstants.rotatekP * crosshairToTargetOffsetX_rad. We will not know what this data will be
+		// for the last 0.02s on a spreadsheet because we do not know what the robotRotateVelocity_mpers was the last 0.02s.
 		if (vision.inputs.botpose_targetspaceTranslationZ_m < VisionConstants.crosshairObjectBoundTranslateZ_m) {
 			robotTranslateVelocity_mpers = VisionConstants.translateKp * vision.inputs.botpose_targetspaceTranslationZ_m
 				- VisionConstants.translateKd * vision.translateErrorDerivative;
@@ -81,15 +80,14 @@ public class ObjectDetectionVision extends CommandBase {
 		}
 	}
 
-	// Stop swerve isFinished
+	// Stop swerve and sets pipeline back to Apriltag
 	@Override
 	public void end(boolean interrupted) {
 		swerve.stop();
-		// Sets pipeline back to Apriltag
 		vision.setPipeline(Pipeline.AprilTag);
 	}
 
-	// Feedback loop for PID
+	// Feedback loop for PID until we meet crosshairObjectBoundTranslateZ_m
 	@Override
 	public boolean isFinished() {
 		return ((-VisionConstants.crosshairObjectBoundRotateX_rad < vision.inputs.crosshairToTargetErrorX_rad)

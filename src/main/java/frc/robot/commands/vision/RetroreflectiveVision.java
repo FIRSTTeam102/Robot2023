@@ -41,10 +41,9 @@ public class RetroreflectiveVision extends CommandBase {
 			return;
 
 		// Outputs a robotRotateVelocity_mpers that updates every 0.02s for the motor. rotateKp, rotateKi, rotateKd must be
-		// tuned and can not be calculated in a spreadsheet as vision.rotateErrorIntegral and vision.rotateErrorDerivative
-		// are based on the last 0.02s VisionConstants.rotatekP * vision.inputs.crosshairToTargetOffsetX_rad. We will not
-		// know what this data will be for the last 0.02s on a spreadsheet because we do not know what the
-		// robotRotateVelocity_mpers was the last 0.02s.
+		// tuned and can not be calculated in a spreadsheet as rotateErrorIntegral and rotateErrorDerivative are based on
+		// the last 0.02s VisionConstants.rotatekP * crosshairToTargetOffsetX_rad. We will not know what this data will be
+		// for the last 0.02s on a spreadsheet because we do not know what the robotRotateVelocity_mpers was the last 0.02s.
 		if (vision.inputs.crosshairToTargetErrorX_rad < -VisionConstants.crosshairTargetBoundRotateX_rad) {
 			robotRotateVelocity_mpers = VisionConstants.rotateKp * vision.inputs.crosshairToTargetErrorX_rad
 				- VisionConstants.rotateKi * vision.rotateErrorIntegral
