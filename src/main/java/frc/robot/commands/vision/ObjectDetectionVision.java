@@ -29,7 +29,7 @@ public class ObjectDetectionVision extends CommandBase {
 	private double robotTranslateVelocity_mps;
 
 	public enum Routine {
-		Ground
+		Gamepiece
 	}
 
 	public ObjectDetectionVision(Routine routine, Vision vision, Elevator elevator, Arm arm, Grabber grabber,
@@ -56,32 +56,35 @@ public class ObjectDetectionVision extends CommandBase {
 
 		// Outputs a robotRotateVelocity_mps that updates every 0.02s for the motor. rotateKp, rotateKi, rotateKd must be
 		// tuned and can not be calculated in a spreadsheet as rotateErrorIntegral and rotateErrorDerivative are based on
-		// the last 0.02s VisionConstants.rotatekP * crosshairToTargetOffsetX_rad. We will not know what this data will be
-		// for the last 0.02s on a spreadsheet because we do not know what the robotRotateVelocity_mps was the last 0.02s.
-		if (vision.inputs.crosshairToTargetErrorX_rad < -VisionConstants.crosshairObjectBoundRotateX_rad) {
+		// the last 0.02s rotatekP * crosshairToTargetOffsetX_rad. We will not know what this data will be for the last
+		// 0.02s on a spreadsheet because we do not know what the robotRotateVelocity_mps was the last 0.02s.
+		if (vision.inputs.crosshairToTargetErrorX_rad < -VisionConstants.crosshairTargetBoundRotateX_rad) {
 			robotRotateVelocity_mps = VisionConstants.rotateKp * vision.inputs.crosshairToTargetErrorX_rad
-				- VisionConstants.rotateKd * vision.translateErrorDerivative;
-		} else if (vision.inputs.crosshairToTargetErrorX_rad > VisionConstants.crosshairObjectBoundRotateX_rad) {
+				- VisionConstants.rotateKi * vision.rotateErrorIntegral
+				- VisionConstants.rotateKd * vision.rotateErrorDerivative;
+		} else if (vision.inputs.crosshairToTargetErrorX_rad > VisionConstants.crosshairTargetBoundRotateX_rad) {
 			robotRotateVelocity_mps = VisionConstants.rotateKp * vision.inputs.crosshairToTargetErrorX_rad
-				+ VisionConstants.rotateKi * vision.translateErrorIntegral
-				+ VisionConstants.rotateKd * vision.translateErrorDerivative;
+				+ VisionConstants.rotateKi * vision.rotateErrorIntegral
+				+ VisionConstants.rotateKd * vision.rotateErrorDerivative;
 		}
 
-		// Outputs a robotRotateVelocity_mps that updates every 0.02s for the motor. rotateKp, rotateKi, rotateKd must be
-		// tuned and can not be calculated in a spreadsheet as rotateErrorIntegral and rotateErrorDerivative are based on
-		// the last 0.02s VisionConstants.rotatekP * crosshairToTargetOffsetX_rad. We will not know what this data will be
-		// for the last 0.02s on a spreadsheet because we do not know what the robotRotateVelocity_mps was the last 0.02s.
-		if (vision.inputs.botpose_targetspaceTranslationZ_m < VisionConstants.crosshairObjectBoundTranslateZ_m) {
+		// Outputs a robotTranslateVelocity_mps that updates every 0.02s for the motor. rotateKp, rotateKi, rotateKd must be
+		// tuned and can not be calculated in a spreadsheet as translateErrorIntegral and translateErrorDerivative are based
+		// on the last 0.02s rotatekP * botpose_targetspaceTranslationZ_m. We will not know what this data will be for the
+		// last 0.02s on a spreadsheet because we do not know what the robotTranslateVelocity_mps was the last 0.02s.
+		if (vision.inputs.botpose_targetspaceTranslationZ_m > VisionConstants.crosshairObjectBoundTranslateZ_m) {
 			robotTranslateVelocity_mps = VisionConstants.translateKp * vision.inputs.botpose_targetspaceTranslationZ_m
-				- VisionConstants.translateKd * vision.translateErrorDerivative;
+				+ VisionConstants.translateKi * vision.translateErrorIntegral
+				+ VisionConstants.translateKd * vision.translateErrorDerivative;
 		}
 
 		// When we see a ground objectdetection, we will translate and rotate to it and put elevator down and put scissor
 		// arm out
 		switch (routine) {
-			case Ground:
-				System.out.println("Translate: " + vision.inputs.botpose_targetspaceRotationZ_rad + " Rotate: "
-					+ vision.inputs.crosshairToTargetErrorX_rad + "Swerve Object + Elevator Object + Arm Object + Arm Object");
+			case Gamepiece:
+				System.out.println("Swerve --> Gamepiece, Elevator --> Gamepiece, Arm --> Gamepiece, Grabber --> Gamepiece");
+				System.out.println("botpose_targetspaceRotationZ_rad: " + vision.inputs.botpose_targetspaceRotationZ_rad
+					+ " crosshairToTargetErrorX_rad: " + vision.inputs.crosshairToTargetErrorX_rad);
 				swerve.drive(new Translation2d(0, robotTranslateVelocity_mps), robotRotateVelocity_mps, true);
 				new SetElevatorPosition(elevator, ElevatorConstants.resetHeight_m);
 				new SetArmPosition(arm, ArmConstants.groundObjectLength_m);

@@ -144,20 +144,20 @@ public class RobotContainer {
 
 		// vision modes
 		driverController.povLeft().and(driverController.x())
-			.whileTrue(new AprilTagVision(AprilTagVision.Routine.LeftGridDoublesubstation, vision, elevator, swerve));
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.BlueRedGridDoublesubstationLeft, vision, elevator, swerve));
 		driverController.povLeft().and(driverController.a())
-			.whileTrue(new AprilTagVision(AprilTagVision.Routine.MiddleGrid, vision, elevator, swerve));
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.BlueRedGridMiddle, vision, elevator, swerve));
 		driverController.povLeft().and(driverController.b())
-			.whileTrue(new AprilTagVision(AprilTagVision.Routine.RightGridDoublesubstation, vision, elevator, swerve));
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.BlueRedGridDoublesubstationRight, vision, elevator, swerve));
 
 		driverController.povDown().and(driverController.a())
-			.whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.MiddleGrid, vision, elevator, swerve));
+			.whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.BlueRedGridMiddle, vision, elevator, swerve));
 		driverController.povDown().and(driverController.y())
-			.whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.TopGrid, vision, elevator, swerve));
+			.whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.BlueRedGridTop, vision, elevator, swerve));
 
 		driverController.povRight().and(driverController.a())
 			.whileTrue(
-				new ObjectDetectionVision(ObjectDetectionVision.Routine.Ground, vision, elevator, arm, grabber, swerve));
+				new ObjectDetectionVision(ObjectDetectionVision.Routine.Gamepiece, vision, elevator, arm, grabber, swerve));
 
 		// arm modes
 		driverController.rightTrigger(0.3).whileTrue(new ManualArmControl(arm, operatorController));
