@@ -30,7 +30,6 @@ import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import org.littletonrobotics.junction.Logger;
 
 import lombok.Getter;
-import lombok.Setter;
 
 public class Swerve extends SubsystemBase implements AutoCloseable {
 	public SwerveDriveKinematics kinematics = new SwerveDriveKinematics(moduleTranslations);
@@ -56,10 +55,7 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 	private Timer timer = new Timer();
 	public double disabledTimeStart = 0.0;
 
-	// configurable stuff
 	private boolean brakeMode = true;
-	@Setter
-	private boolean fieldRelative = false;
 
 	public GyroIO gyroIO;
 	public GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
@@ -191,10 +187,6 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 		}
 	}
 
-	public void toggleFieldRelative() {
-		this.fieldRelative = !this.fieldRelative;
-	}
-
 	public void setCenterRotation(double x, double y) {
 		centerRotation = new Translation2d(x, y);
 	}
@@ -206,7 +198,7 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 	 * <p>if field oriented, the origin of the field is the lower left corner (corner of the field to the driver's right);
 	 * for rotation zero is away from the driver, positive is CCW
 	 */
-	public void drive(Translation2d translation_mps, double rotation_radps) {
+	public void drive(Translation2d translation_mps, double rotation_radps, boolean fieldRelative) {
 		SwerveModuleState[] swerveModuleStates = kinematics.toSwerveModuleStates(
 			fieldRelative
 				? ChassisSpeeds.fromFieldRelativeSpeeds(

@@ -7,12 +7,25 @@ import frc.robot.subsystems.Swerve;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+
+import lombok.Setter;
 
 public class TeleopSwerve extends CommandBase {
 	private double rotation;
 	private Translation2d translation;
-	private boolean fieldRelative = false;
 	private boolean openLoop = true;
+
+	@Setter
+	public boolean fieldRelative = true;
+
+	private void toggleFieldRelative() {
+		fieldRelative = !fieldRelative;
+	}
+
+	public InstantCommand toggleFieldRelativeCommand() {
+		return new InstantCommand(() -> this.toggleFieldRelative());
+	}
 
 	private Swerve swerve;
 	private XboxController controller;
@@ -31,7 +44,7 @@ public class TeleopSwerve extends CommandBase {
 
 		translation = new Translation2d(yAxis, xAxis).times(SwerveConstants.maxVelocity_mps);
 		rotation = rAxis * SwerveConstants.maxAngularVelocity_radps;
-		swerve.drive(translation, rotation);
+		swerve.drive(translation, rotation, fieldRelative);
 	}
 
 	@Override

@@ -14,7 +14,7 @@ public class TurnToAngle extends PIDCommand {
 			Autos.ppRotationController,
 			() -> swerve.getYaw().getRadians(),
 			() -> angle_rad,
-			(double output) -> swerve.drive(zeroTranslation, output),
+			(double output) -> swerve.drive(zeroTranslation, output, false),
 			swerve);
 		m_controller.setTolerance(0.01, 0.01);
 	}

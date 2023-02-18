@@ -46,6 +46,11 @@ public class RobotContainer {
 		return instance;
 	}
 
+	public final CommandXboxController driverController = new CommandXboxController(
+		OperatorConstants.driverControllerPort);
+	public final CommandXboxController operatorController = new CommandXboxController(
+		OperatorConstants.operatorControllerPort);
+
 	public final GyroIO gyro = Robot.isReal()
 		? new GyroIOPigeon2(Constants.pigeonId)
 		: new GyroIOSim();
@@ -56,10 +61,7 @@ public class RobotContainer {
 	public final Swerve swerve = new Swerve(gyro);
 	public final Vision vision = new Vision();
 
-	public final CommandXboxController driverController = new CommandXboxController(
-		OperatorConstants.driverControllerPort);
-	public final CommandXboxController operatorController = new CommandXboxController(
-		OperatorConstants.operatorControllerPort);
+	private final TeleopSwerve teleopSwerve = new TeleopSwerve(swerve, driverController.getHID());
 
 	private LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto mode");
 
@@ -70,7 +72,7 @@ public class RobotContainer {
 		DriverStation.silenceJoystickConnectionWarning(true);
 
 		// will be automatically scheduled when no other scheduled commands require swerve
-		swerve.setDefaultCommand(new TeleopSwerve(swerve, driverController.getHID()));
+		swerve.setDefaultCommand(teleopSwerve);
 
 		configureBindings();
 
@@ -121,7 +123,7 @@ public class RobotContainer {
 	 */
 	private void configureBindings() {
 		/* driver */
-		driverController.a().onTrue(new InstantCommand(() -> swerve.toggleFieldRelative()));
+		driverController.a().onTrue(teleopSwerve.toggleFieldRelativeCommand());
 		driverController.b().onTrue(new InstantCommand(() -> swerve.zeroYaw()));
 		driverController.x().whileTrue(new XStance(swerve));
 

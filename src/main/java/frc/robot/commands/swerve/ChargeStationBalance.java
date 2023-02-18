@@ -73,7 +73,7 @@ public class ChargeStationBalance extends CommandBase {
 					// move on
 					state = State.balance;
 				else {
-					swerve.drive(new Translation2d(0, 0), maxTurn * sign(shortestDistance));
+					swerve.drive(new Translation2d(0, 0), maxTurn * sign(shortestDistance), false);
 					break;
 				}
 			case balance:
@@ -84,7 +84,7 @@ public class ChargeStationBalance extends CommandBase {
 				double x = pitchZeroed ? 0.0 : -sign(pitch_rad),
 					y = rollZeroed ? 0.0 : -sign(roll_rad);
 
-				swerve.drive(new Translation2d(maxSpeed * x, maxSpeed * y), 0.0);
+				swerve.drive(new Translation2d(maxSpeed * x, maxSpeed * y), 0.0, false);
 		}
 	}
 
