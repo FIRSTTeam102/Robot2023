@@ -11,7 +11,7 @@ public class GyroIOPigeon2 implements GyroIO {
 	public GyroIOPigeon2(int deviceNumber) {
 		gyro = new Pigeon2(deviceNumber);
 		gyro.configFactoryDefault();
-		gyro.configMountPose(0, 0, 0);
+		gyro.configMountPose(192.807, 0, 0);
 	}
 
 	@Override
