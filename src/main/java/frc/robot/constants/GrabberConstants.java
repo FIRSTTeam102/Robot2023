@@ -1,7 +1,7 @@
 package frc.robot.constants;
 
 public final class GrabberConstants {
-	public static final int motorId = 12;
+	public static final int motorId = 13;
 	public static final int objectSensorPin = 4; // todo: change
 	public static final int closedSensorPin = 5;
 	public static final double speed = 0.5;
