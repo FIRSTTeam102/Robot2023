@@ -13,6 +13,10 @@ public final class Constants {
 		public static final int driverControllerPort = 0;
 		public static final int operatorControllerPort = 1;
 		public static final double stickDeadband = 0.1;
+
+		// fixme: only low for testing
+		public static final double turnPercent = 0.5;
+		public static final double drivePercent = 0.7;
 	}
 
 	public static class CameraConstants {
