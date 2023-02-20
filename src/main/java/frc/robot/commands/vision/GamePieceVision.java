@@ -18,7 +18,7 @@ import frc.robot.commands.grabber.CloseGrabber;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class ObjectDetectionVision extends CommandBase {
+public class GamePieceVision extends CommandBase {
 	private Routine routine;
 	private Vision vision;
 	private Elevator elevator;
@@ -32,7 +32,7 @@ public class ObjectDetectionVision extends CommandBase {
 		Gamepiece
 	}
 
-	public ObjectDetectionVision(Routine routine, Vision vision, Elevator elevator, Arm arm, Grabber grabber,
+	public GamePieceVision(Routine routine, Vision vision, Elevator elevator, Arm arm, Grabber grabber,
 		Swerve swerve) {
 		this.routine = routine;
 		this.vision = vision;
@@ -87,7 +87,7 @@ public class ObjectDetectionVision extends CommandBase {
 					+ " crosshairToTargetErrorX_rad: " + vision.inputs.crosshairToTargetErrorX_rad);
 				swerve.drive(new Translation2d(0, robotTranslateVelocity_mps), robotRotateVelocity_mps, true);
 				new SetElevatorPosition(elevator, ElevatorConstants.resetHeight_m);
-				new SetArmPosition(arm, ArmConstants.groundObjectLength_m);
+				new SetArmPosition(arm, ArmConstants.gamePieceLength_m);
 				new CloseGrabber(grabber, .5, GrabberConstants.closingTime_s);
 				break;
 		}

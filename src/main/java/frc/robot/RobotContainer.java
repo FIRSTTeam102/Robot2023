@@ -26,7 +26,7 @@ import frc.robot.commands.swerve.ChargeStationBalance;
 import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.swerve.XStance;
 import frc.robot.commands.vision.AprilTagVision;
-import frc.robot.commands.vision.ObjectDetectionVision;
+import frc.robot.commands.vision.GamePieceVision;
 import frc.robot.commands.vision.RetroreflectiveVision;
 
 import edu.wpi.first.cameraserver.CameraServer;
@@ -138,7 +138,7 @@ public class RobotContainer {
 		/* driver controller */
 
 		// drive modes
-		driverController.start().onTrue(new InstantCommand(() -> swerve.toggleFieldRelative()));
+		driverController.start().onTrue(teleopSwerve.toggleFieldRelativeCommand());
 		driverController.back().onTrue(new InstantCommand(() -> swerve.zeroYaw()));
 		driverController.leftStick().whileTrue(new XStance(swerve));
 
@@ -157,7 +157,7 @@ public class RobotContainer {
 
 		driverController.povRight().and(driverController.a())
 			.whileTrue(
-				new ObjectDetectionVision(ObjectDetectionVision.Routine.Gamepiece, vision, elevator, arm, grabber, swerve));
+				new GamePieceVision(GamePieceVision.Routine.Gamepiece, vision, elevator, arm, grabber, swerve));
 
 		// arm modes
 		driverController.rightTrigger(0.3).whileTrue(new ManualArmControl(arm, operatorController));

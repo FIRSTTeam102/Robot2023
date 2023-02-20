@@ -13,7 +13,7 @@ public final class ArmConstants {
 
 	// fixme: actual values
 	public static final double resetLength_m = 0;
-	public static final double groundObjectLength_m = 0.3048;
+	public static final double gamePieceLength_m = 0.3048;
 
 	/* pid stuff */
 	public static final double kP = 1.0;
