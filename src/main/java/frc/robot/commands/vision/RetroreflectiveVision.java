@@ -62,7 +62,7 @@ public class RetroreflectiveVision extends CommandBase {
 			case BlueRedGridMiddle:
 				System.out.println("Swerve --> BlueRedGridMiddle, Elevator --> BlueRedGridNodeMiddle");
 				System.out.println("crosshairToTargetErrorX_rad: " + vision.inputs.crosshairToTargetErrorX_rad);
-				swerve.drive(new Translation2d(0, 0), robotRotateVelocity_mps, false);
+				swerve.drive(new Translation2d(0, 0), robotRotateVelocity_mps, true);
 				new SetElevatorPosition(elevator, ElevatorConstants.middleNodeHeight_m);
 				break;
 
@@ -74,7 +74,7 @@ public class RetroreflectiveVision extends CommandBase {
 			case BlueRedGridTop:
 				System.out.println("Swerve --> BlueRedGridTop, Elevator --> BlueRedGridNodeTop");
 				System.out.println("crosshairToTargetErrorX_rad: " + vision.inputs.crosshairToTargetErrorX_rad);
-				swerve.drive(new Translation2d(0, 0), robotRotateVelocity_mps, false);
+				swerve.drive(new Translation2d(0, 0), robotRotateVelocity_mps, true);
 				new SetElevatorPosition(elevator, ElevatorConstants.topNodeHeight_m);
 				break;
 		}

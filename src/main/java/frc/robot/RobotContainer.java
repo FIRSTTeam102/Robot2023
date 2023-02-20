@@ -144,11 +144,11 @@ public class RobotContainer {
 
 		// vision modes
 		driverController.povLeft().and(driverController.x())
-			.whileTrue(new AprilTagVision(AprilTagVision.Routine.BlueRedGridDoublesubstationLeft, vision, elevator, swerve));
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.BlueRedGridDoublesubstationLeft, vision, swerve));
 		driverController.povLeft().and(driverController.a())
-			.whileTrue(new AprilTagVision(AprilTagVision.Routine.BlueRedGridMiddle, vision, elevator, swerve));
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.BlueRedGridMiddle, vision, swerve));
 		driverController.povLeft().and(driverController.b())
-			.whileTrue(new AprilTagVision(AprilTagVision.Routine.BlueRedGridDoublesubstationRight, vision, elevator, swerve));
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.BlueRedGridDoublesubstationRight, vision, swerve));
 
 		driverController.povDown().and(driverController.a())
 			.whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.BlueRedGridMiddle, vision, elevator, swerve));

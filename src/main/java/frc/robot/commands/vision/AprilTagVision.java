@@ -34,10 +34,9 @@ public class AprilTagVision extends CommandBase {
 		BlueRedGridDoublesubstationLeft, BlueRedGridMiddle, BlueRedGridDoublesubstationRight
 	}
 
-	public AprilTagVision(Routine routine, Vision vision, Elevator elevator, Swerve swerve) {
+	public AprilTagVision(Routine routine, Vision vision, Swerve swerve) {
 		this.routine = routine;
 		this.vision = vision;
-		this.elevator = elevator;
 		this.swerve = swerve;
 	}
 
