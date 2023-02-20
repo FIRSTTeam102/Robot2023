@@ -27,6 +27,13 @@ public class Arm extends SubsystemBase {
 
 	private GenericEntry shuffleboardLength;
 
+	// is within swerve module bounds so elevator doesn't go down too far
+	private static boolean inDangerZone = false;
+
+	public static boolean inDangerZone() {
+		return inDangerZone;
+	}
+
 	public Arm() {
 		var armGroup = Shuffleboard.getTab("Drive").getLayout("Arm", BuiltInLayouts.kList);
 		shuffleboardLength = armGroup
@@ -51,7 +58,8 @@ public class Arm extends SubsystemBase {
 
 	public void setPosition(double armLength_m) {
 		pidController.setReference(
-			MathUtil.clamp(armDistToNutDist(armLength_m), 0, maxNutDist_m - minNutDist_m),
+			MathUtil.clamp(armDistToNutDist(armLength_m), Elevator.inDangerZone() ? armDistToNutDist(moduleDangerZone_m) : 0,
+				maxNutDist_m - minNutDist_m),
 			CANSparkMax.ControlType.kSmartMotion);
 	}
 
@@ -72,6 +80,8 @@ public class Arm extends SubsystemBase {
 			encoder.setPosition(0);
 
 		shuffleboardLength.setDouble(nutDistToArmDist(encoder.getPosition()));
+
+		inDangerZone = (encoder.getPosition() < armDistToNutDist(moduleDangerZone_m));
 	}
 
 	public static double armDistToNutDist(double armDistance_m) {

@@ -5,6 +5,7 @@ import static frc.robot.constants.ElevatorConstants.*;
 import frc.robot.Robot;
 import frc.robot.constants.Constants;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
@@ -37,6 +38,13 @@ public class Elevator extends SubsystemBase {
 	// private ElevatorFeedforward feedforward = new ElevatorFeedforward(kS, kG, kV, kA);
 
 	private double targetPosition_m = 0.0;
+
+	// if within module bounds so arm knows to not go down too far
+	private static boolean inDangerZone = false;
+
+	public static boolean inDangerZone() {
+		return inDangerZone;
+	}
 
 	public Elevator() {
 		// todo: do we want to fall back down when not being told to hold?
@@ -78,7 +86,9 @@ public class Elevator extends SubsystemBase {
 	public void setPosition(double position_m) {
 		targetPosition_m = position_m;
 		// double feed = feedforward.calculate();
-		pidController.setReference(targetPosition_m, CANSparkMax.ControlType.kSmartMotion, 0, feedForward_V);
+		pidController.setReference(
+			MathUtil.clamp(targetPosition_m, Arm.inDangerZone() ? moduleDangerZone_m : 0, maxHeight_m),
+			CANSparkMax.ControlType.kSmartMotion, 0, feedForward_V);
 	}
 
 	@Override
@@ -93,6 +103,8 @@ public class Elevator extends SubsystemBase {
 			encoder.setPosition(maxHeight_m);
 
 		mechElevator.setLength(inputs.position_m);
+
+		inDangerZone = (encoder.getPosition() < moduleDangerZone_m);
 	}
 
 	/**

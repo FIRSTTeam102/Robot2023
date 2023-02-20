@@ -11,6 +11,8 @@ public final class ArmConstants {
 	public static final double armSectionLength_m = Units.inchesToMeters(13.75);
 	public static final double conversionFactor_m_per_rotation = Units.inchesToMeters(-0.3333);
 
+	public static final double moduleDangerZone_m = Units.inchesToMeters(20);
+
 	// todo: tuning
 	public static final double kP = 1.0;
 	public static final double kI = 0;
