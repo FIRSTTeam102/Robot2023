@@ -61,6 +61,9 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 	public GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
 	private double gyroOffset_deg = 0.0;
 
+	public double translationY;
+	public double translationX;
+
 	public Swerve(GyroIO gyroIO) {
 		modules = new SwerveModule[moduleConstants.length];
 		int moduleNumber = 0;
@@ -254,6 +257,8 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 		// update odometry
 		poseEstimator.updateWithTime(timer.get(), getYaw(), modulePositions);
 		var pose = poseEstimator.getEstimatedPosition();
+		translationY = pose.getY();
+		translationX = pose.getX();
 		// todo: estimate without using gyro?
 
 		Logger.getInstance().recordOutput("Odometry/Robot", pose);

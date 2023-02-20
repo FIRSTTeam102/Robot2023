@@ -15,16 +15,23 @@ public class ChargeStationBalance extends CommandBase {
 
 	private final PIDController driveController = new PIDController(0.1, 0, 0.0005);
 
-	// private double translationy = new Pose2d.getY();
-
 	Swerve swerve;
 
-	/*
-	 * public void Geofence(double topy, double bottomy) {
-	 * if (> topy) {
-	 * }
-	 * }
-	 */
+	public void geofence(double bluetopy, double bluebottomy, double blueleftx, double bluerightx, double redtopy,
+		double redbottomy, double redleftx, double redrightx) {
+		if (swerve.translationY > bluetopy - SwerveConstants.robotfence
+			&& swerve.translationY < bluebottomy - SwerveConstants.robotfence
+			&& swerve.translationX > blueleftx - SwerveConstants.robotfence
+			&& swerve.translationX < bluerightx - SwerveConstants.robotfence
+			&& swerve.translationY > redtopy - SwerveConstants.robotfence
+			&& swerve.translationY < redbottomy - SwerveConstants.robotfence
+			&& swerve.translationX > redleftx - SwerveConstants.robotfence
+			&& swerve.translationX < redrightx - SwerveConstants.robotfence) {
+
+		} else {
+
+		}
+	}
 
 	public ChargeStationBalance(Swerve swerve) {
 		this.swerve = swerve;
