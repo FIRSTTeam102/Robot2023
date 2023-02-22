@@ -11,7 +11,7 @@ public final class ElevatorConstants {
 	public static final double doubleSubstationHeight_m = 1;
 
 	/* ports */
-	public static final int motorId = 10;
+	public static final int motorId = 11;
 	public static final int topSwitchPort = 1;
 	public static final int bottomSwitchPort = 2;
 
@@ -48,4 +48,6 @@ public final class ElevatorConstants {
 	public static final double carriageMass_kg = Units
 		.lbsToKilograms(4.893 /* inner elevator */ + 8.166 /* carriage + arm */ + 6 /* grabber */);
 	public static final double drumRadius_m = Units.inchesToMeters(0.5);
+
+	public static final double moduleDangerZone_m = Units.inchesToMeters(5);
 }

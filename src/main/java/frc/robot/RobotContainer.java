@@ -5,7 +5,6 @@ import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.CameraConstants;
 import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.constants.ElevatorConstants;
-import frc.robot.constants.GrabberConstants;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
@@ -75,6 +74,9 @@ public class RobotContainer {
 	public final Grabber grabber = new Grabber();
 
 	private final TeleopSwerve teleopSwerve = new TeleopSwerve(swerve, driverController.getHID());
+
+	private final OpenGrabber openGrabber = new OpenGrabber(grabber, .6, 1);
+	private final CloseGrabber closeGrabber = new CloseGrabber(grabber, .6);
 
 	private LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto mode");
 
