@@ -25,7 +25,7 @@ public class ManualElevatorControl extends CommandBase {
 		double yAxis = operatorController.getLeftY();
 
 		yAxis = MathUtil.applyDeadband(yAxis, OperatorConstants.stickDeadband);
-		elevator.setSpeed(yAxis);
+		elevator.setSpeed(yAxis * .6);
 	}
 
 	@Override

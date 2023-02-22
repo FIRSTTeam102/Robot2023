@@ -79,12 +79,14 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 		// public boolean objectDetected = false;
 		// public boolean closed = false;
 		public double percentOutput = 0.0;
+		public double current_A = 0.0;
 	}
 
 	public GrabberIOInputsAutoLogged inputs = new GrabberIOInputsAutoLogged();
 
 	private void updateInputs(GrabberIOInputs inputs) {
 		inputs.percentOutput = motor.get(); // getAppliedOutput(); ?
+		inputs.current_A = motor.getOutputCurrent();
 
 		if (Robot.isReal()) {
 			// inputs.objectDetected = objectSensor.get();

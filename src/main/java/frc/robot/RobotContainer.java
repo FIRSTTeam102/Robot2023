@@ -4,7 +4,6 @@ import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.CameraConstants;
 import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.constants.ElevatorConstants;
-import frc.robot.constants.GrabberConstants;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
@@ -74,6 +73,9 @@ public class RobotContainer {
 	public final Grabber grabber = new Grabber();
 
 	private final TeleopSwerve teleopSwerve = new TeleopSwerve(swerve, driverController.getHID());
+
+	private final OpenGrabber openGrabber = new OpenGrabber(grabber, .6, 1);
+	private final CloseGrabber closeGrabber = new CloseGrabber(grabber, .6);
 
 	private LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto mode");
 
@@ -157,7 +159,7 @@ public class RobotContainer {
 
 		// todo: will using normal buttons conflict with the pov stuff? is there an exclusive bind?
 
-		operatorController.rightTrigger(0.3).whileTrue(new ManualArmControl(arm, operatorController));
+		operatorController.rightTrigger(.3).whileTrue(new ManualArmControl(arm, operatorController));
 		operatorController.a().onTrue(new SetArmPosition(arm)); // reset arm
 
 		operatorController.leftTrigger(.3).whileTrue(new ManualElevatorControl(elevator, operatorController));
@@ -165,8 +167,8 @@ public class RobotContainer {
 		operatorController.b().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.midHeight_m)); // mid
 		operatorController.y().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.highHeight_m)); // high
 
-		operatorController.leftBumper().toggleOnTrue(new OpenGrabber(grabber, .4, GrabberConstants.openingTime_s));
-		operatorController.rightBumper().toggleOnTrue(new CloseGrabber(grabber, .5));
+		operatorController.leftBumper().toggleOnTrue(closeGrabber);
+		operatorController.rightBumper().onTrue(openGrabber);
 	}
 
 	/**

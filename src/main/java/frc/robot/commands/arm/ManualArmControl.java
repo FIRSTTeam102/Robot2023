@@ -1,6 +1,5 @@
 package frc.robot.commands.arm;
 
-import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.subsystems.Arm;
 
 import edu.wpi.first.math.MathUtil;
@@ -23,9 +22,9 @@ public class ManualArmControl extends CommandBase {
 	@Override
 	public void execute() {
 		double xAxis = operatorController.getRightX();
-		xAxis = MathUtil.applyDeadband(xAxis, OperatorConstants.stickDeadband);
+		xAxis = MathUtil.applyDeadband(xAxis, .2);
 
-		arm.setSpeed(xAxis);
+		arm.setSpeed((xAxis == 0) ? 0 : scaleInput(xAxis));
 	}
 
 	@Override
@@ -36,5 +35,9 @@ public class ManualArmControl extends CommandBase {
 	@Override
 	public boolean isFinished() {
 		return false;
+	}
+
+	public static double scaleInput(double input) {
+		return Math.copySign(.55 * Math.abs(input) + .4, input);
 	}
 }
