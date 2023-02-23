@@ -27,6 +27,8 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 		// .add("closed", false)
 		// .withWidget(BuiltInWidgets.kBooleanBox)
 		// .getEntry();
+
+		motor.setInverted(true);
 	}
 
 	// Depracated: no sensor
@@ -51,6 +53,10 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 		motor.set(0);
 	}
 
+	public void hold() {
+		motor.set(.12);
+	}
+
 	// CloseGrabber closeGrabber = new CloseGrabber(this);
 
 	@Override
@@ -66,9 +72,9 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 
 		// shuffleboardClosed.setBoolean(inputs.closed);
 
-		if (currentLimitReached) {
-			stop();
-		}
+		// if (currentLimitReached) {
+		// stop();
+		// }
 	}
 
 	/**
@@ -80,6 +86,7 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 		// public boolean closed = false;
 		public double percentOutput = 0.0;
 		public double current_A = 0.0;
+		public double temperature_C = 0.0;
 	}
 
 	public GrabberIOInputsAutoLogged inputs = new GrabberIOInputsAutoLogged();
@@ -87,6 +94,7 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 	private void updateInputs(GrabberIOInputs inputs) {
 		inputs.percentOutput = motor.get(); // getAppliedOutput(); ?
 		inputs.current_A = motor.getOutputCurrent();
+		inputs.temperature_C = motor.getMotorTemperature();
 
 		if (Robot.isReal()) {
 			// inputs.objectDetected = objectSensor.get();

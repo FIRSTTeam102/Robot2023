@@ -74,8 +74,8 @@ public class RobotContainer {
 
 	private final TeleopSwerve teleopSwerve = new TeleopSwerve(swerve, driverController.getHID());
 
-	private final OpenGrabber openGrabber = new OpenGrabber(grabber, .6, 1);
-	private final CloseGrabber closeGrabber = new CloseGrabber(grabber, .6);
+	private final OpenGrabber openGrabber = new OpenGrabber(grabber, .4, 1);
+	private final CloseGrabber closeGrabber = new CloseGrabber(grabber, .5);
 
 	private LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto mode");
 
@@ -168,7 +168,7 @@ public class RobotContainer {
 		operatorController.y().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.highHeight_m)); // high
 
 		operatorController.leftBumper().toggleOnTrue(closeGrabber);
-		operatorController.rightBumper().onTrue(openGrabber);
+		operatorController.rightBumper().toggleOnTrue(openGrabber);
 	}
 
 	/**
