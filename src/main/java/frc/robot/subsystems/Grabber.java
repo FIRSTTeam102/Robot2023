@@ -2,14 +2,11 @@ package frc.robot.subsystems;
 
 import static frc.robot.constants.GrabberConstants.motorId;
 
-import frc.robot.Robot;
 import frc.robot.constants.GrabberConstants;
 
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.REVPhysicsSim;
 
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
@@ -18,8 +15,11 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 	private CANSparkMax motor = new CANSparkMax(motorId, CANSparkMax.MotorType.kBrushless);
 
 	public Grabber() {
-		if (Robot.isSimulation())
-			REVPhysicsSim.getInstance().addSparkMax(motor, DCMotor.getNeo550(1));
+		motor.setInverted(true);
+
+		// sim only works with velocity control
+		// if (Robot.isSimulation())
+		// REVPhysicsSim.getInstance().addSparkMax(motor, DCMotor.getNeo550(1));
 	}
 
 	public boolean currentLimitReached = false;
@@ -32,6 +32,10 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 		motor.set(0);
 	}
 
+	public void hold() {
+		motor.set(.12);
+	}
+
 	@Override
 	public void periodic() {
 		updateInputs(inputs);
@@ -40,8 +44,8 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 		// read current once every cycle so results don't change during a cycle
 		currentLimitReached = (inputs.current_A >= GrabberConstants.currentLimit_A);
 
-		if (currentLimitReached)
-			stop();
+		// if (currentLimitReached)
+		// stop();
 	}
 
 	/**
