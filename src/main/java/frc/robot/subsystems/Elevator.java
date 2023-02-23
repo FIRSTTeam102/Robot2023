@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import static frc.robot.constants.ElevatorConstants.*;
 
 import frc.robot.Robot;
+import frc.robot.ScoringMechanism2d;
 import frc.robot.constants.Constants;
 
 import edu.wpi.first.math.MathUtil;
@@ -11,10 +12,6 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.CANSparkMax;
@@ -60,8 +57,6 @@ public class Elevator extends SubsystemBase {
 		encoder.setPositionConversionFactor(conversionFactor_m_per_rotation);
 
 		// if (Robot.isSimulation()) revPhysicsSim.addSparkMax(motor, DCMotor.getNEO(1));
-
-		SmartDashboard.putData("Elevator", mech);
 	}
 
 	public boolean getTopSwitch() {
@@ -93,13 +88,13 @@ public class Elevator extends SubsystemBase {
 		updateInputs(inputs);
 		Logger.getInstance().processInputs(getName(), inputs);
 
+		ScoringMechanism2d.elevator.setLength(inputs.position_m);
+
 		// these won't do anything in simulation
 		if (inputs.bottomSwitch)
 			encoder.setPosition(minHeight_m);
 		if (inputs.topSwitch)
 			encoder.setPosition(maxHeight_m);
-
-		mechElevator.setLength(inputs.position_m);
 
 		inDangerZone = (encoder.getPosition() < moduleDangerZone_m);
 	}
@@ -107,7 +102,7 @@ public class Elevator extends SubsystemBase {
 	/**
 	 * inputs
 	 */
-	private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
+	public final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
 	@AutoLog
 	public static class ElevatorIOInputs {
@@ -156,13 +151,4 @@ public class Elevator extends SubsystemBase {
 			inputs.bottomSwitch = bottomSwitch.isPressed();
 		}
 	}
-
-	/**
-	 * mechanism preview
-	 * todo: combine with scissor and grabber when finished
-	 */
-	private final Mechanism2d mech = new Mechanism2d(3, 4);
-	private final MechanismRoot2d mechRoot = mech.getRoot("elevator root", 2, 0);
-	private final MechanismLigament2d mechElevator = mechRoot
-		.append(new MechanismLigament2d("elevator", inputs.position_m, 90));
 }

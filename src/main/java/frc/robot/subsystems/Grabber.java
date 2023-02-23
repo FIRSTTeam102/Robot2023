@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import static frc.robot.constants.GrabberConstants.motorId;
 
+import frc.robot.Robot;
+import frc.robot.ScoringMechanism2d;
 import frc.robot.constants.GrabberConstants;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -41,6 +43,8 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 		updateInputs(inputs);
 		Logger.getInstance().processInputs(getName(), inputs);
 
+		ScoringMechanism2d.setGrabber(inputs.percentOutput);
+
 		// read current once every cycle so results don't change during a cycle
 		currentLimitReached = (inputs.current_A >= GrabberConstants.currentLimit_A);
 
@@ -61,7 +65,7 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 	public GrabberIOInputsAutoLogged inputs = new GrabberIOInputsAutoLogged();
 
 	private void updateInputs(GrabberIOInputs inputs) {
-		inputs.percentOutput = motor.getAppliedOutput();
+		inputs.percentOutput = Robot.isReal() ? motor.getAppliedOutput() : motor.get();
 		inputs.current_A = motor.getOutputCurrent();
 		inputs.temperature_C = motor.getMotorTemperature();
 	}

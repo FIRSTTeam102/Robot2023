@@ -122,6 +122,8 @@ public class RobotContainer {
 		} catch (edu.wpi.first.cscore.VideoException e) {
 			DriverStation.reportError("Failed to get camera: " + e.toString(), e.getStackTrace());
 		}
+
+		SmartDashboard.putData("scoring", ScoringMechanism2d.mech);
 	}
 
 	/**

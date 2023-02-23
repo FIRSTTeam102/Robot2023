@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import static frc.robot.constants.ArmConstants.*;
 
+import frc.robot.ScoringMechanism2d;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -66,7 +68,9 @@ public class Arm extends SubsystemBase {
 		updateInputs(inputs);
 		Logger.getInstance().processInputs(getName(), inputs);
 
-		Logger.getInstance().recordOutput("Arm/armDist_m", nutDistToArmDist(inputs.nutPosition_m));
+		var armDist_m = nutDistToArmDist(inputs.nutPosition_m);
+		Logger.getInstance().recordOutput("Arm/armDist_m", armDist_m);
+		ScoringMechanism2d.arm.setLength(armDist_m);
 
 		// if (inputs.backLimitSwitch)
 		// encoder.setPosition(maxNutDist_m - minNutDist_m);
