@@ -27,6 +27,8 @@ import com.revrobotics.SparkMaxPIDController;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
+import lombok.Getter;
+
 public class Elevator extends SubsystemBase {
 	private CANSparkMax motor = new CANSparkMax(motorId, MotorType.kBrushless);
 	private SparkMaxPIDController pidController = motor.getPIDController();
@@ -39,15 +41,11 @@ public class Elevator extends SubsystemBase {
 
 	private double targetPosition_m = 0.0;
 
+	@Getter
 	// if within module bounds so arm knows to not go down too far
 	private static boolean inDangerZone = false;
 
-	public static boolean inDangerZone() {
-		return inDangerZone;
-	}
-
 	public Elevator() {
-		// todo: do we want to fall back down when not being told to hold?
 		motor.setIdleMode(IdleMode.kBrake);
 
 		topSwitch.enableLimitSwitch(true);
@@ -61,8 +59,7 @@ public class Elevator extends SubsystemBase {
 
 		encoder.setPositionConversionFactor(conversionFactor_m_per_rotation);
 
-		// if (Robot.isSimulation())
-		// revPhysicsSim.addSparkMax(motor, DCMotor.getNEO(1));
+		// if (Robot.isSimulation()) revPhysicsSim.addSparkMax(motor, DCMotor.getNEO(1));
 
 		SmartDashboard.putData("Elevator", mech);
 	}
@@ -87,7 +84,7 @@ public class Elevator extends SubsystemBase {
 		targetPosition_m = position_m;
 		// double feed = feedforward.calculate();
 		pidController.setReference(
-			MathUtil.clamp(targetPosition_m, Arm.inDangerZone() ? moduleDangerZone_m : 0, maxHeight_m),
+			MathUtil.clamp(targetPosition_m, Arm.isInDangerZone() ? moduleDangerZone_m : 0, maxHeight_m),
 			CANSparkMax.ControlType.kSmartMotion, 0, feedForward_V);
 	}
 
@@ -116,6 +113,8 @@ public class Elevator extends SubsystemBase {
 	public static class ElevatorIOInputs {
 		public double position_m = 0.0;
 		public double velocity_mps = 0.0;
+		public double current_A = 0.0;
+		public double temperature_C = 0.0;
 		public boolean topSwitch = false;
 		public boolean bottomSwitch = false;
 	}
@@ -139,6 +138,7 @@ public class Elevator extends SubsystemBase {
 
 			inputs.position_m = elevatorSim.getPositionMeters();
 			inputs.velocity_mps = elevatorSim.getVelocityMetersPerSecond();
+			inputs.current_A = elevatorSim.getCurrentDrawAmps();
 			inputs.topSwitch = elevatorSim.hasHitUpperLimit();
 			inputs.bottomSwitch = elevatorSim.hasHitLowerLimit();
 
@@ -146,10 +146,12 @@ public class Elevator extends SubsystemBase {
 			// motor.setVoltage(motor.get() * RobotController.getBatteryVoltage());
 			// revPhysicsSim.run();
 
-			RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(elevatorSim.getCurrentDrawAmps()));
+			RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(inputs.current_A));
 		} else {
 			inputs.position_m = encoder.getPosition();
 			inputs.velocity_mps = encoder.getVelocity();
+			inputs.current_A = motor.getOutputCurrent();
+			inputs.temperature_C = motor.getMotorTemperature();
 			inputs.topSwitch = topSwitch.isPressed();
 			inputs.bottomSwitch = bottomSwitch.isPressed();
 		}

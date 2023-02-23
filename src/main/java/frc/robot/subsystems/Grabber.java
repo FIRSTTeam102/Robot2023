@@ -5,41 +5,22 @@ import static frc.robot.constants.GrabberConstants.motorId;
 import frc.robot.Robot;
 import frc.robot.constants.GrabberConstants;
 
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.REVPhysicsSim;
 
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
 public class Grabber extends SubsystemBase implements AutoCloseable {
 	private CANSparkMax motor = new CANSparkMax(motorId, CANSparkMax.MotorType.kBrushless);
-	// private DigitalInput closedSensor = new DigitalInput(closedSensorPin);
-	// private DigitalInput objectSensor = new DigitalInput(objectSensorPin);
-
-	// private GenericEntry shuffleboardClosed;
 
 	public Grabber() {
-		var shuffleboardGroup = Shuffleboard.getTab("Drive").getLayout("Grabber", BuiltInLayouts.kList);
-		// shuffleboardClosed = shuffleboardGroup
-		// .add("closed", false)
-		// .withWidget(BuiltInWidgets.kBooleanBox)
-		// .getEntry();
+		if (Robot.isSimulation())
+			REVPhysicsSim.getInstance().addSparkMax(motor, DCMotor.getNeo550(1));
 	}
-
-	// Depracated: no sensor
-	//
-	// public boolean objectDetected() {
-	// return inputs.objectDetected;
-	// }
-
-	// Depracated: no sensor
-	//
-	// public boolean isClosed() {
-	// return inputs.closed;
-	// }
 
 	public boolean currentLimitReached = false;
 
@@ -51,24 +32,16 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 		motor.set(0);
 	}
 
-	// CloseGrabber closeGrabber = new CloseGrabber(this);
-
 	@Override
 	public void periodic() {
 		updateInputs(inputs);
 		Logger.getInstance().processInputs(getName(), inputs);
 
-		// Read current once every cycle so results don't change during a cycle
-		currentLimitReached = (motor.getOutputCurrent() >= GrabberConstants.currentLimit_A);
+		// read current once every cycle so results don't change during a cycle
+		currentLimitReached = (inputs.current_A >= GrabberConstants.currentLimit_A);
 
-		// if (inputs.objectDetected && !inputs.closed && !closeGrabber.isScheduled())
-		// closeGrabber.schedule();
-
-		// shuffleboardClosed.setBoolean(inputs.closed);
-
-		if (currentLimitReached) {
+		if (currentLimitReached)
 			stop();
-		}
 	}
 
 	/**
@@ -76,33 +49,21 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 	 */
 	@AutoLog
 	public static class GrabberIOInputs {
-		// public boolean objectDetected = false;
-		// public boolean closed = false;
 		public double percentOutput = 0.0;
 		public double current_A = 0.0;
+		public double temperature_C = 0.0;
 	}
 
 	public GrabberIOInputsAutoLogged inputs = new GrabberIOInputsAutoLogged();
 
 	private void updateInputs(GrabberIOInputs inputs) {
-		inputs.percentOutput = motor.get(); // getAppliedOutput(); ?
+		inputs.percentOutput = motor.getAppliedOutput();
 		inputs.current_A = motor.getOutputCurrent();
-
-		if (Robot.isReal()) {
-			// inputs.objectDetected = objectSensor.get();
-			// inputs.closed = closedSensor.get();
-		} else {
-			// inputs.closed = inputs.percentOutput > 0 ? false
-			// : inputs.percentOutput < 0 ? true
-			// : inputs.closed;
-		}
+		inputs.temperature_C = motor.getMotorTemperature();
 	}
 
 	@Override
 	public void close() {
 		motor.close();
-		// objectSensor.close();
-		// closedSensor.close();
-		// closeGrabber.cancel();
 	}
 }

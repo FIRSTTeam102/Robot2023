@@ -3,10 +3,6 @@ package frc.robot.subsystems;
 import static frc.robot.constants.ArmConstants.*;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.CANSparkMax;
@@ -18,7 +14,7 @@ import com.revrobotics.SparkMaxPIDController;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
-import java.util.Map;
+import lombok.Getter;
 
 public class Arm extends SubsystemBase {
 	private CANSparkMax motor = new CANSparkMax(motorId, MotorType.kBrushless);
@@ -28,23 +24,11 @@ public class Arm extends SubsystemBase {
 	private SparkMaxLimitSwitch limitSwitch = motor.getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);
 	// private SparkMaxLimitSwitch backLimitSwitch = motor.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);
 
-	private GenericEntry shuffleboardLength;
-
+	@Getter
 	// is within swerve module bounds so elevator doesn't go down too far
 	private static boolean inDangerZone = false;
 
-	public static boolean inDangerZone() {
-		return inDangerZone;
-	}
-
 	public Arm() {
-		var armGroup = Shuffleboard.getTab("Drive").getLayout("Arm", BuiltInLayouts.kList);
-		shuffleboardLength = armGroup
-			.add("length", 0)
-			.withWidget(BuiltInWidgets.kNumberBar)
-			.withProperties(Map.of("min", 0, "max", 40))
-			.getEntry();
-
 		limitSwitch.enableLimitSwitch(true);
 		// backLimitSwitch.enableLimitSwitch(true);
 
@@ -63,7 +47,8 @@ public class Arm extends SubsystemBase {
 
 	public void setPosition(double armLength_m) {
 		pidController.setReference(
-			MathUtil.clamp(armDistToNutDist(armLength_m), Elevator.inDangerZone() ? armDistToNutDist(moduleDangerZone_m) : 0,
+			MathUtil.clamp(armDistToNutDist(armLength_m),
+				Elevator.isInDangerZone() ? armDistToNutDist(moduleDangerZone_m) : 0,
 				maxNutDist_m - minNutDist_m),
 			CANSparkMax.ControlType.kSmartMotion);
 	}
@@ -82,7 +67,6 @@ public class Arm extends SubsystemBase {
 		Logger.getInstance().processInputs(getName(), inputs);
 
 		Logger.getInstance().recordOutput("Arm/armDist_m", nutDistToArmDist(inputs.nutPosition_m));
-		shuffleboardLength.setDouble(nutDistToArmDist(inputs.nutPosition_m)); // todo: remove?
 
 		// if (inputs.backLimitSwitch)
 		// encoder.setPosition(maxNutDist_m - minNutDist_m);

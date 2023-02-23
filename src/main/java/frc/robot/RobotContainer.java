@@ -74,9 +74,6 @@ public class RobotContainer {
 
 	private final TeleopSwerve teleopSwerve = new TeleopSwerve(swerve, driverController.getHID());
 
-	private final OpenGrabber openGrabber = new OpenGrabber(grabber, .6, 1);
-	private final CloseGrabber closeGrabber = new CloseGrabber(grabber, .6);
-
 	private LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto mode");
 
 	/**
@@ -167,16 +164,14 @@ public class RobotContainer {
 		operatorController.b().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.midHeight_m)); // mid
 		operatorController.y().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.highHeight_m)); // high
 
-		operatorController.leftBumper().toggleOnTrue(closeGrabber);
-		operatorController.rightBumper().onTrue(openGrabber);
+		operatorController.leftBumper().toggleOnTrue(new CloseGrabber(grabber, .6));
+		operatorController.rightBumper().onTrue(new OpenGrabber(grabber, .6, 1));
 	}
 
 	/**
 	 * Use this to pass the autonomous command to the main {@link Robot} class.
-	 *
 	 * @return the command to run in autonomous
 	 */
-
 	public Command getAutonomousCommand() {
 		return autoChooser.get();
 	}
