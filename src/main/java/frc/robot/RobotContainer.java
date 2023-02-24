@@ -5,6 +5,7 @@ import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.CameraConstants;
 import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.constants.ElevatorConstants;
+import frc.robot.constants.GrabberConstants;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
@@ -75,9 +76,6 @@ public class RobotContainer {
 
 	private final TeleopSwerve teleopSwerve = new TeleopSwerve(swerve, driverController.getHID());
 
-	private final OpenGrabber openGrabber = new OpenGrabber(grabber, .6, 1);
-	private final CloseGrabber closeGrabber = new CloseGrabber(grabber, .6);
-
 	private LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto mode");
 
 	/**
@@ -126,6 +124,8 @@ public class RobotContainer {
 		} catch (edu.wpi.first.cscore.VideoException e) {
 			DriverStation.reportError("Failed to get camera: " + e.toString(), e.getStackTrace());
 		}
+
+		SmartDashboard.putData("scoring", ScoringMechanism2d.mech);
 	}
 
 	/**
@@ -178,16 +178,14 @@ public class RobotContainer {
 			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.topNodeHeight_m));
 
 		// grabber modes
-		driverController.a().toggleOnTrue(new CloseGrabber(grabber, .5, GrabberConstants.closingTime_s));
+		driverController.a().toggleOnTrue(new CloseGrabber(grabber, .5));
 		driverController.b().toggleOnTrue(new OpenGrabber(grabber, .4, GrabberConstants.openingTime_s));
 	}
 
 	/**
 	 * Use this to pass the autonomous command to the main {@link Robot} class.
-	 *
 	 * @return the command to run in autonomous
 	 */
-
 	public Command getAutonomousCommand() {
 		return autoChooser.get();
 	}

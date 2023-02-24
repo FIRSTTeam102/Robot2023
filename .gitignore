@@ -161,7 +161,7 @@ bin/
 # Simulation GUI and other tools window save file
 *-window.json
 simgui*.json
-!simgui-ds.json
+# !simgui-ds.json
 networktables.json
 
 # Automatically generated when building

@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import static frc.robot.constants.ElevatorConstants.*;
 
 import frc.robot.Robot;
+import frc.robot.ScoringMechanism2d;
 import frc.robot.constants.Constants;
 
 import edu.wpi.first.math.MathUtil;
@@ -11,10 +12,6 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.CANSparkMax;
@@ -26,6 +23,8 @@ import com.revrobotics.SparkMaxPIDController;
 
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
+
+import lombok.Getter;
 
 public class Elevator extends SubsystemBase {
 	private CANSparkMax motor = new CANSparkMax(motorId, MotorType.kBrushless);
@@ -39,15 +38,11 @@ public class Elevator extends SubsystemBase {
 
 	private double targetPosition_m = 0.0;
 
+	@Getter
 	// if within module bounds so arm knows to not go down too far
 	private static boolean inDangerZone = false;
 
-	public static boolean inDangerZone() {
-		return inDangerZone;
-	}
-
 	public Elevator() {
-		// todo: do we want to fall back down when not being told to hold?
 		motor.setIdleMode(IdleMode.kBrake);
 
 		topSwitch.enableLimitSwitch(true);
@@ -61,10 +56,7 @@ public class Elevator extends SubsystemBase {
 
 		encoder.setPositionConversionFactor(conversionFactor_m_per_rotation);
 
-		// if (Robot.isSimulation())
-		// revPhysicsSim.addSparkMax(motor, DCMotor.getNEO(1));
-
-		SmartDashboard.putData("Elevator", mech);
+		// if (Robot.isSimulation()) revPhysicsSim.addSparkMax(motor, DCMotor.getNEO(1));
 	}
 
 	public boolean getTopSwitch() {
@@ -87,7 +79,7 @@ public class Elevator extends SubsystemBase {
 		targetPosition_m = position_m;
 		// double feed = feedforward.calculate();
 		pidController.setReference(
-			MathUtil.clamp(targetPosition_m, Arm.inDangerZone() ? moduleDangerZone_m : 0, maxHeight_m),
+			MathUtil.clamp(targetPosition_m, Arm.isInDangerZone() ? moduleDangerZone_m : 0, maxHeight_m),
 			CANSparkMax.ControlType.kSmartMotion, 0, feedForward_V);
 	}
 
@@ -96,13 +88,13 @@ public class Elevator extends SubsystemBase {
 		updateInputs(inputs);
 		Logger.getInstance().processInputs(getName(), inputs);
 
+		ScoringMechanism2d.elevator.setLength(inputs.position_m);
+
 		// these won't do anything in simulation
 		if (inputs.bottomSwitch)
 			encoder.setPosition(minHeight_m);
 		if (inputs.topSwitch)
 			encoder.setPosition(maxHeight_m);
-
-		mechElevator.setLength(inputs.position_m);
 
 		inDangerZone = (encoder.getPosition() < moduleDangerZone_m);
 	}
@@ -110,12 +102,14 @@ public class Elevator extends SubsystemBase {
 	/**
 	 * inputs
 	 */
-	private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
+	public final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
 	@AutoLog
 	public static class ElevatorIOInputs {
 		public double position_m = 0.0;
 		public double velocity_mps = 0.0;
+		public double current_A = 0.0;
+		public double temperature_C = 0.0;
 		public boolean topSwitch = false;
 		public boolean bottomSwitch = false;
 	}
@@ -139,6 +133,7 @@ public class Elevator extends SubsystemBase {
 
 			inputs.position_m = elevatorSim.getPositionMeters();
 			inputs.velocity_mps = elevatorSim.getVelocityMetersPerSecond();
+			inputs.current_A = elevatorSim.getCurrentDrawAmps();
 			inputs.topSwitch = elevatorSim.hasHitUpperLimit();
 			inputs.bottomSwitch = elevatorSim.hasHitLowerLimit();
 
@@ -146,21 +141,14 @@ public class Elevator extends SubsystemBase {
 			// motor.setVoltage(motor.get() * RobotController.getBatteryVoltage());
 			// revPhysicsSim.run();
 
-			RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(elevatorSim.getCurrentDrawAmps()));
+			RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(inputs.current_A));
 		} else {
 			inputs.position_m = encoder.getPosition();
 			inputs.velocity_mps = encoder.getVelocity();
+			inputs.current_A = motor.getOutputCurrent();
+			inputs.temperature_C = motor.getMotorTemperature();
 			inputs.topSwitch = topSwitch.isPressed();
 			inputs.bottomSwitch = bottomSwitch.isPressed();
 		}
 	}
-
-	/**
-	 * mechanism preview
-	 * todo: combine with scissor and grabber when finished
-	 */
-	private final Mechanism2d mech = new Mechanism2d(3, 4);
-	private final MechanismRoot2d mechRoot = mech.getRoot("elevator root", 2, 0);
-	private final MechanismLigament2d mechElevator = mechRoot
-		.append(new MechanismLigament2d("elevator", inputs.position_m, 90));
 }
