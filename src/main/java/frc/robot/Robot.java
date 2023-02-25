@@ -104,6 +104,9 @@ public class Robot extends LoggedRobot {
 		});
 
 		robotContainer.swerve.disabledTimeStart = Timer.getFPGATimestamp();
+
+		// keep elevator at current position when re-enabled
+		robotContainer.elevator.setSpeed(0);
 	}
 
 	@Override

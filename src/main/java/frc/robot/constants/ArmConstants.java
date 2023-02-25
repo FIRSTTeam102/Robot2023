@@ -10,6 +10,7 @@ public final class ArmConstants {
 	public static final double minNutDist_m = Units.inchesToMeters(2.441);
 	public static final double armSectionLength_m = Units.inchesToMeters(13.75);
 	public static final double conversionFactor_m_per_rotation = Units.inchesToMeters(-0.3333);
+	public static final double conversionFactor_mps_per_rpm = conversionFactor_m_per_rotation / 60;
 
 	public static final double moduleDangerZone_m = Units.inchesToMeters(20);
 

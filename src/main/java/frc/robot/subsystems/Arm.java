@@ -3,11 +3,15 @@ package frc.robot.subsystems;
 import static frc.robot.constants.ArmConstants.*;
 
 import frc.robot.ScoringMechanism2d;
+import frc.robot.util.BuildManager;
+import frc.robot.util.SendableSparkMaxPIDController;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxLimitSwitch;
@@ -43,8 +47,13 @@ public class Arm extends SubsystemBase {
 		pidController.setOutputRange(minOutput, maxOutput);
 
 		encoder.setPositionConversionFactor(conversionFactor_m_per_rotation);
+		encoder.setVelocityConversionFactor(conversionFactor_mps_per_rpm);
 
 		motor.setSecondaryCurrentLimit(40);
+
+		BuildManager.burnSpark(motor);
+
+		SmartDashboard.putData(new SendableSparkMaxPIDController(pidController, ControlType.kPosition, "arm pid"));
 	}
 
 	public void setPosition(double armLength_m) {
@@ -76,7 +85,7 @@ public class Arm extends SubsystemBase {
 		// encoder.setPosition(maxNutDist_m - minNutDist_m);
 
 		if (inputs.limitSwitch)
-			encoder.setPosition(0);
+			encoder.setPosition(maxNutDist_m);
 
 		// todo: bake danger zone
 		inDangerZone = (inputs.nutPosition_m < armDistToNutDist(moduleDangerZone_m));
@@ -96,10 +105,11 @@ public class Arm extends SubsystemBase {
 	 */
 	@AutoLog
 	public static class ArmIOInputs {
-		public double percentOutput = 0.0;
-		public double current_A = 0.0;
-		public double temperature_C = 0.0;
-		public double nutPosition_m = 0.0;
+		public double percentOutput = 0;
+		public double current_A = 0;
+		public double temperature_C = 0;
+		public double nutPosition_m = 0;
+		public double velocity_mps = 0;
 		public boolean limitSwitch = false;
 		// public boolean backLimitSwitch = false;
 	}
@@ -111,6 +121,7 @@ public class Arm extends SubsystemBase {
 		inputs.current_A = motor.getOutputCurrent();
 		inputs.temperature_C = motor.getMotorTemperature();
 		inputs.nutPosition_m = encoder.getPosition();
+		inputs.velocity_mps = encoder.getVelocity();
 		inputs.limitSwitch = limitSwitch.isPressed();
 		// inputs.backLimitSwitch = backLimitSwitch.isPressed();
 	}
