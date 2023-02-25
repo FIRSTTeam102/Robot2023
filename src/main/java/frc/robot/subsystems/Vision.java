@@ -52,8 +52,8 @@ public class Vision extends SubsystemBase {
 		// Every 0.02s, updating pose2d
 		if (inputs.pipeline == Pipeline.AprilTag.value && isPipelineReady())
 			RobotContainer.getInstance().swerve.addVisionMeasurement(
-				new Pose2d(inputs.botpose_targetspaceTranslationX_m, inputs.botpose_targetspaceTranslationY_m,
-					new Rotation2d(inputs.botpose_targetspaceRotationZ_rad)));
+				new Pose2d(inputs.botpose_fieldTranslationX_m, inputs.botpose_fieldTranslationY_m,
+					new Rotation2d(inputs.botpose_fieldRotationZ_rad)));
 
 		// Getting total crosshairToTargetOffsetX_rad sum every 0.02s
 		rotateErrorTotalHistory.add(inputs.crosshairToTargetErrorX_rad);

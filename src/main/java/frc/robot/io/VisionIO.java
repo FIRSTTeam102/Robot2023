@@ -1,5 +1,7 @@
 package frc.robot.io;
 
+import frc.robot.constants.FieldConstants;
+
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -22,6 +24,13 @@ public class VisionIO {
 		public double botpose_targetspaceRotationY_rad = 0.0;
 		public double botpose_targetspaceRotationZ_rad = 0.0;
 
+		public double botpose_fieldTranslationX_m = 0.0;
+		public double botpose_fieldTranslationY_m = 0.0;
+		public double botpose_fieldTranslationZ_m = 0.0;
+		public double botpose_fieldRotationX_rad = 0.0;
+		public double botpose_fieldRotationY_rad = 0.0;
+		public double botpose_fieldRotationZ_rad = 0.0;
+
 		public double targetAprilTag = 0.0;
 		public double targetObject = 0.0;
 
@@ -38,6 +47,9 @@ public class VisionIO {
 
 	private NetworkTableEntry botpose_targetspaceEntry = table.getEntry("botpose_targetspace");
 	private double[] botpose_targetspaceCache = new double[6];
+
+	private NetworkTableEntry botpose_fieldEntry = table.getEntry("botpose");
+	private double[] botpose_fieldCache = new double[6];
 
 	private NetworkTableEntry tidEntry = table.getEntry("tid");
 	private NetworkTableEntry tclassEntry = table.getEntry("tclass");
@@ -57,6 +69,14 @@ public class VisionIO {
 		inputs.botpose_targetspaceRotationX_rad = Math.toRadians(botpose_targetspaceCache[3]);
 		inputs.botpose_targetspaceRotationY_rad = Math.toRadians(botpose_targetspaceCache[4]);
 		inputs.botpose_targetspaceRotationZ_rad = Math.toRadians(botpose_targetspaceCache[5]);
+
+		botpose_fieldCache = botpose_fieldEntry.getDoubleArray(botpose_fieldCache);
+		inputs.botpose_fieldTranslationX_m = botpose_fieldCache[0] + FieldConstants.fieldLengthX_m / 2;
+		inputs.botpose_fieldTranslationY_m = botpose_fieldCache[1] + FieldConstants.fieldLengthY_m / 2;
+		inputs.botpose_fieldTranslationZ_m = botpose_fieldCache[2];
+		inputs.botpose_fieldRotationX_rad = Math.toRadians(botpose_fieldCache[3]);
+		inputs.botpose_fieldRotationY_rad = Math.toRadians(botpose_fieldCache[4]);
+		inputs.botpose_fieldRotationZ_rad = Math.toRadians(botpose_fieldCache[5]);
 
 		inputs.targetAprilTag = tidEntry.getDouble(inputs.targetAprilTag);
 		inputs.targetObject = tclassEntry.getDouble(inputs.targetObject);

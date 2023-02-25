@@ -85,7 +85,7 @@ public class GamePieceVision extends CommandBase {
 				System.out.println("Swerve --> Gamepiece, Elevator --> Gamepiece, Arm --> Gamepiece, Grabber --> Gamepiece");
 				System.out.println("botpose_targetspaceRotationZ_rad: " + vision.inputs.botpose_targetspaceRotationZ_rad
 					+ " crosshairToTargetErrorX_rad: " + vision.inputs.crosshairToTargetErrorX_rad);
-				swerve.drive(new Translation2d(0, robotTranslateVelocity_mps), robotRotateVelocity_mps, true);
+				swerve.drive(new Translation2d(0, robotTranslateVelocity_mps), robotRotateVelocity_mps, false);
 				new SetElevatorPosition(elevator, ElevatorConstants.resetHeight_m);
 				new SetArmPosition(arm, ArmConstants.gamePieceLength_m);
 				new CloseGrabber(grabber, .5, GrabberConstants.closingTime_s);
