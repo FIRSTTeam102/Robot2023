@@ -23,7 +23,7 @@ public class Lights {
 	private Lights() {}
 
 	public enum Subsystem {
-		Control(0), Vision(1), Claw(2), Arm(3), Elevator(4);
+		Control(0), Vision(1), Grabber(2), Elevator(3), Arm(4);
 
 		public final int value;
 

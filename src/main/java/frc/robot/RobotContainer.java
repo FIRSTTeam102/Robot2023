@@ -1,5 +1,6 @@
 package frc.robot;
 
+import frc.robot.constants.ArmConstants;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.CameraConstants;
 import frc.robot.constants.Constants.OperatorConstants;
@@ -7,10 +8,18 @@ import frc.robot.constants.Constants.ShuffleboardConstants;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
+import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
 
 import frc.robot.commands.FeedForwardCharacterization;
+import frc.robot.commands.arm.ManualArmControl;
+import frc.robot.commands.arm.SetArmPosition;
+import frc.robot.commands.elevator.ManualElevatorControl;
+import frc.robot.commands.grabber.CloseGrabber;
+import frc.robot.commands.grabber.OpenGrabber;
 import frc.robot.commands.swerve.ChargeStationBalance;
 import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.swerve.XStance;
@@ -60,11 +69,12 @@ public class RobotContainer {
 		? new GyroIOPigeon2(Constants.pigeonId)
 		: new GyroIOSim();
 
-	/**
-	 * Subsystems
-	 */
+	/* subsystems */
 	public final Swerve swerve = new Swerve(gyro);
 	public final Vision vision = new Vision();
+	public final Arm arm = new Arm();
+	public final Elevator elevator = new Elevator();
+	public final Grabber grabber = new Grabber();
 
 	private final TeleopSwerve teleopSwerve = new TeleopSwerve(swerve, driverController.getHID());
 
@@ -128,6 +138,8 @@ public class RobotContainer {
 				.withWidget(BuiltInWidgets.kCameraStream)
 				.withSize(7, 6);
 		}
+
+		SmartDashboard.putData("scoring", ScoringMechanism2d.mech);
 	}
 
 	/**
@@ -159,14 +171,27 @@ public class RobotContainer {
 
 		operatorController.povRight().and(operatorController.a())
 			.whileTrue(new ObjectDetectionVision(ObjectDetectionVision.Routine.Ground, vision, swerve));
+
+		// todo: will using normal buttons conflict with the pov stuff? is there an exclusive bind?
+
+		operatorController.rightTrigger(.3).whileTrue(new ManualArmControl(arm, operatorController));
+		operatorController.a().onTrue(new SetArmPosition(arm)); // reset arm
+
+		operatorController.leftTrigger(.3).whileTrue(new ManualElevatorControl(elevator, operatorController));
+		operatorController.a().onTrue(new SetArmPosition(arm, ArmConstants.lowExtension_m)); // low
+		operatorController.b().onTrue(new SetArmPosition(arm, ArmConstants.midExtension_m)); // mid
+		operatorController.y().onTrue(new SetArmPosition(arm, ArmConstants.highExtension_m)); // high
+		operatorController.rightStick().onTrue(new SetArmPosition(arm, Arm.armDistToNutDist(ArmConstants.minNutDist_m)));
+
+		operatorController.leftBumper().toggleOnTrue(new CloseGrabber(grabber, .5));
+		operatorController.rightBumper().toggleOnTrue(new OpenGrabber(grabber, 1, .5));
+
 	}
 
 	/**
 	 * Use this to pass the autonomous command to the main {@link Robot} class.
-	 *
 	 * @return the command to run in autonomous
 	 */
-
 	public Command getAutonomousCommand() {
 		return autoChooser.get();
 	}
