@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
+import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxLimitSwitch;
@@ -30,12 +31,16 @@ public class Arm extends SubsystemBase {
 	private SparkMaxLimitSwitch limitSwitch = motor.getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);
 	// private SparkMaxLimitSwitch backLimitSwitch = motor.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);
 
+	private double targetPosition_m = 0;
+
 	@Getter
 	// is within swerve module bounds so elevator doesn't go down too far
 	private static boolean inDangerZone = false;
 
 	public Arm() {
 		limitSwitch.enableLimitSwitch(true);
+		motor.setSoftLimit(SoftLimitDirection.kReverse, (float) minNutDist_m);
+		motor.enableSoftLimit(SoftLimitDirection.kReverse, true);
 		// backLimitSwitch.enableLimitSwitch(true);
 
 		pidController.setP(kP);
@@ -57,11 +62,13 @@ public class Arm extends SubsystemBase {
 	}
 
 	public void setPosition(double armLength_m) {
+		targetPosition_m = armLength_m;
+
 		pidController.setReference(
 			MathUtil.clamp(armDistToNutDist(armLength_m),
-				Elevator.isInDangerZone() ? armDistToNutDist(moduleDangerZone_m) : 0,
-				maxNutDist_m - minNutDist_m),
-			CANSparkMax.ControlType.kSmartMotion);
+				Elevator.isInDangerZone() ? armDistToNutDist(moduleDangerZone_m) : minNutDist_m,
+				maxNutDist_m),
+			CANSparkMax.ControlType.kPosition);
 	}
 
 	public void setSpeed(double speed) {
@@ -81,6 +88,8 @@ public class Arm extends SubsystemBase {
 		Logger.getInstance().recordOutput("Arm/armDist_m", armDist_m);
 		ScoringMechanism2d.arm.setLength(armDist_m);
 
+		Logger.getInstance().recordOutput("Arm/targetArmDist_m", targetPosition_m);
+
 		// if (inputs.backLimitSwitch)
 		// encoder.setPosition(maxNutDist_m - minNutDist_m);
 
@@ -92,12 +101,11 @@ public class Arm extends SubsystemBase {
 	}
 
 	public static double armDistToNutDist(double armDistance_m) {
-		return Math.sqrt(Math.pow(armSectionLength_m, 2) - Math.pow(armDistance_m / sectionCount, 2))
-			- minNutDist_m;
+		return Math.sqrt(Math.pow(armSectionLength_m, 2) - Math.pow(armDistance_m / sectionCount, 2));
 	}
 
 	public static double nutDistToArmDist(double nutDistance_m) {
-		return sectionCount * Math.sqrt(Math.pow(armSectionLength_m, 2) - Math.pow(nutDistance_m + minNutDist_m, 2));
+		return sectionCount * Math.sqrt(Math.pow(armSectionLength_m, 2) - Math.pow(nutDistance_m, 2));
 	}
 
 	/**
@@ -111,6 +119,7 @@ public class Arm extends SubsystemBase {
 		public double nutPosition_m = 0;
 		public double velocity_mps = 0;
 		public boolean limitSwitch = false;
+		public boolean softLimit = false;
 		// public boolean backLimitSwitch = false;
 	}
 
@@ -123,6 +132,7 @@ public class Arm extends SubsystemBase {
 		inputs.nutPosition_m = encoder.getPosition();
 		inputs.velocity_mps = encoder.getVelocity();
 		inputs.limitSwitch = limitSwitch.isPressed();
+		inputs.softLimit = motor.isSoftLimitEnabled(SoftLimitDirection.kReverse);
 		// inputs.backLimitSwitch = backLimitSwitch.isPressed();
 	}
 }

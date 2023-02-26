@@ -1,9 +1,9 @@
 package frc.robot;
 
+import frc.robot.constants.ArmConstants;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.CameraConstants;
 import frc.robot.constants.Constants.OperatorConstants;
-import frc.robot.constants.ElevatorConstants;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
@@ -17,7 +17,6 @@ import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.arm.ManualArmControl;
 import frc.robot.commands.arm.SetArmPosition;
 import frc.robot.commands.elevator.ManualElevatorControl;
-import frc.robot.commands.elevator.SetElevatorPosition;
 import frc.robot.commands.grabber.CloseGrabber;
 import frc.robot.commands.grabber.OpenGrabber;
 import frc.robot.commands.swerve.ChargeStationBalance;
@@ -162,11 +161,10 @@ public class RobotContainer {
 		operatorController.a().onTrue(new SetArmPosition(arm)); // reset arm
 
 		operatorController.leftTrigger(.3).whileTrue(new ManualElevatorControl(elevator, operatorController));
-		operatorController.a().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.lowHeight_m)); // low
-		operatorController.b().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.midHeight_m)); // mid
-		operatorController.y().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.highHeight_m)); // high
-		operatorController.x().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.maxHeight_m));
-		operatorController.rightStick().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.minHeight_m));
+		operatorController.a().onTrue(new SetArmPosition(arm, ArmConstants.lowExtension_m)); // low
+		operatorController.b().onTrue(new SetArmPosition(arm, ArmConstants.midExtension_m)); // mid
+		operatorController.y().onTrue(new SetArmPosition(arm, ArmConstants.highExtension_m)); // high
+		operatorController.rightStick().onTrue(new SetArmPosition(arm, Arm.armDistToNutDist(ArmConstants.minNutDist_m)));
 
 		operatorController.leftBumper().toggleOnTrue(new CloseGrabber(grabber, .5));
 		operatorController.rightBumper().toggleOnTrue(new OpenGrabber(grabber, 1, .5));
