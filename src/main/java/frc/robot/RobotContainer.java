@@ -3,6 +3,7 @@ package frc.robot;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.CameraConstants;
 import frc.robot.constants.Constants.OperatorConstants;
+import frc.robot.constants.Constants.ShuffleboardConstants;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
@@ -18,6 +19,8 @@ import frc.robot.commands.vision.ObjectDetectionVision;
 import frc.robot.commands.vision.RetroreflectiveVision;
 
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.HttpCamera;
+import edu.wpi.first.cscore.HttpCamera.HttpCameraKind;
 import edu.wpi.first.cscore.MjpegServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -30,6 +33,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import java.util.Map;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -89,9 +94,11 @@ public class RobotContainer {
 		// camera
 		try {
 			var camera = CameraServer.startAutomaticCapture("arm", 0);
-			// camera.setConnectVerbose(0);
+			camera.setConnectVerbose(0);
 			camera.setFPS(CameraConstants.fps);
 			camera.setResolution(CameraConstants.width, CameraConstants.height);
+			camera.setExposureManual(CameraConstants.exposure);
+			// camera.setBrightness(0);
 
 			// camera server is evil
 
@@ -103,13 +110,23 @@ public class RobotContainer {
 			cameraServer.setCompression(CameraConstants.compression);
 			cameraServer.setDefaultCompression(CameraConstants.compression);
 
-			Shuffleboard.getTab("Drive")
+			Shuffleboard.getTab(ShuffleboardConstants.driveTab)
 				.add("camera", SendableCameraWrapper.wrap(camera))
 				// .addCamera("camera", "arm", cameraServ
 				.withWidget(BuiltInWidgets.kCameraStream)
-				.withSize(5, 4);
+				.withSize(8, 6);
 		} catch (edu.wpi.first.cscore.VideoException e) {
 			DriverStation.reportError("Failed to get camera: " + e.toString(), e.getStackTrace());
+		}
+
+		if (Robot.isReal()) {
+			var limelightCamera = new HttpCamera("limelightStream", "http://limelight.local:5800/stream.mjpg",
+				HttpCameraKind.kMJPGStreamer);
+			Shuffleboard.getTab(ShuffleboardConstants.driveTab)
+				.add("limelight", limelightCamera)
+				.withProperties(Map.of("show crosshair", false, "show controls", false))
+				.withWidget(BuiltInWidgets.kCameraStream)
+				.withSize(7, 6);
 		}
 	}
 

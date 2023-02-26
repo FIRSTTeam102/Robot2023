@@ -21,11 +21,16 @@ public final class Constants {
 
 	public static class CameraConstants {
 		// must be a supported resolution or will fail
-		public static final int width = 640;
-		public static final int height = 360;
+		public static final int width = 426;
+		public static final int height = 240;
 		public static final int fps = 30;
 		public static final int compression = 70;
+		public static final int exposure = 50;
 	}
 
 	public static final int pigeonId = 20;
+
+	public static class ShuffleboardConstants {
+		public static final String driveTab = "drive";
+	}
 }

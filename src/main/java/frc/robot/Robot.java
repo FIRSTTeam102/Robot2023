@@ -5,6 +5,7 @@ import static frc.robot.constants.Constants.robotMode;
 import frc.robot.constants.BuildConstants;
 import frc.robot.subsystems.Lights;
 
+import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -67,6 +68,13 @@ public class Robot extends LoggedRobot {
 		}
 
 		logger.start();
+
+		// forward limelight when connected over USB
+		if (Robot.isReal()) {
+			for (int port = 5800; port <= 5805; port++) {
+				PortForwarder.add(port, "limelight.local", port);
+			}
+		}
 
 		/*
 		 * Instantiate our RobotContainer. This will perform all our button bindings,
