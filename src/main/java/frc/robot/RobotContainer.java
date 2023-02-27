@@ -5,6 +5,7 @@ import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.CameraConstants;
 import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.constants.Constants.ShuffleboardConstants;
+import frc.robot.constants.ElevatorConstants;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
@@ -18,6 +19,7 @@ import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.arm.ManualArmControl;
 import frc.robot.commands.arm.SetArmPosition;
 import frc.robot.commands.elevator.ManualElevatorControl;
+import frc.robot.commands.elevator.SetElevatorPosition;
 import frc.robot.commands.grabber.CloseGrabber;
 import frc.robot.commands.grabber.OpenGrabber;
 import frc.robot.commands.swerve.ChargeStationBalance;
@@ -175,17 +177,19 @@ public class RobotContainer {
 		// todo: will using normal buttons conflict with the pov stuff? is there an exclusive bind?
 
 		operatorController.rightTrigger(.3).whileTrue(new ManualArmControl(arm, operatorController));
-		operatorController.a().onTrue(new SetArmPosition(arm)); // reset arm
-
 		operatorController.leftTrigger(.3).whileTrue(new ManualElevatorControl(elevator, operatorController));
-		operatorController.a().onTrue(new SetArmPosition(arm, ArmConstants.lowExtension_m)); // low
-		operatorController.b().onTrue(new SetArmPosition(arm, ArmConstants.midExtension_m)); // mid
-		operatorController.y().onTrue(new SetArmPosition(arm, ArmConstants.highExtension_m)); // high
-		operatorController.rightStick().onTrue(new SetArmPosition(arm, Arm.armDistToNutDist(ArmConstants.minNutDist_m)));
+
+		operatorController.a().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.lowHeight_m)
+			.alongWith(new SetArmPosition(arm, ArmConstants.lowExtension_m))); // low
+		operatorController.b().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.midHeight_m)
+			.alongWith(new SetArmPosition(arm, ArmConstants.midExtension_m))); // mid
+		operatorController.y().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.highHeight_m)
+			.alongWith(new SetArmPosition(arm, ArmConstants.highExtension_m))); // high
+		operatorController.x().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.dangerZone_m)
+			.alongWith(new SetArmPosition(arm, Arm.nutDistToArmDist(ArmConstants.minNutDist_m))));
 
 		operatorController.leftBumper().toggleOnTrue(new CloseGrabber(grabber, .5));
 		operatorController.rightBumper().toggleOnTrue(new OpenGrabber(grabber, 1, .5));
-
 	}
 
 	/**

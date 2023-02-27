@@ -88,7 +88,7 @@ public class Elevator extends SubsystemBase {
 		targetPosition_m = position_m;
 		// double feed = feedforward.calculate();
 		pidController.setReference(
-			MathUtil.clamp(targetPosition_m, Arm.isInDangerZone() ? moduleDangerZone_m : 0, maxHeight_m),
+			MathUtil.clamp(targetPosition_m, Arm.isInDangerZone() ? dangerZone_m : 0, maxHeight_m),
 			ControlType.kPosition, 0, feedForward_V);
 	}
 
@@ -107,7 +107,7 @@ public class Elevator extends SubsystemBase {
 		if (inputs.topSwitch)
 			encoder.setPosition(maxHeight_m);
 
-		inDangerZone = (encoder.getPosition() < moduleDangerZone_m);
+		inDangerZone = (encoder.getPosition() < dangerZone_m);
 	}
 
 	/**

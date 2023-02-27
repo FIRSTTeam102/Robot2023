@@ -47,5 +47,5 @@ public final class ElevatorConstants {
 		.lbsToKilograms(4.893 /* inner elevator */ + 8.166 /* carriage + arm */ + 6 /* grabber */);
 	public static final double drumRadius_m = Units.inchesToMeters(0.5);
 
-	public static final double moduleDangerZone_m = Units.inchesToMeters(5);
+	public static final double dangerZone_m = .065;
 }

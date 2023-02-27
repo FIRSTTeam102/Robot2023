@@ -3,8 +3,8 @@ package frc.robot.constants;
 import edu.wpi.first.math.util.Units;
 
 public final class ArmConstants {
-	public static final double maxNutDist_m = Units.inchesToMeters(13.5);
-	public static final double minNutDist_m = Units.inchesToMeters(4.92);
+	public static final double minNutDist_m = Units.inchesToMeters(13.5);
+	public static final double maxNutDist_m = Units.inchesToMeters(4.92);
 
 	// just for testing please change please please
 	public static final double lowExtension_m = .440;
@@ -19,7 +19,7 @@ public final class ArmConstants {
 		/ 3 /* gear ratio */;
 	public static final double conversionFactor_mps_per_rpm = conversionFactor_m_per_rotation / 60;
 
-	public static final double moduleDangerZone_m = Units.inchesToMeters(20);
+	public static final double dangerZone_m = .39;
 
 	// todo: tuning
 	public static final double kP = 11.0;

@@ -39,7 +39,7 @@ public class Arm extends SubsystemBase {
 
 	public Arm() {
 		limitSwitch.enableLimitSwitch(true);
-		motor.setSoftLimit(SoftLimitDirection.kReverse, (float) minNutDist_m);
+		motor.setSoftLimit(SoftLimitDirection.kReverse, (float) maxNutDist_m);
 		motor.enableSoftLimit(SoftLimitDirection.kReverse, true);
 		// backLimitSwitch.enableLimitSwitch(true);
 
@@ -66,8 +66,8 @@ public class Arm extends SubsystemBase {
 
 		pidController.setReference(
 			MathUtil.clamp(armDistToNutDist(armLength_m),
-				Elevator.isInDangerZone() ? armDistToNutDist(moduleDangerZone_m) : minNutDist_m,
-				maxNutDist_m),
+				Elevator.isInDangerZone() ? armDistToNutDist(dangerZone_m) : maxNutDist_m,
+				minNutDist_m),
 			CANSparkMax.ControlType.kPosition);
 	}
 
@@ -94,10 +94,10 @@ public class Arm extends SubsystemBase {
 		// encoder.setPosition(maxNutDist_m - minNutDist_m);
 
 		if (inputs.limitSwitch)
-			encoder.setPosition(maxNutDist_m);
+			encoder.setPosition(minNutDist_m);
 
 		// todo: bake danger zone
-		inDangerZone = (inputs.nutPosition_m < armDistToNutDist(moduleDangerZone_m));
+		inDangerZone = (inputs.nutPosition_m < armDistToNutDist(dangerZone_m));
 	}
 
 	public static double armDistToNutDist(double armDistance_m) {
