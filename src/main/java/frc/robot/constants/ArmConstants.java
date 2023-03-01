@@ -7,9 +7,9 @@ public final class ArmConstants {
 	public static final double maxNutDist_m = Units.inchesToMeters(4.92);
 
 	// just for testing please change please please
-	public static final double lowExtension_m = .440;
-	public static final double midExtension_m = .886;
-	public static final double highExtension_m = 1.2;
+	public static final double lowExtension_m = Units.inchesToMeters(12);
+	public static final double midExtension_m = Units.inchesToMeters(25);
+	public static final double highExtension_m = Units.inchesToMeters(41);
 
 	public static final int motorId = 12;
 

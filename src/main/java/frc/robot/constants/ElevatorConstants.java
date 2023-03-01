@@ -5,9 +5,9 @@ import edu.wpi.first.math.util.Units;
 public final class ElevatorConstants {
 	/* target heights */
 	// fixme: actual values
-	public static final double lowHeight_m = Units.inchesToMeters(10);
-	public static final double midHeight_m = Units.inchesToMeters(20);
-	public static final double highHeight_m = Units.inchesToMeters(30);
+	public static final double lowHeight_m = Units.inchesToMeters(12);
+	public static final double midHeight_m = Units.inchesToMeters(38);
+	public static final double highHeight_m = Units.inchesToMeters(46.5);
 
 	/* ports */
 	public static final int motorId = 11;
@@ -42,7 +42,7 @@ public final class ElevatorConstants {
 		* 0.2282; /* m/rotation */
 	public static final double conversionFactor_mps_per_rpm = conversionFactor_m_per_rotation / 60;
 	public static final double minHeight_m = Units.inchesToMeters(0);
-	public static final double maxHeight_m = Units.inchesToMeters(42.85);
+	public static final double maxHeight_m = Units.inchesToMeters(46.85);
 	public static final double carriageMass_kg = Units
 		.lbsToKilograms(4.893 /* inner elevator */ + 8.166 /* carriage + arm */ + 6 /* grabber */);
 	public static final double drumRadius_m = Units.inchesToMeters(0.5);
