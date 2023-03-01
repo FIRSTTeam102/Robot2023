@@ -173,6 +173,7 @@ public class RobotContainer {
 		/*
 		 * operator flight stick
 		 */
+		// todo: require trigger pulled to work?
 		arm.setDefaultCommand(new ManualArmControl(arm, operatorJoystick::getX));
 		elevator.setDefaultCommand(new ManualElevatorControl(elevator, operatorJoystick::getY));
 	}
