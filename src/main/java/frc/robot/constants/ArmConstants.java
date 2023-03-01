@@ -10,6 +10,7 @@ public final class ArmConstants {
 	public static final double lowExtension_m = .440;
 	public static final double midExtension_m = .886;
 	public static final double highExtension_m = 1.2;
+	public static final double doubleSubstationExtension_m = 1;
 
 	public static final int motorId = 12;
 

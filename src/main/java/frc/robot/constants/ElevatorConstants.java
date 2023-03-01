@@ -8,6 +8,7 @@ public final class ElevatorConstants {
 	public static final double lowHeight_m = Units.inchesToMeters(10);
 	public static final double midHeight_m = Units.inchesToMeters(20);
 	public static final double highHeight_m = Units.inchesToMeters(30);
+	public static final double doubleSubstationHeight_m = Units.inchesToMeters(25);
 
 	/* ports */
 	public static final int motorId = 11;

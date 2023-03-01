@@ -5,46 +5,52 @@ import frc.robot.constants.SwerveConstants;
 import frc.robot.subsystems.Swerve;
 
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 
-import lombok.Setter;
+import java.util.function.DoubleSupplier;
 
 public class TeleopSwerve extends CommandBase {
 	private double rotation;
 	private Translation2d translation;
 	private boolean openLoop = true;
 
-	@Setter
 	public boolean fieldRelative = true;
 
-	private void toggleFieldRelative() {
-		fieldRelative = !fieldRelative;
+	public InstantCommand toggleFieldRelative() {
+		return new InstantCommand(() -> {
+			fieldRelative = !fieldRelative;
+		});
 	}
 
-	public InstantCommand toggleFieldRelativeCommand() {
-		return new InstantCommand(() -> this.toggleFieldRelative());
+	public InstantCommand zeroYaw() {
+		return new InstantCommand(swerve::zeroYaw);
 	}
 
 	private Swerve swerve;
-	private XboxController controller;
+	private DoubleSupplier driveSupplier;
+	private DoubleSupplier strafeSupplier;
+	private DoubleSupplier turnSupplier;
 
-	public TeleopSwerve(Swerve swerve, XboxController controller) {
+	public TeleopSwerve(Swerve swerve,
+		DoubleSupplier driveSupplier,
+		DoubleSupplier strafeSupplier,
+		DoubleSupplier turnSupplier) {
 		this.swerve = swerve;
 		addRequirements(swerve);
-		this.controller = controller;
+		this.driveSupplier = driveSupplier;
+		this.strafeSupplier = strafeSupplier;
+		this.turnSupplier = turnSupplier;
 	}
 
 	@Override
 	public void execute() {
-		double yAxis = modifyAxis(-controller.getLeftY());
-		double xAxis = modifyAxis(-controller.getLeftX());
-		double rAxis = modifyAxis(-controller.getRightX());
-
-		translation = new Translation2d(yAxis, xAxis)
-			.times(SwerveConstants.maxVelocity_mps * OperatorConstants.drivePercent);
-		rotation = rAxis * SwerveConstants.maxAngularVelocity_radps * OperatorConstants.turnPercent;
+		translation = new Translation2d(
+			modifyAxis(-driveSupplier.getAsDouble()),
+			modifyAxis(-strafeSupplier.getAsDouble()))
+				.times(SwerveConstants.maxVelocity_mps * OperatorConstants.drivePercent);
+		rotation = modifyAxis(-turnSupplier.getAsDouble())
+			* SwerveConstants.maxAngularVelocity_radps * OperatorConstants.turnPercent;
 		swerve.drive(translation, rotation, fieldRelative);
 	}
 

@@ -11,7 +11,9 @@ public final class Constants {
 
 	public static class OperatorConstants {
 		public static final int driverControllerPort = 0;
-		public static final int operatorControllerPort = 1;
+		public static final int operatorConsolePort = 1;
+		public static final int operatorJoystickPort = 2;
+
 		public static final double stickDeadband = 0.1;
 
 		// fixme: only low for testing
@@ -25,7 +27,8 @@ public final class Constants {
 		public static final int height = 240;
 		public static final int fps = 30;
 		public static final int compression = 70;
-		public static final int exposure = 50;
+		// todo: config exposure at comp
+		public static final int exposure = -1;
 	}
 
 	public static final int pigeonId = 20;

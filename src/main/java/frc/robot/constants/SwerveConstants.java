@@ -48,6 +48,7 @@ public final class SwerveConstants {
 	public static final boolean angleInverted = true;
 	public static final IdleMode angleIdleMode = IdleMode.kCoast;
 	// public static final double angleMaxPercentOutput = 0.5;
+	public static final double angleRampTime_s = 0.5;
 	public static final boolean angleEncoderInverted = false;
 	// public static final double angleSparkEncoderPositionFactor_rad = (2 * Math.PI);
 	// public static final double angleSparkEncoderVelocityFactor_radps = (2 * Math.PI) / 60.0;
@@ -70,9 +71,9 @@ public final class SwerveConstants {
 	public static final double simDriveKf = 0.0;
 
 	/* angle motor PID values */
-	public static final double angleKp = 4.0; // todo: calibrate
+	public static final double angleKp = 5.7;
 	public static final double angleKi = 0.0;
-	public static final double angleKd = 0.0;
+	public static final double angleKd = 0.05;
 	public static final double angleKf = 0.0;
 	/* sim angle motor PID values */
 	public static final double simAngleKp = 18.0;

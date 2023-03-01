@@ -67,6 +67,8 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		angleMotor.setSmartCurrentLimit(angleCurrentLimit_amp);
 		angleMotor.setInverted(angleInverted);
 		angleMotor.setIdleMode(angleIdleMode);
+		angleMotor.setClosedLoopRampRate(angleRampTime_s);
+		angleMotor.enableVoltageCompensation(12);
 
 		// angleMotorAbsoluteEncoder = angleMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
 		// angleMotorAbsoluteEncoder.setPositionConversionFactor(angleEncoderPositionFactor_rad);

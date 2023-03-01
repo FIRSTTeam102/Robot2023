@@ -2,8 +2,8 @@ package frc.robot.subsystems;
 
 import static frc.robot.constants.ArmConstants.*;
 
-import frc.robot.ScoringMechanism2d;
 import frc.robot.util.BuildManager;
+import frc.robot.util.ScoringMechanism2d;
 import frc.robot.util.SendableSparkMaxPIDController;
 
 import edu.wpi.first.math.MathUtil;
