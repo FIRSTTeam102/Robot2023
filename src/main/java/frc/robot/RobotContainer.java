@@ -40,6 +40,8 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -184,12 +186,14 @@ public class RobotContainer {
 		operatorController.b().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.midHeight_m)
 			.alongWith(new SetArmPosition(arm, ArmConstants.midExtension_m))); // mid
 		operatorController.y().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.highHeight_m)
-			.alongWith(new SetArmPosition(arm, ArmConstants.highExtension_m))); // high
-		operatorController.x().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.dangerZone_m)
-			.alongWith(new SetArmPosition(arm, Arm.nutDistToArmDist(ArmConstants.minNutDist_m))));
+			.alongWith(new SetArmPosition(arm, Arm.nutDistToArmDist(ArmConstants.maxNutDist_m)))); // high
+		operatorController.x().onTrue(new SequentialCommandGroup(new SetArmPosition(arm),
+			new WaitCommand(1.6), new SetElevatorPosition(elevator, ElevatorConstants.minHeight_m)));
 
-		operatorController.leftBumper().toggleOnTrue(new CloseGrabber(grabber, .5));
-		operatorController.rightBumper().toggleOnTrue(new OpenGrabber(grabber, 1, .5));
+		operatorController.rightStick().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.maxHeight_m));
+
+		operatorController.leftBumper().toggleOnTrue(new CloseGrabber(grabber, .6));
+		operatorController.rightBumper().toggleOnTrue(new OpenGrabber(grabber, .3, .5));
 	}
 
 	/**
