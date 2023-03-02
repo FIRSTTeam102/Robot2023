@@ -4,11 +4,11 @@ import static frc.robot.constants.SwerveConstants.*;
 
 import frc.robot.util.Conversions;
 
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -17,23 +17,25 @@ public class SwerveModule implements AutoCloseable {
 	private Rotation2d lastAngle;
 	private final SwerveModuleIO io;
 	private final SwerveModuleIOInputsAutoLogged inputs = new SwerveModuleIOInputsAutoLogged();
-	private ProfiledPIDController anglePIDController;
+	private PIDController anglePIDController;
 
 	public SwerveModule(int moduleNumber, SwerveModuleIO io) {
 		this.moduleNumber = moduleNumber;
 		this.io = io;
 
 		var isReal = io.getClass() == SwerveModuleIOReal.class;
-		anglePIDController = new ProfiledPIDController(
+		anglePIDController = new PIDController(
 			isReal ? angleKp : simAngleKp,
 			isReal ? angleKi : simAngleKi,
-			isReal ? angleKd : simAngleKd,
-			new TrapezoidProfile.Constraints(
-				maxAngularVelocity_radps,
-				maxAngularVelocity_radps));
+			isReal ? angleKd : simAngleKd);
+		// new TrapezoidProfile.Constraints(
+		// maxAngularVelocity_radps,
+		// maxAngularVelocity_radps));
 		anglePIDController.enableContinuousInput(0, Conversions.twoPi);
 
 		lastAngle = getState().angle;
+
+		SmartDashboard.putData("SwerveModule " + moduleNumber, anglePIDController);
 	}
 
 	private SwerveModuleState optimizedState = new SwerveModuleState();
@@ -118,6 +120,8 @@ public class SwerveModule implements AutoCloseable {
 		}
 
 		lastAngle = angle;
+		Logger.getInstance().recordOutput("SwerveModule " + moduleNumber + "/targetAngle_rad",
+			Conversions.angleModulus2pi(angle.getRadians()));
 	}
 
 	public void setDriveBrakeMode(boolean enable) {

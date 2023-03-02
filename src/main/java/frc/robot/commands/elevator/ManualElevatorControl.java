@@ -5,15 +5,16 @@ import frc.robot.subsystems.Elevator;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+
+import java.util.function.DoubleSupplier;
 
 public class ManualElevatorControl extends CommandBase {
 	private Elevator elevator;
-	private CommandXboxController operatorController;
+	private DoubleSupplier inputSupplier;
 
-	public ManualElevatorControl(Elevator elevator, CommandXboxController operatorcController) {
+	public ManualElevatorControl(Elevator elevator, DoubleSupplier inputSupplier) {
 		this.elevator = elevator;
-		this.operatorController = operatorcController;
+		this.inputSupplier = inputSupplier;
 		addRequirements(elevator);
 	}
 
@@ -22,10 +23,8 @@ public class ManualElevatorControl extends CommandBase {
 
 	@Override
 	public void execute() {
-		double yAxis = operatorController.getLeftY();
-
-		yAxis = MathUtil.applyDeadband(yAxis, OperatorConstants.stickDeadband);
-		elevator.setSpeed(yAxis * -.5);
+		// todo: invert input?
+		elevator.setSpeed(MathUtil.applyDeadband(inputSupplier.getAsDouble(), OperatorConstants.stickDeadband) * -.5);
 	}
 
 	@Override

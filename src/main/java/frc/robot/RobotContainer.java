@@ -14,6 +14,7 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
+import frc.robot.util.ScoringMechanism2d;
 
 import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.arm.ManualArmControl;
@@ -27,7 +28,6 @@ import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.swerve.XStance;
 import frc.robot.commands.vision.AprilTagVision;
 import frc.robot.commands.vision.ObjectDetectionVision;
-import frc.robot.commands.vision.RetroreflectiveVision;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.HttpCamera;
@@ -40,8 +40,8 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -66,8 +66,10 @@ public class RobotContainer {
 
 	public final CommandXboxController driverController = new CommandXboxController(
 		OperatorConstants.driverControllerPort);
-	public final CommandXboxController operatorController = new CommandXboxController(
-		OperatorConstants.operatorControllerPort);
+	public final CommandGenericHID operatorConsole = new CommandGenericHID(
+		OperatorConstants.operatorConsolePort);
+	public final CommandJoystick operatorJoystick = new CommandJoystick(
+		OperatorConstants.operatorJoystickPort);
 
 	public final GyroIO gyro = Robot.isReal()
 		? new GyroIOPigeon2(Constants.pigeonId)
@@ -80,8 +82,6 @@ public class RobotContainer {
 	public final Elevator elevator = new Elevator();
 	public final Grabber grabber = new Grabber();
 
-	private final TeleopSwerve teleopSwerve = new TeleopSwerve(swerve, driverController.getHID());
-
 	private LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto mode");
 
 	/**
@@ -89,9 +89,6 @@ public class RobotContainer {
 	 */
 	public RobotContainer() {
 		DriverStation.silenceJoystickConnectionWarning(true);
-
-		// will be automatically scheduled when no other scheduled commands require swerve
-		swerve.setDefaultCommand(teleopSwerve);
 
 		configureBindings();
 
@@ -103,19 +100,99 @@ public class RobotContainer {
 		autoChooser.addOption("drive characterization",
 			new FeedForwardCharacterization(swerve, true, swerve::runCharacterization, swerve::getCharacterizationVelocity));
 
-		SmartDashboard.putData("do balancing", new ChargeStationBalance(swerve));
+		configureCameras();
 
+		SmartDashboard.putData("scoring", ScoringMechanism2d.mech);
+	}
+
+	/**
+	 * Use this method to define your trigger->command mappings. Triggers can be created via the
+	 * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
+	 * predicate, or via the named factories in
+	 * {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
+	 * {@link CommandXboxController Xbox} controllers or
+	 * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
+	 */
+	private void configureBindings() {
+		/* driver */
+		var teleopSwerve = new TeleopSwerve(swerve,
+			driverController::getLeftY, driverController::getLeftX, driverController::getRightX);
+		swerve.setDefaultCommand(teleopSwerve);
+
+		driverController.a().onTrue(teleopSwerve.toggleFieldRelative());
+		driverController.b().onTrue(teleopSwerve.zeroYaw());
+		driverController.x().whileTrue(new XStance(swerve));
+
+		driverController.povUp().toggleOnTrue(new ChargeStationBalance(swerve));
+
+		/*
+		 * operator console
+		 * G0 G1 G2 B3
+		 * G4 Y5 Y6 B7
+		 * R8 Y9 Y10 B11
+		 * R12 R13 R14 B15
+		 */
+
+		// go to grid (green)
+		operatorConsole.button(0)
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Left, vision, swerve));
+		operatorConsole.button(1)
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Middle, vision, swerve));
+		operatorConsole.button(2)
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Right, vision, swerve));
+
+		// move arm/elevator/score (blue)
+		operatorConsole.button(3) // high
+			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.highHeight_m)
+				.alongWith(new SetArmPosition(arm, ArmConstants.highExtension_m)));
+		// .whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Top, vision, swerve));
+		operatorConsole.button(7) // mid
+			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.midHeight_m)
+				.alongWith(new SetArmPosition(arm, ArmConstants.midExtension_m)));
+		// .whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Middle, vision, swerve));
+		operatorConsole.button(11) // low
+			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.lowHeight_m)
+				.alongWith(new SetArmPosition(arm, ArmConstants.lowExtension_m)));
+		operatorConsole.button(15) // double substation
+			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.doubleSubstationHeight_m)
+				.alongWith(new SetArmPosition(arm, ArmConstants.doubleSubstationExtension_m)));
+
+		operatorConsole.button(14) // all in
+			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.dangerZone_m)
+				.alongWith(new SetArmPosition(arm, Arm.nutDistToArmDist(ArmConstants.minNutDist_m))));
+
+		operatorConsole.button(4) // aim at game piece
+			.whileTrue(new ObjectDetectionVision(ObjectDetectionVision.Routine.Ground, vision, swerve));
+
+		// todo: what happens when both pressed?
+		operatorConsole.button(5)
+			.toggleOnTrue(new CloseGrabber(grabber, .5));
+		operatorConsole.button(6)
+			.toggleOnTrue(new OpenGrabber(grabber, 1, .5));
+
+		/*
+		 * operator flight stick
+		 */
+		// todo: require trigger pulled to work?
+		arm.setDefaultCommand(new ManualArmControl(arm, operatorJoystick::getX));
+		elevator.setDefaultCommand(new ManualElevatorControl(elevator, operatorJoystick::getY));
+	}
+
+	@SuppressWarnings("unused")
+	private void configureCameras() {
 		// camera
 		try {
 			var camera = CameraServer.startAutomaticCapture("arm", 0);
 			camera.setConnectVerbose(0);
 			camera.setFPS(CameraConstants.fps);
 			camera.setResolution(CameraConstants.width, CameraConstants.height);
-			camera.setExposureManual(CameraConstants.exposure);
+			if (CameraConstants.exposure >= 0)
+				camera.setExposureManual(CameraConstants.exposure);
+			else
+				camera.setExposureAuto();
 			// camera.setBrightness(0);
 
 			// camera server is evil
-
 			// var cameraServer = CameraServer.addSwitchedCamera("camera");
 			// var cameraServer = CameraServer.startAutomaticCapture(camera);
 			var cameraServer = (MjpegServer) CameraServer.getServer();
@@ -142,58 +219,6 @@ public class RobotContainer {
 				.withWidget(BuiltInWidgets.kCameraStream)
 				.withSize(7, 6);
 		}
-
-		SmartDashboard.putData("scoring", ScoringMechanism2d.mech);
-	}
-
-	/**
-	 * Use this method to define your trigger->command mappings. Triggers can be created via the
-	 * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
-	 * predicate, or via the named factories in
-	 * {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
-	 * {@link CommandXboxController Xbox} controllers or
-	 * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
-	 */
-	private void configureBindings() {
-		/* driver */
-		driverController.a().onTrue(teleopSwerve.toggleFieldRelativeCommand());
-		driverController.b().onTrue(new InstantCommand(() -> swerve.zeroYaw()));
-		driverController.x().whileTrue(new XStance(swerve));
-
-		/* operator */
-		operatorController.povLeft().and(operatorController.x())
-			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Left, vision, swerve));
-		operatorController.povLeft().and(operatorController.a())
-			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Middle, vision, swerve));
-		operatorController.povLeft().and(operatorController.b())
-			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Right, vision, swerve));
-
-		operatorController.povDown().and(operatorController.a())
-			.whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Middle, vision, swerve));
-		operatorController.povDown().and(operatorController.y())
-			.whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Top, vision, swerve));
-
-		operatorController.povRight().and(operatorController.a())
-			.whileTrue(new ObjectDetectionVision(ObjectDetectionVision.Routine.Ground, vision, swerve));
-
-		// todo: will using normal buttons conflict with the pov stuff? is there an exclusive bind?
-
-		operatorController.rightTrigger(.3).whileTrue(new ManualArmControl(arm, operatorController));
-		operatorController.leftTrigger(.3).whileTrue(new ManualElevatorControl(elevator, operatorController));
-
-		operatorController.a().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.lowHeight_m)
-			.alongWith(new SetArmPosition(arm, ArmConstants.lowExtension_m))); // low
-		operatorController.b().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.midHeight_m)
-			.alongWith(new SetArmPosition(arm, ArmConstants.midExtension_m))); // mid
-		operatorController.y().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.highHeight_m)
-			.alongWith(new SetArmPosition(arm, Arm.nutDistToArmDist(ArmConstants.maxNutDist_m)))); // high
-		operatorController.x().onTrue(new SequentialCommandGroup(new SetArmPosition(arm),
-			new WaitCommand(1.6), new SetElevatorPosition(elevator, ElevatorConstants.minHeight_m)));
-
-		operatorController.rightStick().onTrue(new SetElevatorPosition(elevator, ElevatorConstants.maxHeight_m));
-
-		operatorController.leftBumper().toggleOnTrue(new CloseGrabber(grabber, .6));
-		operatorController.rightBumper().toggleOnTrue(new OpenGrabber(grabber, .3, .5));
 	}
 
 	/**

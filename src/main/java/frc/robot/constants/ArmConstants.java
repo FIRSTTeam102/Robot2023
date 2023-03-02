@@ -10,6 +10,7 @@ public final class ArmConstants {
 	public static final double lowExtension_m = Units.inchesToMeters(12);
 	public static final double midExtension_m = Units.inchesToMeters(25);
 	public static final double highExtension_m = Units.inchesToMeters(41);
+	public static final double doubleSubstationExtension_m = 1; // todo:
 
 	public static final int motorId = 12;
 

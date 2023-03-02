@@ -3,8 +3,8 @@ package frc.robot.subsystems;
 import static frc.robot.constants.GrabberConstants.motorId;
 
 import frc.robot.Robot;
-import frc.robot.ScoringMechanism2d;
 import frc.robot.constants.GrabberConstants;
+import frc.robot.util.ScoringMechanism2d;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
