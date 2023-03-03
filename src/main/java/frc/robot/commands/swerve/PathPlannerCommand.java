@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
+import org.littletonrobotics.junction.Logger;
+
 /**
  * instructs the swerve subsystem to follow the specified trajectory 
  */
@@ -64,6 +66,8 @@ public class PathPlannerCommand extends PPSwerveControllerCommand {
 		Autos.ppXController.reset();
 		Autos.ppYController.reset();
 		Autos.ppRotationController.reset();
+
+		Logger.getInstance().recordOutput("Odometry/PathPlanner", trajectory);
 	}
 
 	@Override
