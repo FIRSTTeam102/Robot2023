@@ -7,10 +7,12 @@ public final class ArmConstants {
 	public static final double maxNutDist_m = Units.inchesToMeters(4.92);
 
 	// just for testing please change please please
-	public static final double lowExtension_m = Units.inchesToMeters(12);
-	public static final double midExtension_m = Units.inchesToMeters(25);
+	public static final double lowExtension_m = .5;
+	public static final double midExtension_m = .88;
+	public static final double midCubeExtenson_m = .777;
 	public static final double highExtension_m = Units.inchesToMeters(41);
-	public static final double doubleSubstationExtension_m = 1; // todo:
+	public static final double highCubeExtension_m = 1.213;
+	public static final double doubleSubstationExtension_m = .9; // todo:
 
 	public static final int motorId = 12;
 

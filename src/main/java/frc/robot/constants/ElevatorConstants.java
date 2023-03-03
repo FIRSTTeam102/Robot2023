@@ -5,10 +5,12 @@ import edu.wpi.first.math.util.Units;
 public final class ElevatorConstants {
 	/* target heights */
 	// fixme: actual values
-	public static final double lowHeight_m = Units.inchesToMeters(12);
+	public static final double lowHeight_m = .172;
 	public static final double midHeight_m = Units.inchesToMeters(38);
+	public static final double midCubeHeight_m = .702;
 	public static final double highHeight_m = Units.inchesToMeters(47.95);
-	public static final double doubleSubstationHeight_m = Units.inchesToMeters(25); // todo:
+	public static final double highCubeHeight_m = .973;
+	public static final double doubleSubstationHeight_m = 1.03; // todo:
 
 	/* ports */
 	public static final int motorId = 11;

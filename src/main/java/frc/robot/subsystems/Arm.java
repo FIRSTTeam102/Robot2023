@@ -33,6 +33,8 @@ public class Arm extends SubsystemBase {
 
 	private double targetPosition_m = 0;
 
+	private double armDist_m = 0;
+
 	@Getter
 	// is within swerve module bounds so elevator doesn't go down too far
 	private static boolean inDangerZone = false;
@@ -71,6 +73,10 @@ public class Arm extends SubsystemBase {
 			CANSparkMax.ControlType.kPosition);
 	}
 
+	public double getCurrentPosition() {
+		return armDist_m;
+	}
+
 	public void setSpeed(double speed) {
 		pidController.setReference(speed, CANSparkMax.ControlType.kDutyCycle);
 	}
@@ -84,7 +90,7 @@ public class Arm extends SubsystemBase {
 		updateInputs(inputs);
 		Logger.getInstance().processInputs(getName(), inputs);
 
-		var armDist_m = nutDistToArmDist(inputs.nutPosition_m);
+		armDist_m = nutDistToArmDist(inputs.nutPosition_m);
 		Logger.getInstance().recordOutput("Arm/armDist_m", armDist_m);
 		ScoringMechanism2d.arm.setLength(armDist_m);
 
