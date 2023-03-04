@@ -67,7 +67,7 @@ public class SwerveModule implements AutoCloseable {
 	 * @param voltage specified voltage for the drive motor
 	 */
 	public void runCharacterization(double voltage) {
-		setDesiredState(new SwerveModuleState(0.0, new Rotation2d(0.0)), true, false);
+		setDesiredState(new SwerveModuleState(0.0, new Rotation2d(0.0)), true, true);
 		io.setDriveMotorPercentage(voltage / 12.0);
 	}
 
