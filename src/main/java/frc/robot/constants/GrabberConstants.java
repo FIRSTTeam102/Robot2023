@@ -5,5 +5,6 @@ public final class GrabberConstants {
 	public static final double speed = 0.5;
 	public static final double openingTime_s = 0.25;
 
-	public static final double currentLimit_A = 60;
+	public static final int smartCurrentLimit_A = 50;
+	public static final int hardCurrentLimit_A = 60;
 }

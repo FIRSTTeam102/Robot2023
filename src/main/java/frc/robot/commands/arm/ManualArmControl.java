@@ -23,7 +23,7 @@ public class ManualArmControl extends CommandBase {
 	@Override
 	public void execute() {
 		// todo: invert input?
-		arm.setSpeed(scaleInput(MathUtil.applyDeadband(-inputSupplier.getAsDouble(), .2)));
+		arm.setSpeed(scaleInput(MathUtil.applyDeadband(inputSupplier.getAsDouble(), .2)));
 	}
 
 	@Override
