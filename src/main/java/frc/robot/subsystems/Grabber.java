@@ -1,9 +1,8 @@
 package frc.robot.subsystems;
 
-import static frc.robot.constants.GrabberConstants.motorId;
+import static frc.robot.constants.GrabberConstants.*;
 
 import frc.robot.Robot;
-import frc.robot.constants.GrabberConstants;
 import frc.robot.util.ScoringMechanism2d;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -19,12 +18,13 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 	public Grabber() {
 		motor.setInverted(true);
 
+		motor.setSmartCurrentLimit(smartCurrentLimit_A);
+		motor.setSecondaryCurrentLimit(hardCurrentLimit_A);
+
 		// sim only works with velocity control
 		// if (Robot.isSimulation())
 		// REVPhysicsSim.getInstance().addSparkMax(motor, DCMotor.getNeo550(1));
 	}
-
-	public boolean currentLimitReached = false;
 
 	public void move(double speed) {
 		motor.set(speed);
@@ -46,7 +46,6 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 		ScoringMechanism2d.setGrabber(inputs.percentOutput);
 
 		// read current once every cycle so results don't change during a cycle
-		currentLimitReached = (inputs.current_A >= GrabberConstants.currentLimit_A);
 
 		// if (currentLimitReached)
 		// stop();

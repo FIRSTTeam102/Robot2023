@@ -8,9 +8,9 @@ public final class ArmConstants {
 
 	// just for testing please change please please
 	public static final double lowExtension_m = .5;
-	public static final double midExtension_m = .88;
-	public static final double midCubeExtenson_m = .777;
-	public static final double highExtension_m = Units.inchesToMeters(41);
+	public static final double midConeExtension_m = .88;
+	public static final double midCubeExtension_m = .777;
+	public static final double highConeExtension_m = Units.inchesToMeters(41);
 	public static final double highCubeExtension_m = 1.213;
 	public static final double doubleSubstationExtension_m = .9; // todo:
 
@@ -22,7 +22,10 @@ public final class ArmConstants {
 		/ 3 /* gear ratio */;
 	public static final double conversionFactor_mps_per_rpm = conversionFactor_m_per_rotation / 60;
 
+	/** minimum distance to not hit the swerve modules when elevator is down */
 	public static final double dangerZone_m = .39;
+	/** clipping distance for mid level on grid */
+	public static final double gridSafeZone_m = .7;
 
 	// fixme: actual values
 	public static final double resetLength_m = 0;

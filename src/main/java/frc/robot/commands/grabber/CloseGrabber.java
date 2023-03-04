@@ -11,6 +11,8 @@ public class CloseGrabber extends CommandBase {
 	private double runTime_s;
 	private double speed;
 
+	private double counter;
+
 	public CloseGrabber(Grabber grabber, double speed, double runTime_s) {
 		this.grabber = grabber;
 		this.speed = speed;
@@ -24,13 +26,21 @@ public class CloseGrabber extends CommandBase {
 
 	@Override
 	public void initialize() {
+		counter = 0;
 		grabber.move(speed);
 		timer.reset();
 		timer.start();
 	}
 
 	@Override
-	public void execute() {}
+	public void execute() {
+		counter++;
+
+		if (counter % 4 == 0)
+			grabber.stop();
+		else
+			grabber.move(speed);
+	}
 
 	@Override
 	public void end(boolean interrupted) {
@@ -43,6 +53,6 @@ public class CloseGrabber extends CommandBase {
 
 	@Override
 	public boolean isFinished() {
-		return grabber.currentLimitReached || (runTime_s > 0 && timer.hasElapsed(runTime_s));
+		return counter >= 12 || grabber.currentLimitReached || (runTime_s > 0 && timer.hasElapsed(runTime_s));
 	}
 }

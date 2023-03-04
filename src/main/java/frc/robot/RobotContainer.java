@@ -127,10 +127,10 @@ public class RobotContainer {
 
 		/*
 		 * operator console
-		 * G0 G1 G2 B3
-		 * G4 Y5 Y6 B7
-		 * R8 Y9 Y10 B11
-		 * R12 R13 R14 B15
+		 * G1 G2 G3 B4
+		 * G5 Y6 Y7 B8
+		 * R9 Y10 Y11 B12
+		 * R13 R14 R15 B16
 		 */
 
 		// swerve to grid or double substation (green)
@@ -154,9 +154,6 @@ public class RobotContainer {
 		operatorConsole.button(11) // low
 			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.lowHeight_m)
 				.alongWith(new SetArmPosition(arm, ArmConstants.lowExtension_m)));
-		operatorConsole.button(15) // double substation
-			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.doubleSubstationHeight_m)
-				.alongWith(new SetArmPosition(arm, ArmConstants.doubleSubstationExtension_m)));
 
 		operatorConsole.button(14) // all in
 			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.dangerZone_m)
@@ -165,18 +162,17 @@ public class RobotContainer {
 		operatorConsole.button(4) // swerve/arm/elevator to gamepiece
 			.whileTrue(new GamePieceVision(GamePieceVision.Routine.Gamepiece, vision, elevator, arm, grabber, swerve));
 
-		// todo: what happens when both pressed?
-		operatorConsole.button(5)
-			.toggleOnTrue(new CloseGrabber(grabber, .5));
-		operatorConsole.button(6)
-			.toggleOnTrue(new OpenGrabber(grabber, 1, .5));
-
 		/*
 		 * operator flight stick
 		 */
 		// todo: require trigger pulled to work?
-		arm.setDefaultCommand(new ManualArmControl(arm, operatorJoystick::getX));
-		elevator.setDefaultCommand(new ManualElevatorControl(elevator, operatorJoystick::getY));
+		arm.setDefaultCommand(new ManualArmControl(arm, () -> -operatorJoystick.getX()));
+		elevator.setDefaultCommand(new ManualElevatorControl(elevator, () -> -operatorJoystick.getY()));
+		// todo: what happens when both pressed?
+		operatorJoystick.trigger()
+			.whileTrue(new OpenGrabber(grabber, 1, .5));
+		operatorJoystick.button(3)
+			.toggleOnTrue(new CloseGrabber(grabber, .5));
 	}
 
 	@SuppressWarnings("unused")

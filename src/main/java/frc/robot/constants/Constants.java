@@ -14,7 +14,7 @@ public final class Constants {
 		public static final int operatorConsolePort = 1;
 		public static final int operatorJoystickPort = 2;
 
-		public static final double stickDeadband = 0.1;
+		public static final double stickDeadband = 0.2;
 		public static final double boolTriggerThreshold = 0.3;
 	}
 
