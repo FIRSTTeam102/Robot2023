@@ -1,6 +1,5 @@
 package frc.robot.commands.swerve;
 
-import frc.robot.RobotContainer;
 import frc.robot.constants.ArmConstants;
 import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.constants.ElevatorConstants;
@@ -29,9 +28,9 @@ public class TeleopSwerve extends CommandBase {
 		return new InstantCommand(swerve::zeroYaw);
 	}
 
-	private Swerve swerve = RobotContainer.getInstance().swerve;
-	private Arm arm = RobotContainer.getInstance().arm;
-	private Elevator elevator = RobotContainer.getInstance().elevator;
+	private Swerve swerve;
+	private Arm arm;
+	private Elevator elevator;
 	private DoubleSupplier driveSupplier;
 	private DoubleSupplier strafeSupplier;
 	private DoubleSupplier turnSupplier;
@@ -41,19 +40,22 @@ public class TeleopSwerve extends CommandBase {
 	 * @param overrideSpeedSupplier forces swerve to run at normal speed when held, instead of slow if scoring mechanism is out
 	 */
 	public TeleopSwerve(DoubleSupplier driveSupplier, DoubleSupplier strafeSupplier, DoubleSupplier turnSupplier,
-		BooleanSupplier overrideSpeedSupplier) {
+		BooleanSupplier overrideSpeedSupplier, Swerve swerve, Arm arm, Elevator elevator) {
 		addRequirements(swerve);
 		this.driveSupplier = driveSupplier;
 		this.strafeSupplier = strafeSupplier;
 		this.turnSupplier = turnSupplier;
 		this.overrideSpeedSupplier = overrideSpeedSupplier;
+		this.swerve = swerve;
+		this.arm = arm;
+		this.elevator = elevator;
 	}
 
 	private double rotation;
 	private Translation2d translation;
 
 	private double maxPercent = 1.0;
-	private static double maxArmDist_m = Arm.nutDistToArmDist(ArmConstants.minNutDist_m);
+	private static double maxArmDist_m = Arm.nutDistToArmDist(ArmConstants.maxNutDist_m);
 
 	@Override
 	public void execute() {

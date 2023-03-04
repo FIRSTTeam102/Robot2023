@@ -115,7 +115,8 @@ public class RobotContainer {
 			() -> -driverController.getLeftY(),
 			() -> -driverController.getLeftX(),
 			() -> -driverController.getRightX(),
-			() -> driverController.getLeftTriggerAxis() > OperatorConstants.boolTriggerThreshold);
+			() -> driverController.getLeftTriggerAxis() > OperatorConstants.boolTriggerThreshold,
+			swerve, arm, elevator);
 		swerve.setDefaultCommand(teleopSwerve);
 
 		driverController.a().onTrue(teleopSwerve.toggleFieldRelative());

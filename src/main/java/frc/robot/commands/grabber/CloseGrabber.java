@@ -29,9 +29,9 @@ public class CloseGrabber extends CommandBase {
 
 	@Override
 	public void end(boolean interrupted) {
-		if (interrupted)
-			grabber.stop();
-		else
-			grabber.hold();
+		// if (interrupted)
+		grabber.stop();
+		// else
+		// grabber.hold();
 	}
 }

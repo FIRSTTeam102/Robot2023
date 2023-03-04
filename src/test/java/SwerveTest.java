@@ -35,10 +35,11 @@ public class SwerveTest {
 
 	@Test
 	public void driverCanTurn() {
-		var teleopSwerve = spy(new TeleopSwerve(swerve,
+		var teleopSwerve = spy(new TeleopSwerve(
 			(() -> 0.0),
 			(() -> 0.0),
-			(() -> 0.5)));
+			(() -> 0.5)),
+			(() -> true));
 		when(teleopSwerve.runsWhenDisabled()).thenReturn(true);
 		teleopSwerve.schedule();
 		assertTrue(teleopSwerve.isScheduled());
