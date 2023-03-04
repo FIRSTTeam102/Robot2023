@@ -14,7 +14,6 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
-import frc.robot.util.ScoringMechanism2d;
 
 import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.arm.ManualArmControl;
@@ -37,7 +36,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.SendableCameraWrapper;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
@@ -101,8 +99,6 @@ public class RobotContainer {
 			new FeedForwardCharacterization(swerve, true, swerve::runCharacterization, swerve::getCharacterizationVelocity));
 
 		configureCameras();
-
-		SmartDashboard.putData("scoring", ScoringMechanism2d.mech);
 	}
 
 	/**
@@ -115,12 +111,16 @@ public class RobotContainer {
 	 */
 	private void configureBindings() {
 		/* driver */
-		var teleopSwerve = new TeleopSwerve(swerve,
-			driverController::getLeftY, driverController::getLeftX, driverController::getRightX);
+		var teleopSwerve = new TeleopSwerve(
+			() -> -driverController.getLeftY(),
+			() -> -driverController.getLeftX(),
+			() -> -driverController.getRightX(),
+			() -> driverController.getLeftTriggerAxis() > OperatorConstants.boolTriggerThreshold,
+			swerve, arm, elevator);
 		swerve.setDefaultCommand(teleopSwerve);
 
 		driverController.a().onTrue(teleopSwerve.toggleFieldRelative());
-		driverController.b().onTrue(teleopSwerve.zeroYaw());
+		driverController.y().onTrue(teleopSwerve.zeroYaw());
 		driverController.x().whileTrue(new XStance(swerve));
 
 		driverController.povUp().toggleOnTrue(new ChargeStationBalance(swerve));

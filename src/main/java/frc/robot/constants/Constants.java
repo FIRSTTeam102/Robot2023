@@ -15,10 +15,7 @@ public final class Constants {
 		public static final int operatorJoystickPort = 2;
 
 		public static final double stickDeadband = 0.1;
-
-		// fixme: only low for testing
-		public static final double turnPercent = 0.5;
-		public static final double drivePercent = 0.7;
+		public static final double boolTriggerThreshold = 0.3;
 	}
 
 	public static class CameraConstants {
