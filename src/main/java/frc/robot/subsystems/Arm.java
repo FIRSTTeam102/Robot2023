@@ -95,8 +95,8 @@ public class Arm extends SubsystemBase {
 		// if (inputs.backLimitSwitch)
 		// encoder.setPosition(maxNutDist_m - minNutDist_m);
 
-		if (inputs.limitSwitch)
-			encoder.setPosition(minNutDist_m);
+		// if (inputs.limitSwitch)
+		// encoder.setPosition(minNutDist_m);
 
 		// todo: bake danger zone
 		inDangerZone = (inputs.nutPosition_m < armDistToNutDist(dangerZone_m));
