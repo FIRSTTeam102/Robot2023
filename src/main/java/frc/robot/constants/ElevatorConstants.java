@@ -6,9 +6,9 @@ public final class ElevatorConstants {
 	/* target heights */
 	// fixme: actual values
 	public static final double lowHeight_m = .172;
-	public static final double midHeight_m = Units.inchesToMeters(38);
+	public static final double midConeHeight_m = Units.inchesToMeters(38);
 	public static final double midCubeHeight_m = .702;
-	public static final double highHeight_m = Units.inchesToMeters(47.95);
+	public static final double highConeHeight_m = Units.inchesToMeters(47.95);
 	public static final double highCubeHeight_m = .973;
 	public static final double doubleSubstationHeight_m = 1.03; // todo:
 

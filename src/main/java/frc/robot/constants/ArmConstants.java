@@ -8,9 +8,9 @@ public final class ArmConstants {
 
 	// just for testing please change please please
 	public static final double lowExtension_m = .5;
-	public static final double midExtension_m = .88;
-	public static final double midCubeExtenson_m = .777;
-	public static final double highExtension_m = Units.inchesToMeters(41);
+	public static final double midConeExtension_m = .88;
+	public static final double midCubeExtension_m = .777;
+	public static final double highConeExtension_m = Units.inchesToMeters(41);
 	public static final double highCubeExtension_m = 1.213;
 	public static final double doubleSubstationExtension_m = .9; // todo:
 
