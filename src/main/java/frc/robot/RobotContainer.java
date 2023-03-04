@@ -6,7 +6,6 @@ import frc.robot.constants.Constants.CameraConstants;
 import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.constants.Constants.ShuffleboardConstants;
 import frc.robot.constants.ElevatorConstants;
-import frc.robot.constants.GrabberConstants;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
@@ -28,7 +27,6 @@ import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.swerve.XStance;
 import frc.robot.commands.vision.AprilTagVision;
 import frc.robot.commands.vision.GamePieceVision;
-import frc.robot.commands.vision.RetroreflectiveVision;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.HttpCamera;
@@ -135,23 +133,23 @@ public class RobotContainer {
 		 * R12 R13 R14 B15
 		 */
 
-		// go to grid (green)
+		// swerve to grid or double substation (green)
 		operatorConsole.button(0)
-			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Left, vision, swerve));
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.BlueRedGridDoublesubstationLeft, vision, swerve));
 		operatorConsole.button(1)
-			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Middle, vision, swerve));
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.BlueRedGridMiddle, vision, swerve));
 		operatorConsole.button(2)
-			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Right, vision, swerve));
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.BlueRedGridDoublesubstationRight, vision, swerve));
 
-		// move arm/elevator/score (blue)
+		// arm/elevator to grid or double substation (blue)
 		operatorConsole.button(3) // high
 			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.highHeight_m)
 				.alongWith(new SetArmPosition(arm, ArmConstants.highExtension_m)));
-		// .whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Top, vision, swerve));
+		// .whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.BlueRedGridTop, vision, elevator, swerve));
 		operatorConsole.button(7) // mid
 			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.midHeight_m)
 				.alongWith(new SetArmPosition(arm, ArmConstants.midExtension_m)));
-		// .whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Middle, vision, swerve));
+		// .whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.BlueRedGridMiddle, vision, elevator, swerve));
 		operatorConsole.button(11) // low
 			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.lowHeight_m)
 				.alongWith(new SetArmPosition(arm, ArmConstants.lowExtension_m)));
@@ -163,8 +161,8 @@ public class RobotContainer {
 			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.dangerZone_m)
 				.alongWith(new SetArmPosition(arm, Arm.nutDistToArmDist(ArmConstants.minNutDist_m))));
 
-		operatorConsole.button(4) // aim at game piece
-			.whileTrue(new ObjectDetectionVision(ObjectDetectionVision.Routine.Ground, vision, swerve));
+		operatorConsole.button(4) // swerve/arm/elevator to gamepiece
+			.whileTrue(new GamePieceVision(GamePieceVision.Routine.Gamepiece, vision, elevator, arm, grabber, swerve));
 
 		// todo: what happens when both pressed?
 		operatorConsole.button(5)
