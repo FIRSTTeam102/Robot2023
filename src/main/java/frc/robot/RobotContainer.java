@@ -136,7 +136,8 @@ public class RobotContainer {
 		// swerve to grid or double substation (green)
 		operatorConsole.button(0)
 			.whileTrue(new AprilTagVision(AprilTagVision.Routine.BlueRedGridDoublesubstationLeft, vision, swerve));
-		operatorConsole.button(1)
+		// operatorConsole.button(1)
+		driverController.povDown()
 			.whileTrue(new AprilTagVision(AprilTagVision.Routine.BlueRedGridMiddle, vision, swerve));
 		operatorConsole.button(2)
 			.whileTrue(new AprilTagVision(AprilTagVision.Routine.BlueRedGridDoublesubstationRight, vision, swerve));

@@ -38,8 +38,8 @@ public class SwerveTest {
 		var teleopSwerve = spy(new TeleopSwerve(
 			(() -> 0.0),
 			(() -> 0.0),
-			(() -> 0.5)),
-			(() -> true));
+			(() -> 0.5),
+			(() -> true), swerve, RobotContainer.getInstance().arm, RobotContainer.getInstance().elevator));
 		when(teleopSwerve.runsWhenDisabled()).thenReturn(true);
 		teleopSwerve.schedule();
 		assertTrue(teleopSwerve.isScheduled());

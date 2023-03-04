@@ -190,6 +190,8 @@ public class AprilTagVision extends CommandBase {
 		cancelPPCommand();
 		ppCommand = new PathPlannerCommand(trajectory, swerve, false);
 		ppCommand.schedule();
+
+		regeneratePaths = false;
 	}
 
 	// Stop swerve
@@ -201,8 +203,13 @@ public class AprilTagVision extends CommandBase {
 	// AprilTagVision.java does not end automatically if PathPlannerCommand.java is running
 	@Override
 	public boolean isFinished() {
-		if (ppCommand != null && !ppCommand.isFinished())
+		try {
+			if (ppCommand != null && !ppCommand.isFinished())
+				return false;
+		} catch (NullPointerException e) {
+			// the command's initialize is not called before the first time that our isFinished is called
 			return false;
+		}
 
 		return false;
 	}
