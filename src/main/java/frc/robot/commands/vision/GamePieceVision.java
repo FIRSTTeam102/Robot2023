@@ -64,7 +64,7 @@ public class GamePieceVision extends CommandBase {
 		switch (routine) {
 			case Gamepiece:
 				System.out.println("Swerve --> Gamepiece, Elevator --> Gamepiece, Arm --> Gamepiece, Grabber --> Gamepiece");
-				System.out.println("botpose_targetspaceRotationZ_rad: " + vision.inputs.botpose_targetspaceRotationZ_rad
+				System.out.println("botpose_targetspaceRotationZ_rad: " + vision.inputs.camerapose_targetspaceRotationZ_rad
 					+ " crosshairToTargetErrorX_rad: " + vision.inputs.crosshairToTargetErrorX_rad);
 				swerve.drive(new Translation2d(0, robotTranslateVelocity_mps), robotRotateVelocity_mps, false);
 				new SetElevatorPosition(elevator, ElevatorConstants.groundHeight_m);
@@ -86,6 +86,6 @@ public class GamePieceVision extends CommandBase {
 	public boolean isFinished() {
 		return ((-VisionConstants.crosshairObjectBoundRotateX_rad < vision.inputs.crosshairToTargetErrorX_rad)
 			&& (vision.inputs.crosshairToTargetErrorX_rad < VisionConstants.crosshairObjectBoundRotateX_rad))
-			&& (vision.inputs.botpose_targetspaceRotationZ_rad < VisionConstants.crosshairObjectBoundTranslateZ_m);
+			&& (vision.inputs.camerapose_targetspaceRotationZ_rad < VisionConstants.crosshairObjectBoundTranslateZ_m);
 	}
 }

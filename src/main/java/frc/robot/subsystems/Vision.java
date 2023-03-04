@@ -20,8 +20,6 @@ public class Vision extends SubsystemBase {
 
 	public Vision() {
 		setPipeline(Pipeline.AprilTag);
-		setPipeline(Pipeline.Retroreflective);
-		setPipeline(Pipeline.GamePiece);
 	}
 
 	@Override
