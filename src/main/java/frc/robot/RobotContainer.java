@@ -38,6 +38,8 @@ import edu.wpi.first.wpilibj.shuffleboard.SendableCameraWrapper;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -161,7 +163,8 @@ public class RobotContainer {
 				.alongWith(new SetArmPosition(arm, ArmConstants.midCubeExtension_m)));
 		operatorConsole.button(15) // all in
 			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.dangerZone_m)
-				.alongWith(new SetArmPosition(arm, Arm.nutDistToArmDist(ArmConstants.minNutDist_m))));
+				.alongWith(new SequentialCommandGroup(new WaitCommand(.2),
+					new SetArmPosition(arm, Arm.nutDistToArmDist(ArmConstants.minNutDist_m)))));
 		operatorConsole.button(16) // ground
 			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.lowHeight_m)
 				.alongWith(new SetArmPosition(arm, ArmConstants.lowExtension_m)));
