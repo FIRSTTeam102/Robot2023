@@ -16,6 +16,7 @@ public class SetArmPosition extends InstantCommand {
 
 	@Override
 	public void initialize() {
+		arm.inManualMode = false;
 		arm.setPosition(armLength_m);
 	}
 }

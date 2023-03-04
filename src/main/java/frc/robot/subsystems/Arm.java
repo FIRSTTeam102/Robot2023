@@ -39,6 +39,8 @@ public class Arm extends SubsystemBase {
 	// is within swerve module bounds so elevator doesn't go down too far
 	private static boolean inDangerZone = false;
 
+	public boolean inManualMode = true;
+
 	public Arm() {
 		limitSwitch.enableLimitSwitch(true);
 		motor.setSoftLimit(SoftLimitDirection.kReverse, (float) maxNutDist_m);

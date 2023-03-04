@@ -1,5 +1,6 @@
 package frc.robot.commands.arm;
 
+import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.subsystems.Arm;
 
 import edu.wpi.first.math.MathUtil;
@@ -23,7 +24,11 @@ public class ManualArmControl extends CommandBase {
 	@Override
 	public void execute() {
 		// todo: invert input?
-		arm.setSpeed(scaleInput(MathUtil.applyDeadband(inputSupplier.getAsDouble(), .2)));
+		if (Math.abs(inputSupplier.getAsDouble()) >= OperatorConstants.stickDeadband)
+			arm.inManualMode = true;
+
+		if (arm.inManualMode)
+			arm.setSpeed(scaleInput(MathUtil.applyDeadband(inputSupplier.getAsDouble(), OperatorConstants.stickDeadband)));
 	}
 
 	@Override

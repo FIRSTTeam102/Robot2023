@@ -46,6 +46,8 @@ public class Elevator extends SubsystemBase {
 	// if within module bounds so arm knows to not go down too far
 	private static boolean inDangerZone = false;
 
+	public boolean inManualMode = true;
+
 	public Elevator() {
 		motor.setIdleMode(IdleMode.kBrake);
 
