@@ -42,22 +42,12 @@ public class RetroreflectiveVision extends CommandBase {
 		if (!vision.isPipelineReady())
 			return;
 
-		// Outputs a robotRotateVelocity_mps that updates every 0.02s for the motor. rotateKp, rotateKi, rotateKd must be
-		// tuned and can not be calculated in a spreadsheet as rotateErrorIntegral and rotateErrorDerivative are based on
-		// the last 0.02s rotatekP * crosshairToTargetOffsetX_rad. We will not know what this data will be for the last
-		// 0.02s on a spreadsheet because we do not know what the robotRotateVelocity_mps was the last 0.02s.
-		if (vision.inputs.crosshairToTargetErrorX_rad < -VisionConstants.crosshairTargetBoundRotateX_rad) {
-			robotRotateVelocity_mps = VisionConstants.rotateKp * vision.inputs.crosshairToTargetErrorX_rad
-				- VisionConstants.rotateKi * vision.rotateErrorIntegral
-				- VisionConstants.rotateKd * vision.rotateErrorDerivative;
-		} else if (vision.inputs.crosshairToTargetErrorX_rad > VisionConstants.crosshairTargetBoundRotateX_rad) {
-			robotRotateVelocity_mps = VisionConstants.rotateKp * vision.inputs.crosshairToTargetErrorX_rad
-				+ VisionConstants.rotateKi * vision.rotateErrorIntegral
-				+ VisionConstants.rotateKd * vision.rotateErrorDerivative;
-		}
+		// robotRotateVelocity_mps and PID loop using PIDcontroller class
+		// vision.inputs.crosshairToTargetErrorX_rad and VisionConstants.crosshairTargetBoundRotateX_rad
 
 		// When we see a grid retroreflective, we will rotate to it and put elevator up
 		// When are at a doublesubstation apriltag, we will put elevator up
+
 		switch (routine) {
 			case BlueRedGridMiddle:
 				System.out.println("Swerve --> BlueRedGridMiddle, Elevator --> BlueRedGridNodeMiddle");

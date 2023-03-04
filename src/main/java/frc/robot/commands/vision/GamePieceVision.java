@@ -53,30 +53,12 @@ public class GamePieceVision extends CommandBase {
 		// If isPipelineReady true, begin execute
 		if (!vision.isPipelineReady())
 			return;
+		
+		// robotRotateVelocity_mps and PID loop using PIDcontroller class
+		// vision.inputs.crosshairToTargetErrorX_rad and VisionConstants.crosshairTargetBoundRotateX_rad
 
-		// Outputs a robotRotateVelocity_mps that updates every 0.02s for the motor. rotateKp, rotateKi, rotateKd must be
-		// tuned and can not be calculated in a spreadsheet as rotateErrorIntegral and rotateErrorDerivative are based on
-		// the last 0.02s rotatekP * crosshairToTargetOffsetX_rad. We will not know what this data will be for the last
-		// 0.02s on a spreadsheet because we do not know what the robotRotateVelocity_mps was the last 0.02s.
-		if (vision.inputs.crosshairToTargetErrorX_rad < -VisionConstants.crosshairTargetBoundRotateX_rad) {
-			robotRotateVelocity_mps = VisionConstants.rotateKp * vision.inputs.crosshairToTargetErrorX_rad
-				- VisionConstants.rotateKi * vision.rotateErrorIntegral
-				- VisionConstants.rotateKd * vision.rotateErrorDerivative;
-		} else if (vision.inputs.crosshairToTargetErrorX_rad > VisionConstants.crosshairTargetBoundRotateX_rad) {
-			robotRotateVelocity_mps = VisionConstants.rotateKp * vision.inputs.crosshairToTargetErrorX_rad
-				+ VisionConstants.rotateKi * vision.rotateErrorIntegral
-				+ VisionConstants.rotateKd * vision.rotateErrorDerivative;
-		}
-
-		// Outputs a robotTranslateVelocity_mps that updates every 0.02s for the motor. rotateKp, rotateKi, rotateKd must be
-		// tuned and can not be calculated in a spreadsheet as translateErrorIntegral and translateErrorDerivative are based
-		// on the last 0.02s rotatekP * botpose_targetspaceTranslationZ_m. We will not know what this data will be for the
-		// last 0.02s on a spreadsheet because we do not know what the robotTranslateVelocity_mps was the last 0.02s.
-		if (vision.inputs.botpose_targetspaceTranslationZ_m > VisionConstants.crosshairObjectBoundTranslateZ_m) {
-			robotTranslateVelocity_mps = VisionConstants.translateKp * vision.inputs.botpose_targetspaceTranslationZ_m
-				+ VisionConstants.translateKi * vision.translateErrorIntegral
-				+ VisionConstants.translateKd * vision.translateErrorDerivative;
-		}
+		// robotTranslateVelocity_mps and PID loop using PIDcontroller class
+		// vision.inputs.botpose_targetspaceTranslationZ_m and VisionConstants.crosshairObjectBoundTranslateZ_m
 
 		// When we see a ground objectdetection, we will translate and rotate to it and put elevator down and put scissor
 		// arm out
@@ -92,6 +74,7 @@ public class GamePieceVision extends CommandBase {
 				break;
 		}
 	}
+
 
 	// Stop swerve and sets pipeline back to Apriltag
 	@Override
