@@ -3,7 +3,6 @@ package frc.robot.commands.vision;
 import frc.robot.constants.AutoConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.io.VisionIO.Pipeline;
-import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
 
@@ -21,7 +20,6 @@ import com.pathplanner.lib.PathPoint;
 public class AprilTagVision extends CommandBase {
 	private Routine routine;
 	private Vision vision;
-	private Elevator elevator;
 	private Swerve swerve;
 	private PathPlannerCommand ppCommand;
 	private boolean regeneratePaths = true;
