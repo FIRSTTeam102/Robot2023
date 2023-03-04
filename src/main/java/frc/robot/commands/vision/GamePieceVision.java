@@ -68,7 +68,7 @@ public class GamePieceVision extends CommandBase {
 					+ " crosshairToTargetErrorX_rad: " + vision.inputs.crosshairToTargetErrorX_rad);
 				swerve.drive(new Translation2d(0, robotTranslateVelocity_mps), robotRotateVelocity_mps, false);
 				new SetElevatorPosition(elevator, ElevatorConstants.groundHeight_m);
-				new SetArmPosition(arm, ArmConstants.lowExtension_m);
+				new SetArmPosition(arm, ArmConstants.groundExtension_m);
 				new CloseGrabber(grabber, .5, GrabberConstants.closingTime_s);
 				break;
 		}

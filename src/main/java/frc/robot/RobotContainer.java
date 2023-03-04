@@ -164,7 +164,7 @@ public class RobotContainer {
 				.alongWith(new SetArmPosition(arm, ArmConstants.midCubeExtension_m)));
 		operatorConsole.button(16) // ground
 			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.groundHeight_m)
-				.alongWith(new SetArmPosition(arm, ArmConstants.lowExtension_m)));
+				.alongWith(new SetArmPosition(arm, ArmConstants.groundExtension_m)));
 
 		// initalize human player communication and stop commands (Red)
 		operatorConsole.button(15) // all in
