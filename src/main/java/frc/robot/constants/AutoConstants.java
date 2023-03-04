@@ -3,7 +3,7 @@ package frc.robot.constants;
 public final class AutoConstants {
 	/* pathplanner */
 	// todo:?
-	public static final double maxVelocity_mps = 4;
+	public static final double maxVelocity_mps = 4.97;
 	public static final double maxAcceleration_mps2 = 3;
 
 	/* auto path PID values */
