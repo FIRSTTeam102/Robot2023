@@ -51,4 +51,5 @@ public final class ElevatorConstants {
 	public static final double drumRadius_m = Units.inchesToMeters(0.5);
 
 	public static final double dangerZone_m = .089;
+	public static final double gridSafeZone_m = .7;
 }

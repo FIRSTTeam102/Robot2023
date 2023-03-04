@@ -1,6 +1,5 @@
 package frc.robot.commands.arm;
 
-import frc.robot.constants.ArmConstants;
 import frc.robot.subsystems.Arm;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -11,13 +10,6 @@ public class SetArmPosition extends InstantCommand {
 
 	public SetArmPosition(Arm arm, double armLength_m) {
 		this.armLength_m = armLength_m;
-		this.arm = arm;
-		addRequirements(arm);
-	}
-
-	/** sets arm position to 0, esentiallty a reset */
-	public SetArmPosition(Arm arm) {
-		this.armLength_m = Arm.nutDistToArmDist(ArmConstants.minNutDist_m);
 		this.arm = arm;
 		addRequirements(arm);
 	}

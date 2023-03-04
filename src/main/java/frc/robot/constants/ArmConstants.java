@@ -22,7 +22,10 @@ public final class ArmConstants {
 		/ 3 /* gear ratio */;
 	public static final double conversionFactor_mps_per_rpm = conversionFactor_m_per_rotation / 60;
 
+	/** minimum distance to not hit the swerve modules when elevator is down */
 	public static final double dangerZone_m = .39;
+	/** clipping distance for mid level on grid */
+	public static final double gridSafeZone_m = .7;
 
 	// todo: tuning
 	public static final double kP = 17.0;
