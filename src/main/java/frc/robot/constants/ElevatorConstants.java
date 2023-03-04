@@ -5,7 +5,7 @@ import edu.wpi.first.math.util.Units;
 public final class ElevatorConstants {
 	/* target heights */
 	// fixme: actual values
-	public static final double lowHeight_m = .172;
+	public static final double groundHeight_m = 0;
 	public static final double midConeHeight_m = Units.inchesToMeters(38);
 	public static final double midCubeHeight_m = .702;
 	public static final double highConeHeight_m = Units.inchesToMeters(47.95);

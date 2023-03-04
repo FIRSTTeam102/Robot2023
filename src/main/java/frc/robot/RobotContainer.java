@@ -163,8 +163,8 @@ public class RobotContainer {
 			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.dangerZone_m)
 				.alongWith(new SetArmPosition(arm, Arm.nutDistToArmDist(ArmConstants.minNutDist_m))));
 		operatorConsole.button(16) // ground
-			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.lowHeight_m)
-				.alongWith(new SetArmPosition(arm, ArmConstants.lowExtension_m)));
+			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.groundHeight_m)
+				.alongWith(new SetArmPosition(arm, ArmConstants.groundExtension_m)));
 
 		operatorConsole.button(5) // aim at game piece
 			.whileTrue(new ObjectDetectionVision(ObjectDetectionVision.Routine.Ground, vision, swerve));

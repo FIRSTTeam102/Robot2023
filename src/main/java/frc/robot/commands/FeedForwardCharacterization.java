@@ -16,8 +16,8 @@ import java.util.function.Supplier;
  * @see https://github.com/Mechanical-Advantage/RobotCode2023/blob/main/src/main/java/org/littletonrobotics/frc2023/commands/FeedForwardCharacterization.java
  */
 public class FeedForwardCharacterization extends CommandBase {
-	private static final double startDelaySecs = 2.0;
-	private static final double rampRateVoltsPerSec = 0.05;
+	private static final double startDelaySecs = 0.2;
+	private static final double rampRateVoltsPerSec = 0.07; // 0.05;
 
 	private final boolean forwards;
 	private final boolean isDrive;

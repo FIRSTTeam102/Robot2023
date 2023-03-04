@@ -34,7 +34,7 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 	private SparkMaxPIDController angleSparkPidController;
 	// private SparkMaxAbsoluteEncoder angleMotorAbsoluteEncoder;
 	// private RelativeEncoder angleMotorRelativeEncoder;
-	private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(driveKs, driveKv, driveKa);
+	private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(driveKs, driveKv);
 	private double angleOffset_rad;
 
 	// private SimpleMotorFeedforward turnFeedforward = new SimpleMotorFeedforward(turnKs, turnKv);

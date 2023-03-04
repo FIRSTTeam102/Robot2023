@@ -3,11 +3,11 @@ package frc.robot.constants;
 import edu.wpi.first.math.util.Units;
 
 public final class ArmConstants {
-	public static final double minNutDist_m = Units.inchesToMeters(13.5);
+	public static final double minNutDist_m = 0.34925;
 	public static final double maxNutDist_m = Units.inchesToMeters(4.92);
 
-	// just for testing please change please please
-	public static final double lowExtension_m = .5;
+	public static final double inExtension_m = .2;
+	public static final double groundExtension_m = .413;
 	public static final double midConeExtension_m = .88;
 	public static final double midCubeExtension_m = .777;
 	public static final double highConeExtension_m = Units.inchesToMeters(41);
