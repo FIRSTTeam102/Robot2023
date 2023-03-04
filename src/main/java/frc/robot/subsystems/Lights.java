@@ -2,7 +2,7 @@ package frc.robot.subsystems;
 
 import frc.robot.Robot;
 
-import edu.wpi.first.wpilibj.SerialPort;
+import edu.wpi.first.wpilibj.SPI;
 
 /**
  * Passes status information to the Arduino coprocessor.
@@ -12,12 +12,12 @@ import edu.wpi.first.wpilibj.SerialPort;
  * commands can update them independantly of other subsystems.
  */
 public class Lights {
-	private static SerialPort serial = new SerialPort(9600, SerialPort.Port.kMXP,
-		8, SerialPort.Parity.kNone, SerialPort.StopBits.kOne);
+	private static SPI spi = new SPI(SPI.Port.kOnboardCS0);
 
 	static {
-		serial.setWriteBufferMode(SerialPort.WriteBufferMode.kFlushOnAccess);
-		serial.setWriteBufferSize(1);
+		spi.setClockRate(4000000);
+		spi.setMode(SPI.Mode.kMode0);
+		spi.setChipSelectActiveLow();
 	}
 
 	private Lights() {}
@@ -58,10 +58,11 @@ public class Lights {
 		if (subsystem < 0 || subsystem > 0b1111 || status < 0 || status > 0b1111)
 			throw new RuntimeException("invalid lights status message");
 		Integer message = (status << 4) ^ subsystem;
+
 		System.out.println("Lights serial message: " + message);
-		if (Robot.isReal()) {
-			serial.write(new byte[] {message.byteValue()}, 1);
-		}
+		if (Robot.isReal())
+			for (int i = 0; i < 3; i++)
+				spi.write(new byte[] {message.byteValue()}, 1);
 	}
 
 	public static void setStatus(Subsystem subsystem, Status status) {

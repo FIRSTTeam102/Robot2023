@@ -52,11 +52,11 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 			+ (driveWheelSim.getAngularVelocityRadPerSec() * loopPeriod_s * wheelRadius_m);
 		inputs.driveVelocity_mps = driveWheelSim.getAngularVelocityRadPerSec() * wheelRadius_m;
 		inputs.driveAppliedPercentage = driveAppliedVolts / 12.0;
-		inputs.driveCurrent_amp = Math.abs(driveWheelSim.getCurrentDrawAmps());
+		inputs.driveCurrent_A = Math.abs(driveWheelSim.getCurrentDrawAmps());
 
 		inputs.angleVelocity_radps = angleWheelSim.getAngularVelocityRadPerSec();
 		inputs.angleAppliedPercentage = angleAppliedVolts / 12.0;
-		inputs.angleCurrent_amp = Math.abs(angleWheelSim.getCurrentDrawAmps());
+		inputs.angleCurrent_A = Math.abs(angleWheelSim.getCurrentDrawAmps());
 
 		if (!isDriveOpenLoop) {
 			double velocityRadPerSec = driveSetpoint_mps / wheelRadius_m;

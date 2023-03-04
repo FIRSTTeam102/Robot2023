@@ -34,7 +34,7 @@ public class SendableSparkMaxPIDController implements Sendable, AutoCloseable {
 		builder.addDoubleProperty("i", controller::getI, controller::setI);
 		builder.addDoubleProperty("d", controller::getD, controller::setD);
 		builder.addDoubleProperty("setpoint",
-			// fixme: read actual values
+			// todo: read actual values
 			() -> setpoint,
 			(double setpoint) -> {
 				this.setpoint = setpoint;

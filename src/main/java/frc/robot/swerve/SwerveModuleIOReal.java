@@ -67,6 +67,8 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		angleMotor.setSmartCurrentLimit(angleCurrentLimit_amp);
 		angleMotor.setInverted(angleInverted);
 		angleMotor.setIdleMode(angleIdleMode);
+		angleMotor.setClosedLoopRampRate(angleRampTime_s);
+		angleMotor.enableVoltageCompensation(12);
 
 		// angleMotorAbsoluteEncoder = angleMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
 		// angleMotorAbsoluteEncoder.setPositionConversionFactor(angleEncoderPositionFactor_rad);
@@ -133,13 +135,15 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 			wheelCircumference_m,
 			driveGearRatio);
 		inputs.driveAppliedPercentage = driveMotor.getMotorOutputPercent();
-		inputs.driveCurrent_amp = driveMotor.getStatorCurrent();
+		inputs.driveCurrent_A = driveMotor.getStatorCurrent();
+		inputs.driveTemperature_C = driveMotor.getTemperature();
 
 		// inputs.angleAbsolutePosition_rad = angleMotorAbsoluteEncoder.getPosition();
 		inputs.anglePosition_rad = angleCancoder.getPosition();
 		inputs.angleVelocity_radps = angleCancoder.getVelocity();
 		inputs.angleAppliedPercentage = angleMotor.getAppliedOutput();
-		inputs.angleCurrent_amp = angleMotor.getOutputCurrent();
+		inputs.angleCurrent_A = angleMotor.getOutputCurrent();
+		inputs.angleTemperature_C = angleMotor.getMotorTemperature();
 	}
 
 	@Override

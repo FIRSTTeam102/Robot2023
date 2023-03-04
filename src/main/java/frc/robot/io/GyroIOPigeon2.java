@@ -25,6 +25,7 @@ public class GyroIOPigeon2 implements GyroIO {
 		inputs.pitch_dps = xyz_dps[1];
 		inputs.roll_deg = ypr_deg[2];
 		inputs.roll_dps = xyz_dps[2];
+		inputs.temperature_C = gyro.getTemp();
 	}
 
 	@Override

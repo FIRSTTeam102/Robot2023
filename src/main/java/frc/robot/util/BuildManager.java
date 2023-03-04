@@ -40,7 +40,7 @@ public class BuildManager {
 		return shouldBurn;
 	}
 
-	// burns config to spark only when new build
+	/** burns config to spark only when new build */
 	public static void burnSpark(CANSparkMax spark) {
 		if (shouldBurn())
 			spark.burnFlash();

@@ -4,6 +4,7 @@ import frc.robot.constants.ArmConstants;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.CameraConstants;
 import frc.robot.constants.Constants.OperatorConstants;
+import frc.robot.constants.Constants.ShuffleboardConstants;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.GrabberConstants;
 import frc.robot.io.GyroIO;
@@ -30,18 +31,23 @@ import frc.robot.commands.vision.GamePieceVision;
 import frc.robot.commands.vision.RetroreflectiveVision;
 
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.HttpCamera;
+import edu.wpi.first.cscore.HttpCamera.HttpCameraKind;
 import edu.wpi.first.cscore.MjpegServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.SendableCameraWrapper;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import java.util.Map;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -60,8 +66,10 @@ public class RobotContainer {
 
 	public final CommandXboxController driverController = new CommandXboxController(
 		OperatorConstants.driverControllerPort);
-	public final CommandXboxController operatorController = new CommandXboxController(
-		OperatorConstants.operatorControllerPort);
+	public final CommandGenericHID operatorConsole = new CommandGenericHID(
+		OperatorConstants.operatorConsolePort);
+	public final CommandJoystick operatorJoystick = new CommandJoystick(
+		OperatorConstants.operatorJoystickPort);
 
 	public final GyroIO gyro = Robot.isReal()
 		? new GyroIOPigeon2(Constants.pigeonId)
@@ -74,8 +82,6 @@ public class RobotContainer {
 	public final Elevator elevator = new Elevator();
 	public final Grabber grabber = new Grabber();
 
-	private final TeleopSwerve teleopSwerve = new TeleopSwerve(swerve, driverController.getHID());
-
 	private LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto mode");
 
 	/**
@@ -83,9 +89,6 @@ public class RobotContainer {
 	 */
 	public RobotContainer() {
 		DriverStation.silenceJoystickConnectionWarning(true);
-
-		// will be automatically scheduled when no other scheduled commands require swerve
-		swerve.setDefaultCommand(teleopSwerve);
 
 		configureBindings();
 
@@ -97,35 +100,7 @@ public class RobotContainer {
 		autoChooser.addOption("drive characterization",
 			new FeedForwardCharacterization(swerve, true, swerve::runCharacterization, swerve::getCharacterizationVelocity));
 
-		SmartDashboard.putData("do balancing", new ChargeStationBalance(swerve));
-
-		// camera
-		try {
-			var camera = CameraServer.startAutomaticCapture("arm", 0);
-			// camera.setConnectVerbose(0);
-			camera.setFPS(CameraConstants.fps);
-			camera.setResolution(CameraConstants.width, CameraConstants.height);
-
-			// camera server is evil
-
-			// var cameraServer = CameraServer.addSwitchedCamera("camera");
-			// var cameraServer = CameraServer.startAutomaticCapture(camera);
-			var cameraServer = (MjpegServer) CameraServer.getServer();
-			cameraServer.setFPS(CameraConstants.fps);
-			cameraServer.setResolution(CameraConstants.width, CameraConstants.height);
-			cameraServer.setCompression(CameraConstants.compression);
-			cameraServer.setDefaultCompression(CameraConstants.compression);
-
-			Shuffleboard.getTab("Drive")
-				.add("camera", SendableCameraWrapper.wrap(camera))
-				// .addCamera("camera", "arm", cameraServ
-				.withWidget(BuiltInWidgets.kCameraStream)
-				.withSize(5, 4);
-		} catch (edu.wpi.first.cscore.VideoException e) {
-			DriverStation.reportError("Failed to get camera: " + e.toString(), e.getStackTrace());
-		}
-
-		SmartDashboard.putData("scoring", ScoringMechanism2d.mech);
+		configureCameras();
 	}
 
 	/**
@@ -137,49 +112,115 @@ public class RobotContainer {
 	 * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
 	 */
 	private void configureBindings() {
-		/* driver controller */
+		/* driver */
+		var teleopSwerve = new TeleopSwerve(
+			() -> -driverController.getLeftY(),
+			() -> -driverController.getLeftX(),
+			() -> -driverController.getRightX(),
+			() -> driverController.getLeftTriggerAxis() > OperatorConstants.boolTriggerThreshold,
+			swerve, arm, elevator);
+		swerve.setDefaultCommand(teleopSwerve);
 
-		// drive modes
-		driverController.start().onTrue(teleopSwerve.toggleFieldRelativeCommand());
-		driverController.back().onTrue(new InstantCommand(() -> swerve.zeroYaw()));
-		driverController.leftStick().whileTrue(new XStance(swerve));
+		driverController.a().onTrue(teleopSwerve.toggleFieldRelative());
+		driverController.y().onTrue(teleopSwerve.zeroYaw());
+		driverController.x().whileTrue(new XStance(swerve));
 
-		// vision modes
-		driverController.povLeft().and(driverController.x())
-			.whileTrue(new AprilTagVision(AprilTagVision.Routine.BlueRedGridDoublesubstationLeft, vision, swerve));
-		driverController.povLeft().and(driverController.a())
-			.whileTrue(new AprilTagVision(AprilTagVision.Routine.BlueRedGridMiddle, vision, swerve));
-		driverController.povLeft().and(driverController.b())
-			.whileTrue(new AprilTagVision(AprilTagVision.Routine.BlueRedGridDoublesubstationRight, vision, swerve));
+		driverController.povUp().toggleOnTrue(new ChargeStationBalance(swerve));
 
-		driverController.povDown().and(driverController.a())
-			.whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.BlueRedGridMiddle, vision, elevator, swerve));
-		driverController.povDown().and(driverController.y())
-			.whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.BlueRedGridTop, vision, elevator, swerve));
+		/*
+		 * operator console
+		 * G0 G1 G2 B3
+		 * G4 Y5 Y6 B7
+		 * R8 Y9 Y10 B11
+		 * R12 R13 R14 B15
+		 */
 
-		driverController.povRight().and(driverController.a())
-			.whileTrue(
-				new GamePieceVision(GamePieceVision.Routine.Gamepiece, vision, elevator, arm, grabber, swerve));
+		// go to grid (green)
+		operatorConsole.button(0)
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Left, vision, swerve));
+		operatorConsole.button(1)
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Middle, vision, swerve));
+		operatorConsole.button(2)
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Right, vision, swerve));
 
-		// arm modes
-		driverController.rightTrigger(0.3).whileTrue(new ManualArmControl(arm, operatorController));
-		driverController.rightTrigger().and(driverController.x())
-			.onTrue(new SetArmPosition(arm, ArmConstants.resetLength_m));
+		// move arm/elevator/score (blue)
+		operatorConsole.button(3) // high
+			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.highHeight_m)
+				.alongWith(new SetArmPosition(arm, ArmConstants.highExtension_m)));
+		// .whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Top, vision, swerve));
+		operatorConsole.button(7) // mid
+			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.midHeight_m)
+				.alongWith(new SetArmPosition(arm, ArmConstants.midExtension_m)));
+		// .whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Middle, vision, swerve));
+		operatorConsole.button(11) // low
+			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.lowHeight_m)
+				.alongWith(new SetArmPosition(arm, ArmConstants.lowExtension_m)));
+		operatorConsole.button(15) // double substation
+			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.doubleSubstationHeight_m)
+				.alongWith(new SetArmPosition(arm, ArmConstants.doubleSubstationExtension_m)));
 
-		// elevator modes
-		driverController.leftTrigger(.3).whileTrue(new ManualElevatorControl(elevator, operatorController));
-		driverController.rightTrigger().and(driverController.x())
-			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.resetHeight_m));
-		driverController.rightTrigger().and(driverController.a())
-			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.middleNodeHeight_m));
-		driverController.rightTrigger().and(driverController.b())
-			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.doubleSubstationHeight_m));
-		driverController.rightTrigger().and(driverController.y())
-			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.topNodeHeight_m));
+		operatorConsole.button(14) // all in
+			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.dangerZone_m)
+				.alongWith(new SetArmPosition(arm, Arm.nutDistToArmDist(ArmConstants.minNutDist_m))));
 
-		// grabber modes
-		driverController.a().toggleOnTrue(new CloseGrabber(grabber, .5));
-		driverController.b().toggleOnTrue(new OpenGrabber(grabber, .4, GrabberConstants.openingTime_s));
+		operatorConsole.button(4) // aim at game piece
+			.whileTrue(new ObjectDetectionVision(ObjectDetectionVision.Routine.Ground, vision, swerve));
+
+		// todo: what happens when both pressed?
+		operatorConsole.button(5)
+			.toggleOnTrue(new CloseGrabber(grabber, .5));
+		operatorConsole.button(6)
+			.toggleOnTrue(new OpenGrabber(grabber, 1, .5));
+
+		/*
+		 * operator flight stick
+		 */
+		// todo: require trigger pulled to work?
+		arm.setDefaultCommand(new ManualArmControl(arm, operatorJoystick::getX));
+		elevator.setDefaultCommand(new ManualElevatorControl(elevator, operatorJoystick::getY));
+	}
+
+	@SuppressWarnings("unused")
+	private void configureCameras() {
+		// camera
+		try {
+			var camera = CameraServer.startAutomaticCapture("arm", 0);
+			camera.setConnectVerbose(0);
+			camera.setFPS(CameraConstants.fps);
+			camera.setResolution(CameraConstants.width, CameraConstants.height);
+			if (CameraConstants.exposure >= 0)
+				camera.setExposureManual(CameraConstants.exposure);
+			else
+				camera.setExposureAuto();
+			// camera.setBrightness(0);
+
+			// camera server is evil
+			// var cameraServer = CameraServer.addSwitchedCamera("camera");
+			// var cameraServer = CameraServer.startAutomaticCapture(camera);
+			var cameraServer = (MjpegServer) CameraServer.getServer();
+			cameraServer.setFPS(CameraConstants.fps);
+			cameraServer.setResolution(CameraConstants.width, CameraConstants.height);
+			cameraServer.setCompression(CameraConstants.compression);
+			cameraServer.setDefaultCompression(CameraConstants.compression);
+
+			Shuffleboard.getTab(ShuffleboardConstants.driveTab)
+				.add("camera", SendableCameraWrapper.wrap(camera))
+				// .addCamera("camera", "arm", cameraServ
+				.withWidget(BuiltInWidgets.kCameraStream)
+				.withSize(8, 6);
+		} catch (edu.wpi.first.cscore.VideoException e) {
+			DriverStation.reportError("Failed to get camera: " + e.toString(), e.getStackTrace());
+		}
+
+		if (Robot.isReal()) {
+			var limelightCamera = new HttpCamera("limelightStream", "http://limelight.local:5800/stream.mjpg",
+				HttpCameraKind.kMJPGStreamer);
+			Shuffleboard.getTab(ShuffleboardConstants.driveTab)
+				.add("limelight", limelightCamera)
+				.withProperties(Map.of("show crosshair", false, "show controls", false))
+				.withWidget(BuiltInWidgets.kCameraStream)
+				.withSize(7, 6);
+		}
 	}
 
 	/**
