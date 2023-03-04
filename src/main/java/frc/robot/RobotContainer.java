@@ -127,55 +127,59 @@ public class RobotContainer {
 
 		/*
 		 * operator console
-		 * G0 G1 G2 B3
-		 * G4 Y5 Y6 B7
-		 * R8 Y9 Y10 B11
-		 * R12 R13 R14 B15
+		 * G1 G2 G3 B4
+		 * G5 Y6 Y7 B8
+		 * R9 Y10 Y11 B12
+		 * R13 R14 R15 B16
 		 */
 
 		// go to grid (green)
-		operatorConsole.button(0)
-			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Left, vision, swerve));
 		operatorConsole.button(1)
-			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Middle, vision, swerve));
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Left, vision, swerve));
 		operatorConsole.button(2)
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Middle, vision, swerve));
+		operatorConsole.button(3)
 			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Right, vision, swerve));
 
-		// move arm/elevator/score (blue)
-		operatorConsole.button(3) // high
-			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.highHeight_m)
-				.alongWith(new SetArmPosition(arm, ArmConstants.highExtension_m)));
-		// .whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Top, vision, swerve));
-		operatorConsole.button(7) // mid
-			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.midHeight_m)
-				.alongWith(new SetArmPosition(arm, ArmConstants.midExtension_m)));
-		// .whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Middle, vision, swerve));
-		operatorConsole.button(11) // low
-			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.lowHeight_m)
-				.alongWith(new SetArmPosition(arm, ArmConstants.lowExtension_m)));
-		operatorConsole.button(15) // double substation
+		// move arm/elevator/score
+		operatorConsole.button(4) // double substation
 			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.doubleSubstationHeight_m)
 				.alongWith(new SetArmPosition(arm, ArmConstants.doubleSubstationExtension_m)));
-
-		operatorConsole.button(14) // all in
+		operatorConsole.button(7) // high cone
+			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.highConeHeight_m)
+				.alongWith(new SetArmPosition(arm, ArmConstants.highConeExtension_m)));
+		// .whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Top, vision, swerve));
+		operatorConsole.button(8) // high cube
+			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.highCubeHeight_m)
+				.alongWith(new SetArmPosition(arm, ArmConstants.highCubeExtension_m)));
+		operatorConsole.button(11) // mid cone
+			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.midConeHeight_m)
+				.alongWith(new SetArmPosition(arm, ArmConstants.midConeExtension_m)));
+		// .whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Middle, vision, swerve));
+		operatorConsole.button(12) // mid cube
+			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.midCubeHeight_m)
+				.alongWith(new SetArmPosition(arm, ArmConstants.midCubeExtension_m)));
+		operatorConsole.button(15) // all in
 			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.dangerZone_m)
 				.alongWith(new SetArmPosition(arm, Arm.nutDistToArmDist(ArmConstants.minNutDist_m))));
+		operatorConsole.button(16) // ground
+			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.lowHeight_m)
+				.alongWith(new SetArmPosition(arm, ArmConstants.lowExtension_m)));
 
-		operatorConsole.button(4) // aim at game piece
+		operatorConsole.button(5) // aim at game piece
 			.whileTrue(new ObjectDetectionVision(ObjectDetectionVision.Routine.Ground, vision, swerve));
-
-		// todo: what happens when both pressed?
-		operatorConsole.button(5)
-			.toggleOnTrue(new CloseGrabber(grabber, .5));
-		operatorConsole.button(6)
-			.toggleOnTrue(new OpenGrabber(grabber, 1, .5));
 
 		/*
 		 * operator flight stick
 		 */
 		// todo: require trigger pulled to work?
 		arm.setDefaultCommand(new ManualArmControl(arm, () -> -operatorJoystick.getX()));
-		elevator.setDefaultCommand(new ManualElevatorControl(elevator, operatorJoystick::getY));
+		elevator.setDefaultCommand(new ManualElevatorControl(elevator, () -> -operatorJoystick.getY()));
+		// todo: what happens when both pressed?
+		operatorJoystick.trigger()
+			.whileTrue(new OpenGrabber(grabber, 1, .5));
+		operatorJoystick.button(3)
+			.toggleOnTrue(new CloseGrabber(grabber, .5));
 	}
 
 	@SuppressWarnings("unused")
