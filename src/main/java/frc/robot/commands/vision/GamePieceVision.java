@@ -44,8 +44,8 @@ public class GamePieceVision extends CommandBase {
 
 	@Override
 	public void initialize() {
-		// Sets pipeline to ObjectDetection
-		vision.setPipeline(Pipeline.ObjectDetection);
+		// Sets pipeline to GamePiece
+		vision.setPipeline(Pipeline.GamePiece);
 	}
 
 	@Override
@@ -53,28 +53,26 @@ public class GamePieceVision extends CommandBase {
 		// If isPipelineReady true, begin execute
 		if (!vision.isPipelineReady())
 			return;
-		
+
 		// robotRotateVelocity_mps and PID loop using PIDcontroller class
 		// vision.inputs.crosshairToTargetErrorX_rad and VisionConstants.crosshairTargetBoundRotateX_rad
 
 		// robotTranslateVelocity_mps and PID loop using PIDcontroller class
 		// vision.inputs.botpose_targetspaceTranslationZ_m and VisionConstants.crosshairObjectBoundTranslateZ_m
 
-		// When we see a ground objectdetection, we will translate and rotate to it and put elevator down and put scissor
-		// arm out
+		// When we see a ground gamepiece, we will translate and rotate to it and put elevator down and put scissor arm out
 		switch (routine) {
 			case Gamepiece:
 				System.out.println("Swerve --> Gamepiece, Elevator --> Gamepiece, Arm --> Gamepiece, Grabber --> Gamepiece");
 				System.out.println("botpose_targetspaceRotationZ_rad: " + vision.inputs.botpose_targetspaceRotationZ_rad
 					+ " crosshairToTargetErrorX_rad: " + vision.inputs.crosshairToTargetErrorX_rad);
 				swerve.drive(new Translation2d(0, robotTranslateVelocity_mps), robotRotateVelocity_mps, false);
-				new SetElevatorPosition(elevator, ElevatorConstants.resetHeight_m);
-				new SetArmPosition(arm, ArmConstants.gamePieceLength_m);
+				new SetElevatorPosition(elevator, ElevatorConstants.groundHeight_m);
+				new SetArmPosition(arm, ArmConstants.lowExtension_m);
 				new CloseGrabber(grabber, .5, GrabberConstants.closingTime_s);
 				break;
 		}
 	}
-
 
 	// Stop swerve and sets pipeline back to Apriltag
 	@Override

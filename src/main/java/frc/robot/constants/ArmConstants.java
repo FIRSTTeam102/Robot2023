@@ -27,10 +27,6 @@ public final class ArmConstants {
 	/** clipping distance for mid level on grid */
 	public static final double gridSafeZone_m = .7;
 
-	// fixme: actual values
-	public static final double resetLength_m = 0;
-	public static final double gamePieceLength_m = 0.3048;
-
 	// todo: tuning
 	public static final double kP = 17.0;
 	public static final double kI = 0.005;

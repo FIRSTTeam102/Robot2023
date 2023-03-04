@@ -27,6 +27,7 @@ import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.swerve.XStance;
 import frc.robot.commands.vision.AprilTagVision;
 import frc.robot.commands.vision.GamePieceVision;
+import frc.robot.commands.vision.RetroreflectiveVision;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.HttpCamera;
@@ -133,34 +134,42 @@ public class RobotContainer {
 		 * R13 R14 R15 B16
 		 */
 
-		// swerve to grid or double substation (green)
-		operatorConsole.button(0)
+		// swerve to grid or double substation. swerve/arm/elevator game piece (green)
+		operatorConsole.button(1) // left grid or left double substation
 			.whileTrue(new AprilTagVision(AprilTagVision.Routine.BlueRedGridDoublesubstationLeft, vision, swerve));
-		// operatorConsole.button(1)
-		driverController.povDown()
+		operatorConsole.button(2) // middle grid
 			.whileTrue(new AprilTagVision(AprilTagVision.Routine.BlueRedGridMiddle, vision, swerve));
-		operatorConsole.button(2)
+		operatorConsole.button(3) // right grid or right double substation
 			.whileTrue(new AprilTagVision(AprilTagVision.Routine.BlueRedGridDoublesubstationRight, vision, swerve));
+		operatorConsole.button(4) // gamepiece
+			.whileTrue(new GamePieceVision(GamePieceVision.Routine.Gamepiece, vision, elevator, arm, grabber, swerve));
 
-		// arm/elevator to grid or double substation (blue)
-		operatorConsole.button(3) // high
-			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.highHeight_m)
-				.alongWith(new SetArmPosition(arm, ArmConstants.highExtension_m)));
-		// .whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.BlueRedGridTop, vision, elevator, swerve));
-		operatorConsole.button(7) // mid
-			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.midHeight_m)
-				.alongWith(new SetArmPosition(arm, ArmConstants.midExtension_m)));
-		// .whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.BlueRedGridMiddle, vision, elevator, swerve));
-		operatorConsole.button(11) // low
-			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.lowHeight_m)
+		// swerve or/and arm/elevator to grid or double substation (blue + orange)
+		operatorConsole.button(4) // double substation
+			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.doubleSubstationHeight_m)
+				.alongWith(new SetArmPosition(arm, ArmConstants.doubleSubstationExtension_m)));
+		operatorConsole.button(7) // high cone
+			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.highConeHeight_m)
+				.alongWith(new SetArmPosition(arm, ArmConstants.highConeExtension_m)))
+			.whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.BlueRedGridTop, vision, swerve));
+		operatorConsole.button(8) // high cube
+			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.highCubeHeight_m)
+				.alongWith(new SetArmPosition(arm, ArmConstants.highCubeExtension_m)));
+		operatorConsole.button(11) // mid cone
+			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.midConeHeight_m)
+				.alongWith(new SetArmPosition(arm, ArmConstants.midConeExtension_m)))
+			.whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.BlueRedGridMiddle, vision, swerve));
+		operatorConsole.button(12) // mid cube
+			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.midCubeHeight_m)
+				.alongWith(new SetArmPosition(arm, ArmConstants.midCubeExtension_m)));
+		operatorConsole.button(16) // ground
+			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.groundHeight_m)
 				.alongWith(new SetArmPosition(arm, ArmConstants.lowExtension_m)));
 
-		operatorConsole.button(14) // all in
+		// initalize human player communication and stop commands (Red)
+		operatorConsole.button(15) // all in
 			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.dangerZone_m)
 				.alongWith(new SetArmPosition(arm, Arm.nutDistToArmDist(ArmConstants.minNutDist_m))));
-
-		operatorConsole.button(4) // swerve/arm/elevator to gamepiece
-			.whileTrue(new GamePieceVision(GamePieceVision.Routine.Gamepiece, vision, elevator, arm, grabber, swerve));
 
 		/*
 		 * operator flight stick

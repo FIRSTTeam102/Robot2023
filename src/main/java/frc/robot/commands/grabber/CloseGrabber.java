@@ -53,6 +53,6 @@ public class CloseGrabber extends CommandBase {
 
 	@Override
 	public boolean isFinished() {
-		return counter >= 12 || grabber.currentLimitReached || (runTime_s > 0 && timer.hasElapsed(runTime_s));
+		return counter >= 12 || (runTime_s > 0 && timer.hasElapsed(runTime_s));
 	}
 }

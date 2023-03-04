@@ -53,7 +53,7 @@ public class AprilTagVision extends CommandBase {
 			return;
 		}
 
-		// When we see a grid apriltag, we will position and rotate to alliance color's side
+		// When we see a grid apriltag or grid doublesubstation, we will position and rotate to alliance color's side
 		switch (routine) {
 			case BlueRedGridDoublesubstationLeft:
 				if (vision.inputs.targetAprilTag == 5) {

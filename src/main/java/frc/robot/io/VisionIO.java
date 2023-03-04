@@ -85,7 +85,7 @@ public class VisionIO {
 	}
 
 	public enum Pipeline {
-		AprilTag(0), Retroreflective(1), ObjectDetection(2);
+		AprilTag(0), Retroreflective(1), GamePiece(2);
 
 		public final int value;
 
