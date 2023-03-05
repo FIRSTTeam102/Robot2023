@@ -42,7 +42,7 @@ public class AprilTagVision extends CommandBase {
 		vision.setPipeline(Pipeline.AprilTag);
 
 		// If we are too far away maxZDistanceAprilTag_m from the Apriltag, AprilTagVision will not execute
-		regeneratePaths = vision.inputs.camerapose_targetspaceTranslationZ_m < VisionConstants.maxZDistanceAprilTag_m;
+		regeneratePaths = vision.inputs.botpose_fieldTranslationZ_m < VisionConstants.maxZDistanceAprilTag_m;
 		cancelPPCommand();
 	}
 
