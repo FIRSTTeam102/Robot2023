@@ -184,10 +184,7 @@ public class AprilTagVision extends CommandBase {
 		// Generate a path using from pose2d to apriltag
 		PathPlannerTrajectory trajectory = PathPlanner.generatePath(
 			new PathConstraints(AutoConstants.maxVelocity_mps, AutoConstants.maxAcceleration_mps2),
-			new PathPoint(swerve.getPose().getTranslation(), swerve.getPose().getRotation(), swerve.getPose().getRotation()), // start
-																																																												// at
-																																																												// current
-																																																												// pos
+			new PathPoint(swerve.getPose().getTranslation(), swerve.getPose().getRotation(), swerve.getPose().getRotation()),
 			new PathPoint(new Translation2d(botpose_fieldGoToX_m, botpose_fieldGoToY_m),
 				Rotation2d.fromDegrees(180), Rotation2d.fromDegrees(180)));
 
