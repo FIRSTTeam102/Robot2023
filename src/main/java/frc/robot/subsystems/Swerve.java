@@ -5,6 +5,7 @@ import static frc.robot.constants.SwerveConstants.*;
 import frc.robot.Robot;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOInputsAutoLogged;
+import frc.robot.io.VisionIO.Pipeline;
 import frc.robot.swerve.SwerveModule;
 import frc.robot.swerve.SwerveModuleIOReal;
 import frc.robot.swerve.SwerveModuleIOSim;
@@ -64,7 +65,9 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 	public double translationY;
 	public double translationX;
 
-	public Swerve(GyroIO gyroIO) {
+	private Vision vision;
+
+	public Swerve(GyroIO gyroIO, Vision vision) {
 		modules = new SwerveModule[moduleConstants.length];
 		int moduleNumber = 0;
 		for (var mod : moduleConstants) {
@@ -81,6 +84,8 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 		timer.start();
 
 		SmartDashboard.putData("Field", fieldSim);
+
+		this.vision = vision;
 	}
 
 	/** update and return states */
@@ -256,6 +261,12 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 			// log outputs
 			Logger.getInstance().recordOutput("Swerve/State " + mod.moduleNumber, moduleStates[mod.moduleNumber]);
 		}
+
+		// Every 0.02s, updating pose2d
+		if (vision.inputs.pipeline == Pipeline.AprilTag.value && vision.isPipelineReady())
+			addVisionMeasurement(
+				new Pose2d(vision.inputs.botpose_fieldTranslationX_m, vision.inputs.botpose_fieldTranslationY_m,
+					new Rotation2d(vision.inputs.botpose_fieldRotationZ_rad)));
 
 		// update odometry
 		poseEstimator.updateWithTime(timer.get(), getYaw(), modulePositions);

@@ -75,8 +75,8 @@ public class RobotContainer {
 		: new GyroIOSim();
 
 	/* subsystems */
-	public final Swerve swerve = new Swerve(gyro);
 	public final Vision vision = new Vision();
+	public final Swerve swerve = new Swerve(gyro, vision);
 	public final Arm arm = new Arm();
 	public final Elevator elevator = new Elevator();
 	public final Grabber grabber = new Grabber();
