@@ -62,7 +62,7 @@ public class TeleopSwerve extends CommandBase {
 		maxPercent = overrideSpeedSupplier.getAsBoolean() ? 1.0
 			: 1 - 0.5 * (
 			// bigger coefficient = more of a speed decrease the farther out it is
-			1 * (arm.getCurrentPosition() / maxArmDist_m)
+			1 * (arm.getArmDist_m() / maxArmDist_m)
 				+ 0.5 * ((elevator.inputs.position_m - ArmConstants.dangerZone_m) / ElevatorConstants.maxHeight_m));
 
 		translation = new Translation2d(

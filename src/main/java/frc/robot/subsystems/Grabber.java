@@ -3,8 +3,10 @@ package frc.robot.subsystems;
 import static frc.robot.constants.GrabberConstants.*;
 
 import frc.robot.Robot;
+import frc.robot.util.BuildManager;
 import frc.robot.util.ScoringMechanism2d;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.CANSparkMax;
@@ -21,6 +23,10 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 		motor.setSmartCurrentLimit(smartCurrentLimit_A);
 		motor.setSecondaryCurrentLimit(hardCurrentLimit_A);
 
+		motor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+
+		BuildManager.burnSpark(motor);
+
 		// sim only works with velocity control
 		// if (Robot.isSimulation())
 		// REVPhysicsSim.getInstance().addSparkMax(motor, DCMotor.getNeo550(1));
@@ -35,8 +41,10 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 	}
 
 	public void hold() {
-		motor.set(.12);
+		motor.set(.05);
 	}
+
+	private int overCurrentCounter = 0;
 
 	@Override
 	public void periodic() {
@@ -45,10 +53,14 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 
 		ScoringMechanism2d.setGrabber(inputs.percentOutput);
 
-		// read current once every cycle so results don't change during a cycle
-
-		// if (currentLimitReached)
-		// stop();
+		if (inputs.current_A > smartCurrentLimit_A) {
+			overCurrentCounter++;
+			if (overCurrentCounter > 10) {
+				overCurrentCounter = 0;
+				DriverStation.reportWarning("grabber over current!", false);
+				stop();
+			}
+		}
 	}
 
 	/**

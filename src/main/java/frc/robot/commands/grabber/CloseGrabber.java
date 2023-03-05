@@ -10,37 +10,44 @@ public class CloseGrabber extends CommandBase {
 
 	private double counter;
 
+	/**
+	 * 1st press: run at grab
+	 * 1st hold->release: run at hold
+	 * 2nd press: stop
+	 */
+	public CloseGrabber(Grabber grabber) {
+		this(grabber, 0.3);
+	}
+
 	public CloseGrabber(Grabber grabber, double speed) {
 		this.grabber = grabber;
 		this.speed = speed;
 		addRequirements(grabber);
 	}
 
+	private boolean stop = false;
+
 	@Override
 	public void initialize() {
-		counter = 0;
-	}
+		stop = grabber.inputs.percentOutput > 0;
 
-	@Override
-	public void execute() {
-		counter++;
-
-		if (counter % 4 == 0)
+		if (stop)
 			grabber.stop();
 		else
 			grabber.move(speed);
 	}
 
 	@Override
+	public void execute() {}
+
+	@Override
 	public boolean isFinished() {
-		return counter >= 12;
+		return false;
 	}
 
 	@Override
 	public void end(boolean interrupted) {
-		// if (interrupted)
-		grabber.stop();
-		// else
-		// grabber.hold();
+		if (!stop)
+			grabber.hold();
 	}
 }

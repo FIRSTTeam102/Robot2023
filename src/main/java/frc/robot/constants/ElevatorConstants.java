@@ -12,6 +12,9 @@ public final class ElevatorConstants {
 	public static final double highCubeHeight_m = .973;
 	public static final double doubleSubstationHeight_m = 1.03; // todo:
 
+	public static final double dangerZone_m = .1;
+	public static final double gridSafeZone_m = .7;
+
 	/* ports */
 	public static final int motorId = 11;
 
@@ -49,7 +52,4 @@ public final class ElevatorConstants {
 	public static final double carriageMass_kg = Units
 		.lbsToKilograms(4.893 /* inner elevator */ + 8.166 /* carriage + arm */ + 6 /* grabber */);
 	public static final double drumRadius_m = Units.inchesToMeters(0.5);
-
-	public static final double dangerZone_m = .089;
-	public static final double gridSafeZone_m = .7;
 }

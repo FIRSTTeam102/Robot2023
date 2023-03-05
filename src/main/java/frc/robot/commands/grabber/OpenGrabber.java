@@ -11,6 +11,10 @@ public class OpenGrabber extends CommandBase {
 	private double runTime_s;
 	private double speed;
 
+	public OpenGrabber(Grabber grabber) {
+		this(grabber, 0.2, 0.5);
+	}
+
 	/**
 	 * @param time_s how long to close
 	*/

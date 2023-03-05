@@ -8,7 +8,7 @@ public final class ArmConstants {
 
 	public static final double inExtension_m = .2;
 	public static final double groundExtension_m = .413;
-	public static final double midConeExtension_m = .88;
+	public static final double midConeExtension_m = .82;
 	public static final double midCubeExtension_m = .777;
 	public static final double highConeExtension_m = Units.inchesToMeters(41);
 	public static final double highCubeExtension_m = 1.213;

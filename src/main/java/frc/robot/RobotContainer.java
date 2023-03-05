@@ -16,10 +16,10 @@ import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
 
 import frc.robot.commands.FeedForwardCharacterization;
+import frc.robot.commands.SetElevatorArmPosition;
 import frc.robot.commands.arm.ManualArmControl;
-import frc.robot.commands.arm.SetArmPosition;
 import frc.robot.commands.elevator.ManualElevatorControl;
-import frc.robot.commands.elevator.SetElevatorPosition;
+import frc.robot.commands.elevator.MoveElevatorBy;
 import frc.robot.commands.grabber.CloseGrabber;
 import frc.robot.commands.grabber.OpenGrabber;
 import frc.robot.commands.swerve.ChargeStationBalance;
@@ -38,8 +38,6 @@ import edu.wpi.first.wpilibj.shuffleboard.SendableCameraWrapper;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -145,29 +143,28 @@ public class RobotContainer {
 
 		// move arm/elevator/score
 		operatorConsole.button(4) // double substation
-			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.doubleSubstationHeight_m)
-				.alongWith(new SetArmPosition(arm, ArmConstants.doubleSubstationExtension_m)));
+			.onTrue(new SetElevatorArmPosition(elevator, arm,
+				ElevatorConstants.doubleSubstationHeight_m, ArmConstants.doubleSubstationExtension_m));
 		operatorConsole.button(7) // high cone
-			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.highConeHeight_m)
-				.alongWith(new SetArmPosition(arm, ArmConstants.highConeExtension_m)));
+			.onTrue(new SetElevatorArmPosition(elevator, arm,
+				ElevatorConstants.highConeHeight_m, ArmConstants.highConeExtension_m));
 		// .whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Top, vision, swerve));
 		operatorConsole.button(8) // high cube
-			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.highCubeHeight_m)
-				.alongWith(new SetArmPosition(arm, ArmConstants.highCubeExtension_m)));
+			.onTrue(new SetElevatorArmPosition(elevator, arm,
+				ElevatorConstants.highCubeHeight_m, ArmConstants.highCubeExtension_m));
 		operatorConsole.button(11) // mid cone
-			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.midConeHeight_m)
-				.alongWith(new SetArmPosition(arm, ArmConstants.midConeExtension_m)));
+			.onTrue(new SetElevatorArmPosition(elevator, arm,
+				ElevatorConstants.midConeHeight_m, ArmConstants.midConeExtension_m));
 		// .whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Middle, vision, swerve));
 		operatorConsole.button(12) // mid cube
-			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.midCubeHeight_m)
-				.alongWith(new SetArmPosition(arm, ArmConstants.midCubeExtension_m)));
+			.onTrue(new SetElevatorArmPosition(elevator, arm,
+				ElevatorConstants.midCubeHeight_m, ArmConstants.midCubeExtension_m));
 		operatorConsole.button(15) // all in
-			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.dangerZone_m)
-				.alongWith(new SequentialCommandGroup(new WaitCommand(.2),
-					new SetArmPosition(arm, Arm.nutDistToArmDist(ArmConstants.minNutDist_m)))));
+			.onTrue(new SetElevatorArmPosition(elevator, arm,
+				ElevatorConstants.dangerZone_m, Arm.nutDistToArmDist(ArmConstants.minNutDist_m)));
 		operatorConsole.button(16) // ground
-			.onTrue(new SetElevatorPosition(elevator, ElevatorConstants.groundHeight_m)
-				.alongWith(new SetArmPosition(arm, ArmConstants.groundExtension_m)));
+			.onTrue(new SetElevatorArmPosition(elevator, arm,
+				ElevatorConstants.groundHeight_m, ArmConstants.groundExtension_m));
 
 		operatorConsole.button(5) // aim at game piece
 			.whileTrue(new ObjectDetectionVision(ObjectDetectionVision.Routine.Ground, vision, swerve));
@@ -177,12 +174,15 @@ public class RobotContainer {
 		 */
 		// todo: require trigger pulled to work?
 		arm.setDefaultCommand(new ManualArmControl(arm, () -> -operatorJoystick.getX()));
-		elevator.setDefaultCommand(new ManualElevatorControl(elevator, () -> -operatorJoystick.getY()));
+		elevator.setDefaultCommand(new ManualElevatorControl(elevator, () -> operatorJoystick.getY()));
 		// todo: what happens when both pressed?
 		operatorJoystick.trigger()
-			.whileTrue(new OpenGrabber(grabber, 1, .5));
+			.whileTrue(new CloseGrabber(grabber));
+		operatorJoystick.button(2)
+			.whileTrue(new OpenGrabber(grabber));
 		operatorJoystick.button(3)
-			.toggleOnTrue(new CloseGrabber(grabber, .5));
+			.onTrue(new MoveElevatorBy(elevator, -0.1)
+				.andThen(new OpenGrabber(grabber)));
 	}
 
 	@SuppressWarnings("unused")

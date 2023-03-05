@@ -34,6 +34,9 @@ public class Arm extends SubsystemBase {
 	private double targetPosition_m = 0;
 
 	@Getter
+	private double armDist_m = 0;
+
+	@Getter
 	// is within swerve module bounds so elevator doesn't go down too far
 	private static boolean inDangerZone = false;
 
@@ -86,7 +89,7 @@ public class Arm extends SubsystemBase {
 		updateInputs(inputs);
 		Logger.getInstance().processInputs(getName(), inputs);
 
-		var armDist_m = nutDistToArmDist(inputs.nutPosition_m);
+		armDist_m = nutDistToArmDist(inputs.nutPosition_m);
 		Logger.getInstance().recordOutput("Arm/armDist_m", armDist_m);
 		ScoringMechanism2d.arm.setLength(armDist_m);
 
@@ -95,19 +98,22 @@ public class Arm extends SubsystemBase {
 		// if (inputs.backLimitSwitch)
 		// encoder.setPosition(maxNutDist_m - minNutDist_m);
 
-		// if (inputs.limitSwitch)
-		// encoder.setPosition(minNutDist_m);
+		if (inputs.limitSwitch)
+			encoder.setPosition(minNutDist_m);
 
 		// todo: bake danger zone
 		inDangerZone = (inputs.nutPosition_m < armDistToNutDist(dangerZone_m));
 	}
 
 	public static double armDistToNutDist(double armDistance_m) {
-		return Math.sqrt(Math.pow(armSectionLength_m, 2) - Math.pow(armDistance_m / sectionCount, 2));
+		// make negative distances work
+		var x = Math.pow(armSectionLength_m, 2) - Math.pow(armDistance_m / sectionCount, 2);
+		return Math.copySign(Math.sqrt(Math.abs(x)), x);
 	}
 
 	public static double nutDistToArmDist(double nutDistance_m) {
-		return sectionCount * Math.sqrt(Math.pow(armSectionLength_m, 2) - Math.pow(nutDistance_m, 2));
+		var x = Math.pow(armSectionLength_m, 2) - Math.pow(nutDistance_m, 2);
+		return sectionCount * Math.copySign(Math.sqrt(Math.abs(x)), x);
 	}
 
 	/**
