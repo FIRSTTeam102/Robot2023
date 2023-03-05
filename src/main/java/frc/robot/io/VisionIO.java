@@ -11,7 +11,7 @@ import org.littletonrobotics.junction.AutoLog;
 public class VisionIO {
 	@AutoLog
 	public static class VisionIOInputs {
-		public double target = 0.0;
+		public boolean target = false;
 
 		public double crosshairToTargetErrorX_rad = 0.0;
 		public double crosshairToTargetErrorY_rad = 0.0;
@@ -56,7 +56,7 @@ public class VisionIO {
 	private NetworkTableEntry pipelineEntry = table.getEntry("pipeline");
 
 	public void updateInputs(VisionIOInputs inputs) {
-		inputs.target = tvEntry.getDouble(inputs.target);
+		inputs.target = tvEntry.getDouble(0) == 1;
 
 		inputs.crosshairToTargetErrorX_rad = Math.toRadians(txEntry.getDouble(0));
 		inputs.crosshairToTargetErrorY_rad = Math.toRadians(tyEntry.getDouble(0));

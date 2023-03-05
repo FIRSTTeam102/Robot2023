@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import static frc.robot.constants.SwerveConstants.*;
 
 import frc.robot.Robot;
+import frc.robot.constants.VisionConstants;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOInputsAutoLogged;
 import frc.robot.io.VisionIO.Pipeline;
@@ -263,7 +264,9 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 		}
 
 		// Every 0.02s, updating pose2d
-		if (vision.inputs.pipeline == Pipeline.AprilTag.value && vision.isPipelineReady())
+		if (vision.inputs.pipeline == Pipeline.AprilTag.value && vision.isPipelineReady()
+			&& vision.inputs.botpose_fieldTranslationZ_m < VisionConstants.maxZDistanceAprilTag_m
+			&& vision.inputs.target == true)
 			addVisionMeasurement(
 				new Pose2d(vision.inputs.botpose_fieldTranslationX_m, vision.inputs.botpose_fieldTranslationY_m,
 					new Rotation2d(vision.inputs.botpose_fieldRotationZ_rad)));

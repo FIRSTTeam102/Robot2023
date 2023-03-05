@@ -42,7 +42,8 @@ public class AprilTagVision extends CommandBase {
 		vision.setPipeline(Pipeline.AprilTag);
 
 		// If we are too far away maxZDistanceAprilTag_m from the Apriltag, AprilTagVision will not execute
-		regeneratePaths = vision.inputs.botpose_fieldTranslationZ_m < VisionConstants.maxZDistanceAprilTag_m;
+		regeneratePaths = vision.inputs.botpose_fieldTranslationZ_m < VisionConstants.maxZDistanceAprilTag_m
+			&& vision.inputs.target == true;
 		cancelPPCommand();
 	}
 
@@ -183,12 +184,15 @@ public class AprilTagVision extends CommandBase {
 		// Generate a path using from pose2d to apriltag
 		PathPlannerTrajectory trajectory = PathPlanner.generatePath(
 			new PathConstraints(AutoConstants.maxVelocity_mps, AutoConstants.maxAcceleration_mps2),
-			new PathPoint(swerve.getPose().getTranslation(), swerve.getPose().getRotation()), // start at current pos
+			new PathPoint(swerve.getPose().getTranslation(), swerve.getPose().getRotation(), swerve.getPose().getRotation()), // start
+																																																												// at
+																																																												// current
+																																																												// pos
 			new PathPoint(new Translation2d(botpose_fieldGoToX_m, botpose_fieldGoToY_m),
-				Rotation2d.fromRadians(0)));
+				Rotation2d.fromDegrees(180), Rotation2d.fromDegrees(180)));
 
 		cancelPPCommand();
-		ppCommand = new PathPlannerCommand(trajectory, swerve, false);
+		ppCommand = new PathPlannerCommand(trajectory, swerve, true);
 		ppCommand.schedule();
 
 		regeneratePaths = false;
