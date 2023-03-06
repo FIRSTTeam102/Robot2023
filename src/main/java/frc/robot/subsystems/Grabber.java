@@ -41,7 +41,7 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 	}
 
 	public void hold() {
-		motor.set(.05);
+		motor.set(.1);
 	}
 
 	private int overCurrentCounter = 0;

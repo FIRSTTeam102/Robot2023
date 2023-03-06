@@ -40,6 +40,7 @@ public class SwerveTest {
 			(() -> 0.0),
 			(() -> 0.5),
 			(() -> true),
+			(() -> false),
 			swerve, RobotContainer.getInstance().arm, RobotContainer.getInstance().elevator));
 		when(teleopSwerve.runsWhenDisabled()).thenReturn(true);
 		teleopSwerve.schedule();

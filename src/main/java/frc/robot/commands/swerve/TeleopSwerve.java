@@ -11,7 +11,7 @@ import frc.robot.subsystems.Swerve;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.Commands;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -20,12 +20,18 @@ public class TeleopSwerve extends CommandBase {
 	public boolean fieldRelative = true;
 	public boolean overrideSpeed = false;
 
-	public InstantCommand toggleFieldRelative() {
-		return new InstantCommand(() -> fieldRelative = !fieldRelative);
-	}
+	public CommandBase toggleFieldRelative() {
+		return Commands.runOnce(() -> fieldRelative = !fieldRelative);
+	};
 
-	public InstantCommand zeroYaw() {
-		return new InstantCommand(swerve::zeroYaw);
+	public CommandBase holdToggleFieldRelative() {
+		return Commands.startEnd(
+			() -> fieldRelative = !fieldRelative,
+			() -> fieldRelative = !fieldRelative);
+	};
+
+	public CommandBase zeroYaw() {
+		return Commands.runOnce(swerve::zeroYaw);
 	}
 
 	private Swerve swerve;
@@ -35,17 +41,20 @@ public class TeleopSwerve extends CommandBase {
 	private DoubleSupplier strafeSupplier;
 	private DoubleSupplier turnSupplier;
 	private BooleanSupplier overrideSpeedSupplier;
+	private BooleanSupplier preciseModeSupplier;
 
 	/**
 	 * @param overrideSpeedSupplier forces swerve to run at normal speed when held, instead of slow if scoring mechanism is out
 	 */
 	public TeleopSwerve(DoubleSupplier driveSupplier, DoubleSupplier strafeSupplier, DoubleSupplier turnSupplier,
-		BooleanSupplier overrideSpeedSupplier, Swerve swerve, Arm arm, Elevator elevator) {
+		BooleanSupplier overrideSpeedSupplier, BooleanSupplier preciseModeSupplier, Swerve swerve, Arm arm,
+		Elevator elevator) {
 		addRequirements(swerve);
 		this.driveSupplier = driveSupplier;
 		this.strafeSupplier = strafeSupplier;
 		this.turnSupplier = turnSupplier;
 		this.overrideSpeedSupplier = overrideSpeedSupplier;
+		this.preciseModeSupplier = preciseModeSupplier;
 		this.swerve = swerve;
 		this.arm = arm;
 		this.elevator = elevator;
@@ -65,13 +74,17 @@ public class TeleopSwerve extends CommandBase {
 			1 * (arm.getArmDist_m() / maxArmDist_m)
 				+ 0.5 * ((elevator.inputs.position_m - ArmConstants.dangerZone_m) / ElevatorConstants.maxHeight_m));
 
+		if (preciseModeSupplier.getAsBoolean())
+			maxPercent *= 0.3;
+
 		translation = new Translation2d(
 			modifyAxis(driveSupplier.getAsDouble()),
 			modifyAxis(strafeSupplier.getAsDouble()))
 				.times(SwerveConstants.maxVelocity_mps * maxPercent);
 
 		rotation = modifyAxis(turnSupplier.getAsDouble())
-			* SwerveConstants.maxAngularVelocity_radps;
+			* SwerveConstants.maxAngularVelocity_radps
+			* maxPercent;
 		// * (overrideSpeedSupplier.getAsBoolean() ? 0.7 : 0.5);
 
 		swerve.drive(translation, rotation, fieldRelative);

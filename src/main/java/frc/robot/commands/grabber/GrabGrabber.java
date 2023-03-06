@@ -4,7 +4,7 @@ import frc.robot.subsystems.Grabber;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class CloseGrabber extends CommandBase {
+public class GrabGrabber extends CommandBase {
 	private Grabber grabber;
 	private double speed;
 
@@ -15,11 +15,11 @@ public class CloseGrabber extends CommandBase {
 	 * 1st hold->release: run at hold
 	 * 2nd press: stop
 	 */
-	public CloseGrabber(Grabber grabber) {
+	public GrabGrabber(Grabber grabber) {
 		this(grabber, 0.3);
 	}
 
-	public CloseGrabber(Grabber grabber, double speed) {
+	public GrabGrabber(Grabber grabber, double speed) {
 		this.grabber = grabber;
 		this.speed = speed;
 		addRequirements(grabber);

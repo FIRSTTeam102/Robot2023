@@ -20,8 +20,8 @@ import frc.robot.commands.SetElevatorArmPosition;
 import frc.robot.commands.arm.ManualArmControl;
 import frc.robot.commands.elevator.ManualElevatorControl;
 import frc.robot.commands.elevator.MoveElevatorBy;
-import frc.robot.commands.grabber.CloseGrabber;
-import frc.robot.commands.grabber.OpenGrabber;
+import frc.robot.commands.grabber.GrabGrabber;
+import frc.robot.commands.grabber.ReleaseGrabber;
 import frc.robot.commands.swerve.ChargeStationBalance;
 import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.swerve.XStance;
@@ -115,9 +115,13 @@ public class RobotContainer {
 			() -> -driverController.getLeftY(),
 			() -> -driverController.getLeftX(),
 			() -> -driverController.getRightX(),
-			() -> driverController.getLeftTriggerAxis() > OperatorConstants.boolTriggerThreshold,
+			driverController.getHID()::getLeftBumper, // override speed
+			() -> driverController.getLeftTriggerAxis() > OperatorConstants.boolTriggerThreshold, // preceise mode
 			swerve, arm, elevator);
 		swerve.setDefaultCommand(teleopSwerve);
+
+		driverController.rightTrigger(OperatorConstants.boolTriggerThreshold)
+			.whileTrue(teleopSwerve.holdToggleFieldRelative());
 
 		driverController.a().onTrue(teleopSwerve.toggleFieldRelative());
 		driverController.y().onTrue(teleopSwerve.zeroYaw());
@@ -177,12 +181,12 @@ public class RobotContainer {
 		elevator.setDefaultCommand(new ManualElevatorControl(elevator, () -> operatorJoystick.getY()));
 		// todo: what happens when both pressed?
 		operatorJoystick.trigger()
-			.whileTrue(new CloseGrabber(grabber));
+			.whileTrue(new GrabGrabber(grabber));
 		operatorJoystick.button(2)
-			.whileTrue(new OpenGrabber(grabber));
+			.whileTrue(new ReleaseGrabber(grabber));
 		operatorJoystick.button(3)
-			.onTrue(new MoveElevatorBy(elevator, -0.1)
-				.andThen(new OpenGrabber(grabber)));
+			.onTrue(new MoveElevatorBy(elevator, -0.15)
+				.andThen(new ReleaseGrabber(grabber)));
 	}
 
 	@SuppressWarnings("unused")

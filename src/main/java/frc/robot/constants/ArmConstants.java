@@ -6,13 +6,13 @@ public final class ArmConstants {
 	public static final double minNutDist_m = 0.34925;
 	public static final double maxNutDist_m = Units.inchesToMeters(4.92);
 
-	public static final double inExtension_m = .2;
+	public static final double inExtension_m = 0;
 	public static final double groundExtension_m = .413;
 	public static final double midConeExtension_m = .82;
 	public static final double midCubeExtension_m = .777;
-	public static final double highConeExtension_m = Units.inchesToMeters(41);
+	public static final double highConeExtension_m = 1.308;
 	public static final double highCubeExtension_m = 1.213;
-	public static final double doubleSubstationExtension_m = .9; // todo:
+	public static final double doubleSubstationExtension_m = .382;
 
 	public static final int motorId = 12;
 
