@@ -17,6 +17,7 @@ public interface GyroIO {
 		public double yaw_dps = 0.0;
 		public double roll_deg = 0.0;
 		public double roll_dps = 0.0;
+		public double temperature_C = 0.0;
 	}
 
 	public default void updateInputs(GyroIOInputs inputs) {}

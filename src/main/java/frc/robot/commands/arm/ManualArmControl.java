@@ -1,18 +1,20 @@
 package frc.robot.commands.arm;
 
+import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.subsystems.Arm;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+
+import java.util.function.DoubleSupplier;
 
 public class ManualArmControl extends CommandBase {
 	private Arm arm;
-	private CommandXboxController operatorController;
+	private DoubleSupplier inputSupplier;
 
-	public ManualArmControl(Arm arm, CommandXboxController operatorController) {
+	public ManualArmControl(Arm arm, DoubleSupplier inputSupplier) {
 		this.arm = arm;
-		this.operatorController = operatorController;
+		this.inputSupplier = inputSupplier;
 		addRequirements(arm);
 	}
 
@@ -21,10 +23,12 @@ public class ManualArmControl extends CommandBase {
 
 	@Override
 	public void execute() {
-		double xAxis = operatorController.getRightX();
-		xAxis = MathUtil.applyDeadband(xAxis, .2);
+		// todo: invert input?
+		if (Math.abs(inputSupplier.getAsDouble()) >= OperatorConstants.stickDeadband)
+			arm.inManualMode = true;
 
-		arm.setSpeed((xAxis == 0) ? 0 : scaleInput(xAxis));
+		if (arm.inManualMode)
+			arm.setSpeed(scaleInput(MathUtil.applyDeadband(inputSupplier.getAsDouble(), OperatorConstants.stickDeadband)));
 	}
 
 	@Override
@@ -38,6 +42,8 @@ public class ManualArmControl extends CommandBase {
 	}
 
 	public static double scaleInput(double input) {
-		return Math.copySign(.55 * Math.abs(input) + .4, input);
+		return input == 0
+			? 0
+			: Math.copySign(.55 * Math.abs(input) + .4, input);
 	}
 }

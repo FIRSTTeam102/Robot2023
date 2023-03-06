@@ -2,8 +2,8 @@ package frc.robot.subsystems;
 
 import static frc.robot.constants.ArmConstants.*;
 
-import frc.robot.ScoringMechanism2d;
 import frc.robot.util.BuildManager;
+import frc.robot.util.ScoringMechanism2d;
 import frc.robot.util.SendableSparkMaxPIDController;
 
 import edu.wpi.first.math.MathUtil;
@@ -34,12 +34,17 @@ public class Arm extends SubsystemBase {
 	private double targetPosition_m = 0;
 
 	@Getter
+	private double armDist_m = 0;
+
+	@Getter
 	// is within swerve module bounds so elevator doesn't go down too far
 	private static boolean inDangerZone = false;
 
+	public boolean inManualMode = true;
+
 	public Arm() {
 		limitSwitch.enableLimitSwitch(true);
-		motor.setSoftLimit(SoftLimitDirection.kReverse, (float) minNutDist_m);
+		motor.setSoftLimit(SoftLimitDirection.kReverse, (float) maxNutDist_m);
 		motor.enableSoftLimit(SoftLimitDirection.kReverse, true);
 		// backLimitSwitch.enableLimitSwitch(true);
 
@@ -66,8 +71,8 @@ public class Arm extends SubsystemBase {
 
 		pidController.setReference(
 			MathUtil.clamp(armDistToNutDist(armLength_m),
-				Elevator.isInDangerZone() ? armDistToNutDist(moduleDangerZone_m) : minNutDist_m,
-				maxNutDist_m),
+				Elevator.isInDangerZone() ? armDistToNutDist(dangerZone_m) : maxNutDist_m,
+				minNutDist_m),
 			CANSparkMax.ControlType.kPosition);
 	}
 
@@ -84,7 +89,7 @@ public class Arm extends SubsystemBase {
 		updateInputs(inputs);
 		Logger.getInstance().processInputs(getName(), inputs);
 
-		var armDist_m = nutDistToArmDist(inputs.nutPosition_m);
+		armDist_m = nutDistToArmDist(inputs.nutPosition_m);
 		Logger.getInstance().recordOutput("Arm/armDist_m", armDist_m);
 		ScoringMechanism2d.arm.setLength(armDist_m);
 
@@ -94,18 +99,21 @@ public class Arm extends SubsystemBase {
 		// encoder.setPosition(maxNutDist_m - minNutDist_m);
 
 		if (inputs.limitSwitch)
-			encoder.setPosition(maxNutDist_m);
+			encoder.setPosition(minNutDist_m);
 
 		// todo: bake danger zone
-		inDangerZone = (inputs.nutPosition_m < armDistToNutDist(moduleDangerZone_m));
+		inDangerZone = (inputs.nutPosition_m < armDistToNutDist(dangerZone_m));
 	}
 
 	public static double armDistToNutDist(double armDistance_m) {
-		return Math.sqrt(Math.pow(armSectionLength_m, 2) - Math.pow(armDistance_m / sectionCount, 2));
+		// make negative distances work
+		var x = Math.pow(armSectionLength_m, 2) - Math.pow(armDistance_m / sectionCount, 2);
+		return Math.copySign(Math.sqrt(Math.abs(x)), x);
 	}
 
 	public static double nutDistToArmDist(double nutDistance_m) {
-		return sectionCount * Math.sqrt(Math.pow(armSectionLength_m, 2) - Math.pow(nutDistance_m, 2));
+		var x = Math.pow(armSectionLength_m, 2) - Math.pow(nutDistance_m, 2);
+		return sectionCount * Math.copySign(Math.sqrt(Math.abs(x)), x);
 	}
 
 	/**

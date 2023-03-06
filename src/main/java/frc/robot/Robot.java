@@ -4,9 +4,13 @@ import static frc.robot.constants.Constants.robotMode;
 
 import frc.robot.constants.BuildConstants;
 import frc.robot.subsystems.Lights;
+import frc.robot.util.ScoringMechanism2d;
 
+import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -59,6 +63,7 @@ public class Robot extends LoggedRobot {
 				Logger.getInstance().addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
 			}
 			case ACTIVE -> {
+				// logger.addDataReceiver(new WPILOGWriter("/media/sda2/")); // todo: sd card
 				logger.addDataReceiver(new NT4Publisher()); // publish data to NetworkTables
 				if (isReal()) {
 					LoggedPowerDistribution.getInstance(); // enable power distribution logging
@@ -68,7 +73,17 @@ public class Robot extends LoggedRobot {
 			}
 		}
 
+		// disable LiveWindow telemetry in favor of AdvantageKit to reduce processing each tick
+		LiveWindow.disableAllTelemetry();
+
 		logger.start();
+
+		// forward limelight when connected over USB
+		if (Robot.isReal()) {
+			for (int port = 5800; port <= 5805; port++) {
+				PortForwarder.add(port, "limelight.local", port);
+			}
+		}
 
 		/*
 		 * Instantiate our RobotContainer. This will perform all our button bindings,
@@ -93,6 +108,8 @@ public class Robot extends LoggedRobot {
 		 * block in order for anything in the Command-based framework to work.
 		 */
 		CommandScheduler.getInstance().run();
+
+		Logger.getInstance().recordOutput("Mechanism/Scoring", ScoringMechanism2d.mech);
 	}
 
 	/** This function is called once each time the robot enters Disabled mode. */
@@ -155,6 +172,9 @@ public class Robot extends LoggedRobot {
 		CommandScheduler.getInstance().cancelAll();
 
 		PathPlannerServer.startServer(5811);
+		SmartDashboard.putData("PP x pid", Autos.ppXController);
+		SmartDashboard.putData("PP y pid", Autos.ppYController);
+		SmartDashboard.putData("PP rotation pid", Autos.ppRotationController);
 	}
 
 	/** This function is called periodically during test mode. */

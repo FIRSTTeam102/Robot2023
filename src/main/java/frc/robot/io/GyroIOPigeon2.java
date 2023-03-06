@@ -11,7 +11,7 @@ public class GyroIOPigeon2 implements GyroIO {
 	public GyroIOPigeon2(int deviceNumber) {
 		gyro = new Pigeon2(deviceNumber);
 		gyro.configFactoryDefault();
-		gyro.configMountPose(0, 0, 0);
+		gyro.configMountPose(192.807, 0, 0);
 	}
 
 	@Override
@@ -25,6 +25,7 @@ public class GyroIOPigeon2 implements GyroIO {
 		inputs.pitch_dps = xyz_dps[1];
 		inputs.roll_deg = ypr_deg[2];
 		inputs.roll_dps = xyz_dps[2];
+		inputs.temperature_C = gyro.getTemp();
 	}
 
 	@Override

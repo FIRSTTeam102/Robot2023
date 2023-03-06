@@ -32,7 +32,7 @@ public final class Autos {
 	}
 
 	public static Command simpleWall(Swerve swerve) {
-		List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup("simple wall",
+		List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup("2 piece",
 			new PathConstraints(maxVelocity_mps, maxAcceleration_mps2));
 
 		if (pathGroup == null)

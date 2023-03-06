@@ -16,6 +16,7 @@ public class SetElevatorPosition extends InstantCommand {
 
 	@Override
 	public void initialize() {
+		elevator.inManualMode = false;
 		elevator.setPosition(height_m);
 	}
 }

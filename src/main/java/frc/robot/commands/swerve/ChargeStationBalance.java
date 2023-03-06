@@ -3,19 +3,29 @@ package frc.robot.commands.swerve;
 import frc.robot.constants.SwerveConstants;
 import frc.robot.subsystems.Swerve;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class ChargeStationBalance extends CommandBase {
-	private final double maxSpeed = 0.2 * SwerveConstants.maxVelocity_mps;
-	private final double maxTurn = 0.2 * SwerveConstants.maxAngularVelocity_radps;
+	private final double maxSpeed = 0.005 * SwerveConstants.maxVelocity_mps;
+	private final double maxTurn = 0.005 * SwerveConstants.maxAngularVelocity_radps;
+
+	private final PIDController driveController = new PIDController(0.1, 0, 0.0005);
 
 	Swerve swerve;
 
 	public ChargeStationBalance(Swerve swerve) {
 		this.swerve = swerve;
 		addRequirements(swerve);
+
+		SmartDashboard.putData("balance drive pid", driveController);
+
+		driveController.setTolerance(0.05, 0.05);
+		driveController.setSetpoint(0);
+		driveController.enableContinuousInput(-Math.PI, Math.PI);
 	}
 
 	private double pitch_rad;
@@ -39,7 +49,7 @@ public class ChargeStationBalance extends CommandBase {
 	}
 
 	private boolean withinDeadband(double input) {
-		return withinDeadband(input, 0.05);
+		return withinDeadband(input, 0.03);
 	}
 
 	private double sign(double input) {
@@ -56,15 +66,16 @@ public class ChargeStationBalance extends CommandBase {
 			rollZeroed = withinDeadband(roll_rad);
 
 		// already balanced for now
-		if (pitchZeroed && rollZeroed)
+		if (pitchZeroed && rollZeroed) {
+			swerve.stop();
 			return;
+		}
 
-		double shortestDistance = (Math.abs(pitch_rad) < Math.abs(roll_rad)) ? pitch_rad : roll_rad;
+		double shortestAngle_rad = (Math.abs(pitch_rad) < Math.abs(roll_rad)) ? pitch_rad : roll_rad;
 
 		// todo: pid? to better aim instead of constant speed
 		// todo: move side to side to take up left space
 		// will these move in the right direction?
-		// do we have to deal with field orientation?
 		// track which way we came up? or see which direction yaw is pointed in?
 
 		switch (state) {
@@ -73,7 +84,7 @@ public class ChargeStationBalance extends CommandBase {
 					// move on
 					state = State.balance;
 				else {
-					swerve.drive(new Translation2d(0, 0), maxTurn * sign(shortestDistance), false);
+					swerve.drive(new Translation2d(0, 0), maxTurn * sign(shortestAngle_rad), false);
 					break;
 				}
 			case balance:
@@ -81,8 +92,8 @@ public class ChargeStationBalance extends CommandBase {
 					state = State.turn;
 
 				// fixme: when gyro is actually mounted fix the axises
-				double x = pitchZeroed ? 0.0 : -sign(pitch_rad),
-					y = rollZeroed ? 0.0 : -sign(roll_rad);
+				double x = pitchZeroed ? 0 : driveController.calculate(pitch_rad),
+					y = rollZeroed ? 0 : driveController.calculate(roll_rad);
 
 				swerve.drive(new Translation2d(maxSpeed * x, maxSpeed * y), 0.0, false);
 		}

@@ -12,10 +12,10 @@ import com.revrobotics.CANSparkMax.IdleMode;
 public final class SwerveConstants {
 	// FL, FR, BR, BL
 	public static final SwerveModuleConstants moduleConstants[] = {
-		new SwerveModuleConstants(21, 22, 23, 3.6954),
-		new SwerveModuleConstants(24, 25, 26, 2.5786),
+		new SwerveModuleConstants(21, 22, 23, 3.6938),
+		new SwerveModuleConstants(24, 25, 26, 2.5745),
 		new SwerveModuleConstants(27, 28, 29, 3.0173),
-		new SwerveModuleConstants(30, 31, 32, 2.2473)
+		new SwerveModuleConstants(30, 31, 32, 2.2708)
 	};
 
 	// the left-to-right distance between the drivetrain wheels, should be measured from center to center
@@ -48,6 +48,7 @@ public final class SwerveConstants {
 	public static final boolean angleInverted = true;
 	public static final IdleMode angleIdleMode = IdleMode.kCoast;
 	// public static final double angleMaxPercentOutput = 0.5;
+	public static final double angleRampTime_s = 0.5;
 	public static final boolean angleEncoderInverted = false;
 	// public static final double angleSparkEncoderPositionFactor_rad = (2 * Math.PI);
 	// public static final double angleSparkEncoderVelocityFactor_radps = (2 * Math.PI) / 60.0;
@@ -70,9 +71,9 @@ public final class SwerveConstants {
 	public static final double simDriveKf = 0.0;
 
 	/* angle motor PID values */
-	public static final double angleKp = 4.0; // todo: calibrate
+	public static final double angleKp = 5.7;
 	public static final double angleKi = 0.0;
-	public static final double angleKd = 0.0;
+	public static final double angleKd = 0.05;
 	public static final double angleKf = 0.0;
 	/* sim angle motor PID values */
 	public static final double simAngleKp = 18.0;
@@ -81,9 +82,27 @@ public final class SwerveConstants {
 	public static final double simAngleKf = 0.0;
 
 	/* drive motor characterization (feed forward) */
+	/**
+	 * some of this data seems wonky
+	 * todo: further research
+	 * 
+	 * Count=979
+	 * R2=0.96370
+	 * kS=0.65851
+	 * kV=1.17628
+	 * 
+	 * Count=979
+	 * R2=0.99145
+	 * kS=0.70712
+	 * kV=1.07510
+	 * 
+	 * Count=2181
+	 * R2=0.98878
+	 * kS=0.69428
+	 * kV=1.07837
+	 */
 	public static final double driveKs = 0.0029032;
 	public static final double driveKv = 0.016325;
-	public static final double driveKa = 0.00035285;
 	/* sim drive motor characterization */
 	public static final double simDriveKs = 0.117;
 	public static final double simDriveKv = 0.133;

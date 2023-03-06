@@ -14,15 +14,9 @@ public class SetArmPosition extends InstantCommand {
 		addRequirements(arm);
 	}
 
-	/** sets arm position to 0, esentiallty a reset */
-	public SetArmPosition(Arm arm) {
-		this.armLength_m = 0;
-		this.arm = arm;
-		addRequirements(arm);
-	}
-
 	@Override
 	public void initialize() {
+		arm.inManualMode = false;
 		arm.setPosition(armLength_m);
 	}
 }

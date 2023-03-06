@@ -3,6 +3,7 @@ package frc.robot.io;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
 
 import org.littletonrobotics.junction.AutoLog;
 
@@ -51,12 +52,15 @@ public class VisionIO {
 		inputs.targetArea = taEntry.getDouble(inputs.targetArea);
 
 		botpose_targetspaceCache = botpose_targetspaceEntry.getDoubleArray(botpose_targetspaceCache);
-		inputs.botpose_targetspaceTranslationX_m = botpose_targetspaceCache[0];
-		inputs.botpose_targetspaceTranslationY_m = botpose_targetspaceCache[1];
-		inputs.botpose_targetspaceTranslationZ_m = botpose_targetspaceCache[2];
-		inputs.botpose_targetspaceRotationX_rad = Math.toRadians(botpose_targetspaceCache[3]);
-		inputs.botpose_targetspaceRotationY_rad = Math.toRadians(botpose_targetspaceCache[4]);
-		inputs.botpose_targetspaceRotationZ_rad = Math.toRadians(botpose_targetspaceCache[5]);
+		if (botpose_targetspaceCache.length > 0) {
+			inputs.botpose_targetspaceTranslationX_m = botpose_targetspaceCache[0];
+			inputs.botpose_targetspaceTranslationY_m = botpose_targetspaceCache[1];
+			inputs.botpose_targetspaceTranslationZ_m = botpose_targetspaceCache[2];
+			inputs.botpose_targetspaceRotationX_rad = Math.toRadians(botpose_targetspaceCache[3]);
+			inputs.botpose_targetspaceRotationY_rad = Math.toRadians(botpose_targetspaceCache[4]);
+			inputs.botpose_targetspaceRotationZ_rad = Math.toRadians(botpose_targetspaceCache[5]);
+		} else
+			DriverStation.reportWarning("invalid botpose array from limelight", true);
 
 		inputs.targetAprilTag = tidEntry.getDouble(inputs.targetAprilTag);
 		inputs.targetObject = tclassEntry.getDouble(inputs.targetObject);

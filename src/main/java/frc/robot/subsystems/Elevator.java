@@ -3,9 +3,9 @@ package frc.robot.subsystems;
 import static frc.robot.constants.ElevatorConstants.*;
 
 import frc.robot.Robot;
-import frc.robot.ScoringMechanism2d;
 import frc.robot.constants.Constants;
 import frc.robot.util.BuildManager;
+import frc.robot.util.ScoringMechanism2d;
 import frc.robot.util.SendableSparkMaxPIDController;
 
 import edu.wpi.first.math.MathUtil;
@@ -45,6 +45,8 @@ public class Elevator extends SubsystemBase {
 	@Getter
 	// if within module bounds so arm knows to not go down too far
 	private static boolean inDangerZone = false;
+
+	public boolean inManualMode = true;
 
 	public Elevator() {
 		motor.setIdleMode(IdleMode.kBrake);
@@ -88,7 +90,7 @@ public class Elevator extends SubsystemBase {
 		targetPosition_m = position_m;
 		// double feed = feedforward.calculate();
 		pidController.setReference(
-			MathUtil.clamp(targetPosition_m, Arm.isInDangerZone() ? moduleDangerZone_m : 0, maxHeight_m),
+			MathUtil.clamp(targetPosition_m, Arm.isInDangerZone() ? dangerZone_m : 0, maxHeight_m),
 			ControlType.kPosition, 0, feedForward_V);
 	}
 
@@ -107,7 +109,7 @@ public class Elevator extends SubsystemBase {
 		if (inputs.topSwitch)
 			encoder.setPosition(maxHeight_m);
 
-		inDangerZone = (encoder.getPosition() < moduleDangerZone_m);
+		inDangerZone = (encoder.getPosition() < dangerZone_m);
 	}
 
 	/**

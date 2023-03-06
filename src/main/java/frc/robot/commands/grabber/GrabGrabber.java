@@ -1,14 +1,20 @@
 package frc.robot.commands.grabber;
 
+import static frc.robot.constants.GrabberConstants.grabSpeed;
+
 import frc.robot.subsystems.Grabber;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class CloseGrabber extends CommandBase {
+public class GrabGrabber extends CommandBase {
 	private Grabber grabber;
 	private double speed;
 
-	public CloseGrabber(Grabber grabber, double speed) {
+	public GrabGrabber(Grabber grabber) {
+		this(grabber, grabSpeed);
+	}
+
+	public GrabGrabber(Grabber grabber, double speed) {
 		this.grabber = grabber;
 		this.speed = speed;
 		addRequirements(grabber);
@@ -20,18 +26,12 @@ public class CloseGrabber extends CommandBase {
 	}
 
 	@Override
-	public void execute() {}
-
-	@Override
 	public boolean isFinished() {
-		return grabber.currentLimitReached;
+		return false;
 	}
 
 	@Override
 	public void end(boolean interrupted) {
-		if (interrupted)
-			grabber.stop();
-		else
-			grabber.hold();
+		grabber.hold();
 	}
 }

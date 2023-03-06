@@ -9,7 +9,6 @@ import frc.robot.commands.swerve.TeleopSwerve;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import org.junit.jupiter.api.AfterEach;
@@ -36,10 +35,13 @@ public class SwerveTest {
 
 	@Test
 	public void driverCanTurn() {
-		var driverController = spy(new XboxController(2));
-		when(driverController.getRightX()).thenReturn(0.5);
-
-		var teleopSwerve = spy(new TeleopSwerve(swerve, driverController));
+		var teleopSwerve = spy(new TeleopSwerve(
+			(() -> 0.0),
+			(() -> 0.0),
+			(() -> 0.5),
+			(() -> true),
+			(() -> false),
+			swerve, RobotContainer.getInstance().arm, RobotContainer.getInstance().elevator));
 		when(teleopSwerve.runsWhenDisabled()).thenReturn(true);
 		teleopSwerve.schedule();
 		assertTrue(teleopSwerve.isScheduled());

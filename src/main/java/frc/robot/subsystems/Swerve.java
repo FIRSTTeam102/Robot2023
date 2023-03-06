@@ -122,7 +122,10 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 	 * (like at the start of an autonomous path)
 	 */
 	public void resetOdometry(PathPlannerState state) {
-		setGyroOffset_deg(state.holonomicRotation.getDegrees());
+		// fixme:?
+		// setGyroOffset_deg(state.holonomicRotation.getDegrees());
+		gyroIO.setYaw(state.holonomicRotation.getDegrees() + 180);
+		// gyroIO.setYaw(0);
 
 		// estimatedPoseWithoutGyro = new Pose2d(state.poseMeters.getTranslation(), state.holonomicRotation);
 		poseEstimator.resetPosition(
