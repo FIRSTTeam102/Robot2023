@@ -45,7 +45,7 @@ public class Lights {
 	};
 
 	public enum ControlMode {
-		Off(1), Regular(2), DisabledRed(3), DisabledBlue(4);
+		Off(1), Regular(2), DisabledRed(3), DisabledBlue(4), Cube(5), Cone(6), Victory(7);
 
 		public final int value;
 
