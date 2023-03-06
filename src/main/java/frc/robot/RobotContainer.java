@@ -22,6 +22,7 @@ import frc.robot.commands.elevator.ManualElevatorControl;
 import frc.robot.commands.elevator.MoveElevatorBy;
 import frc.robot.commands.grabber.GrabGrabber;
 import frc.robot.commands.grabber.ReleaseGrabber;
+import frc.robot.commands.grabber.StopGrabber;
 import frc.robot.commands.swerve.ChargeStationBalance;
 import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.swerve.XStance;
@@ -176,7 +177,6 @@ public class RobotContainer {
 		/*
 		 * operator flight stick
 		 */
-		// todo: require trigger pulled to work?
 		arm.setDefaultCommand(new ManualArmControl(arm, () -> -operatorJoystick.getX()));
 		elevator.setDefaultCommand(new ManualElevatorControl(elevator, () -> operatorJoystick.getY()));
 		// todo: what happens when both pressed?
@@ -187,6 +187,8 @@ public class RobotContainer {
 		operatorJoystick.button(3)
 			.onTrue(new MoveElevatorBy(elevator, -0.15)
 				.andThen(new ReleaseGrabber(grabber)));
+		operatorJoystick.button(4)
+			.onTrue(new StopGrabber(grabber));
 	}
 
 	@SuppressWarnings("unused")

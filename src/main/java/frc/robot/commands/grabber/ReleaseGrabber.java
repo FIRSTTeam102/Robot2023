@@ -1,5 +1,7 @@
 package frc.robot.commands.grabber;
 
+import static frc.robot.constants.GrabberConstants.*;
+
 import frc.robot.subsystems.Grabber;
 
 import edu.wpi.first.wpilibj.Timer;
@@ -12,7 +14,7 @@ public class ReleaseGrabber extends CommandBase {
 	private double speed;
 
 	public ReleaseGrabber(Grabber grabber) {
-		this(grabber, 0.15, 0.5);
+		this(grabber, releaseSpeed, releaseTime_s);
 	}
 
 	/**
@@ -28,12 +30,8 @@ public class ReleaseGrabber extends CommandBase {
 	@Override
 	public void initialize() {
 		grabber.move(-speed);
-		timer.reset();
-		timer.start();
+		timer.restart();
 	}
-
-	@Override
-	public void execute() {}
 
 	@Override
 	public void end(boolean interrupted) {
