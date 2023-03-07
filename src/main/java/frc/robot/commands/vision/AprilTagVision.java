@@ -41,9 +41,9 @@ public class AprilTagVision extends CommandBase {
 		// Sets pipeline to Apriltag
 		vision.setPipeline(Pipeline.AprilTag);
 
-		// If we are too far away maxZDistanceAprilTag_m from the Apriltag, AprilTagVision will not execute
-		regeneratePaths = vision.inputs.botpose_fieldTranslationZ_m < VisionConstants.maxZDistanceAprilTag_m
-			&& vision.inputs.target == true;
+		// If see an Apriltag and are within maxZDistanceAprilTag_m from the Apriltag, AprilTagVision will execute
+		regeneratePaths = vision.inputs.target == true
+			&& vision.inputs.botpose_fieldTranslationZ_m < VisionConstants.maxZDistanceAprilTag_m;
 		cancelPPCommand();
 	}
 
@@ -208,7 +208,7 @@ public class AprilTagVision extends CommandBase {
 			if (ppCommand != null && !ppCommand.isFinished())
 				return false;
 		} catch (NullPointerException e) {
-			// the command's initialize is not called before the first time that our isFinished is called
+			// The command's initialize is not called before the first time that our isFinished is called
 			return false;
 		}
 
