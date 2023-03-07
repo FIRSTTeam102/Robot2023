@@ -1,8 +1,4 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
-package frc.robot.commands;
+package frc.robot.commands.scoring;
 
 import frc.robot.constants.ArmConstants;
 import frc.robot.constants.ElevatorConstants;
@@ -23,7 +19,6 @@ public class SetScoringPosition extends InstantCommand {
 	private double armTarget_m;
 
 	public SetScoringPosition(Elevator elevator, Arm arm, double elevatorTarget_m, double armTarget_m) {
-		// Use addRequirements() here to declare subsystem dependencies.
 		this.elevator = elevator;
 		this.arm = arm;
 		this.elevatorTarget_m = elevatorTarget_m;
@@ -32,20 +27,22 @@ public class SetScoringPosition extends InstantCommand {
 		addRequirements(elevator, arm);
 	}
 
-	// Called when the command is initially scheduled.
 	@Override
 	public void initialize() {
 		if ((armTarget_m <= ArmConstants.gridSafeZone_m)
 			&& (Arm.nutDistToArmDist(arm.inputs.nutPosition_m) > ArmConstants.gridSafeZone_m)) {
-			new SequentialCommandGroup(new SetArmPosition(arm, armTarget_m),
+			new SequentialCommandGroup(
+				new SetArmPosition(arm, armTarget_m),
 				new WaitUntilCommand(() -> (Arm.nutDistToArmDist(arm.inputs.nutPosition_m) < ArmConstants.gridSafeZone_m)),
 				new SetElevatorPosition(elevator, elevatorTarget_m))
 					.schedule();
 		} else if ((armTarget_m >= ArmConstants.gridSafeZone_m)
 			&& (Arm.nutDistToArmDist(arm.inputs.nutPosition_m) < ArmConstants.gridSafeZone_m)) {
-			new SequentialCommandGroup(new SetElevatorPosition(elevator, elevatorTarget_m),
+			new SequentialCommandGroup(
+				new SetElevatorPosition(elevator, elevatorTarget_m),
 				new WaitUntilCommand(() -> (elevator.inputs.position_m >= ElevatorConstants.gridSafeZone_m)),
-				new SetArmPosition(arm, armTarget_m)).schedule();
+				new SetArmPosition(arm, armTarget_m))
+					.schedule();
 		} else {
 			new SetElevatorPosition(elevator, elevatorTarget_m).schedule();
 			new SetArmPosition(arm, armTarget_m).schedule();

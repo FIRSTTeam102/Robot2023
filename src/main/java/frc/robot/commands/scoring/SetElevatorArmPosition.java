@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.scoring;
 
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Elevator;
@@ -12,11 +12,16 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 
 public class SetElevatorArmPosition extends ProxyCommand {
 	public SetElevatorArmPosition(Elevator elevator, Arm arm, double elevatorPos_m, double armPos_m) {
-		super(() -> new SetElevatorArmPositionProxied(elevator, arm, elevatorPos_m, armPos_m));
+		super(() -> new SetElevatorArmPositionProxied(elevator, arm, elevatorPos_m, armPos_m, 0));
+	}
+
+	public SetElevatorArmPosition(Elevator elevator, Arm arm, double elevatorPos_m, double armPos_m, double tolerance) {
+		super(() -> new SetElevatorArmPositionProxied(elevator, arm, elevatorPos_m, armPos_m, tolerance));
 	}
 
 	private static class SetElevatorArmPositionProxied extends SequentialCommandGroup {
-		SetElevatorArmPositionProxied(Elevator elevator, Arm arm, double elevatorTarget_m, double armTarget_m) {
+		SetElevatorArmPositionProxied(Elevator elevator, Arm arm, double elevatorTarget_m, double armTarget_m,
+			double tolerance) {
 			elevator.inManualMode = false;
 			arm.inManualMode = false;
 			if (elevatorTarget_m > elevator.inputs.position_m) {
@@ -45,6 +50,11 @@ public class SetElevatorArmPosition extends ProxyCommand {
 						// return Math.abs(arm.getArmDist_m() - armTarget_m) <= 0.1;
 					}),
 					new SetElevatorPosition(elevator, elevatorTarget_m));
+			}
+
+			if (tolerance > 0) {
+				addCommands(new WaitUntilCommand(() -> Math.abs(elevator.inputs.position_m - elevatorTarget_m) < tolerance
+					&& Math.abs(arm.getArmDist_m() - armTarget_m) < tolerance));
 			}
 		}
 	}

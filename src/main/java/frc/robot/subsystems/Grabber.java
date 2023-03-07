@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import static frc.robot.constants.GrabberConstants.*;
 
 import frc.robot.Robot;
+import frc.robot.constants.GrabberConstants;
 import frc.robot.util.BuildManager;
 import frc.robot.util.ScoringMechanism2d;
 
@@ -18,7 +19,7 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 	private CANSparkMax motor = new CANSparkMax(motorId, CANSparkMax.MotorType.kBrushed);
 
 	public Grabber() {
-		motor.setInverted(true);
+		motor.setInverted(false);
 
 		motor.setSmartCurrentLimit(smartCurrentLimit_A);
 		motor.setSecondaryCurrentLimit(hardCurrentLimit_A);
@@ -42,6 +43,16 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 
 	public void hold() {
 		motor.set(holdSpeed);
+	}
+
+	private int grabbedCounter = 0;
+
+	public boolean hasGrabbed() {
+		if (inputs.current_A > GrabberConstants.grabbedCurrent_A)
+			grabbedCounter++;
+		else
+			grabbedCounter = 0;
+		return grabbedCounter > 6;
 	}
 
 	private int overCurrentCounter = 0;

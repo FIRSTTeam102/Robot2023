@@ -18,13 +18,14 @@ import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
 
 import frc.robot.commands.FeedForwardCharacterization;
-import frc.robot.commands.SetElevatorArmPosition;
 import frc.robot.commands.arm.ManualArmControl;
 import frc.robot.commands.elevator.ManualElevatorControl;
 import frc.robot.commands.elevator.MoveElevatorBy;
 import frc.robot.commands.grabber.GrabGrabber;
+import frc.robot.commands.grabber.GrabGrabberUntilGrabbed;
 import frc.robot.commands.grabber.ReleaseGrabber;
 import frc.robot.commands.grabber.StopGrabber;
+import frc.robot.commands.scoring.SetElevatorArmPosition;
 import frc.robot.commands.swerve.ChargeStationBalance;
 import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.swerve.XStance;
@@ -95,7 +96,7 @@ public class RobotContainer {
 
 		// setup autos
 		autoChooser.addDefaultOption("nothing", new InstantCommand());
-		autoChooser.addOption("PP test", Autos.simpleWall(swerve));
+		autoChooser.addOption("2 piece", Autos.runAutoPath("2 piece", this));
 
 		// for testing
 		autoChooser.addOption("drive characterization",
@@ -168,7 +169,7 @@ public class RobotContainer {
 				ElevatorConstants.midCubeHeight_m, ArmConstants.midCubeExtension_m));
 		operatorConsole.button(15) // all in
 			.onTrue(new SetElevatorArmPosition(elevator, arm,
-				ElevatorConstants.dangerZone_m, Arm.nutDistToArmDist(ArmConstants.minNutDist_m)));
+				ElevatorConstants.inHeight_m, ArmConstants.inExtension_m));
 		operatorConsole.button(16) // ground
 			.onTrue(new SetElevatorArmPosition(elevator, arm,
 				ElevatorConstants.groundHeight_m, ArmConstants.groundExtension_m));
@@ -187,10 +188,12 @@ public class RobotContainer {
 		operatorJoystick.button(2)
 			.whileTrue(new ReleaseGrabber(grabber));
 		operatorJoystick.button(3)
-			.onTrue(new MoveElevatorBy(elevator, -0.15)
+			.onTrue(new MoveElevatorBy(elevator, ElevatorConstants.coneMoveDownHeight_m)
 				.andThen(new ReleaseGrabber(grabber)));
 		operatorJoystick.button(4)
 			.onTrue(new StopGrabber(grabber));
+		operatorJoystick.button(5)
+			.onTrue(new GrabGrabberUntilGrabbed(grabber));
 	}
 
 	@SuppressWarnings("unused")

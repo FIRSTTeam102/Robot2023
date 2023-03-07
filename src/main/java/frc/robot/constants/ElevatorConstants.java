@@ -11,9 +11,12 @@ public final class ElevatorConstants {
 	public static final double highConeHeight_m = Units.inchesToMeters(47.95);
 	public static final double highCubeHeight_m = .973;
 	public static final double doubleSubstationHeight_m = .952; // todo:
+	public static final double inHeight_m = .19;
 
-	public static final double dangerZone_m = .13;
+	public static final double dangerZone_m = .11;
 	public static final double gridSafeZone_m = .7;
+
+	public static final double coneMoveDownHeight_m = -0.15;
 
 	/* ports */
 	public static final int motorId = 11;

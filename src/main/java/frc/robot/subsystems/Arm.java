@@ -61,6 +61,8 @@ public class Arm extends SubsystemBase {
 
 		motor.setSecondaryCurrentLimit(40);
 
+		motor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+
 		BuildManager.burnSpark(motor);
 
 		SmartDashboard.putData(new SendableSparkMaxPIDController(pidController, ControlType.kPosition, "arm pid"));
