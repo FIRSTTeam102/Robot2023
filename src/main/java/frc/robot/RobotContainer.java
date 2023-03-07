@@ -14,6 +14,8 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
+import frc.robot.util.Alert;
+import frc.robot.util.Alert.AlertType;
 
 import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.SetElevatorArmPosition;
@@ -240,5 +242,20 @@ public class RobotContainer {
 	 */
 	public Command getAutonomousCommand() {
 		return autoChooser.get();
+	}
+
+	Alert controllerAlert = new Alert("OI not connected/in wrong spots (changed in teleopInit)", AlertType.Error);
+
+	public void updateOIAlert() {
+		if (!driverController.getHID().isConnected()
+			|| driverController.getHID().getName().indexOf("Xbox") < 0
+			|| !operatorConsole.getHID().isConnected()
+			|| operatorConsole.getHID().getName().indexOf("CyController") < 0
+			|| !operatorJoystick.getHID().isConnected()
+			|| operatorJoystick.getHID().getName().indexOf("Logitech") < 0) {
+			controllerAlert.set(true);
+		} else {
+			controllerAlert.set(false);
+		}
 	}
 }
