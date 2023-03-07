@@ -15,7 +15,7 @@ import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
 public class Grabber extends SubsystemBase implements AutoCloseable {
-	private CANSparkMax motor = new CANSparkMax(motorId, CANSparkMax.MotorType.kBrushless);
+	private CANSparkMax motor = new CANSparkMax(motorId, CANSparkMax.MotorType.kBrushed);
 
 	public Grabber() {
 		motor.setInverted(true);
