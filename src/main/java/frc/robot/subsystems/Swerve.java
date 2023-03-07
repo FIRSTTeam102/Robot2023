@@ -271,10 +271,10 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 			&& vision.inputs.botpose_fieldTranslationZ_m < VisionConstants.maxZDistanceAprilTag_m) {
 			var visionPose = new Pose2d(vision.inputs.botpose_fieldTranslationX_m, vision.inputs.botpose_fieldTranslationY_m,
 				new Rotation2d(vision.inputs.botpose_fieldRotationZ_rad));
-			if (Math.abs(vision.inputs.botpose_fieldTranslationX_m - translationX) < VisionConstants.poseError_m
-				&& Math.abs(vision.inputs.botpose_fieldTranslationY_m - translationY) < VisionConstants.poseError_m) {
-				poseEstimator.addVisionMeasurement(visionPose, timer.get());
-			}
+			// if (Math.abs(vision.inputs.botpose_fieldTranslationX_m - translationX) < VisionConstants.poseError_m
+			// && Math.abs(vision.inputs.botpose_fieldTranslationY_m - translationY) < VisionConstants.poseError_m) {
+			poseEstimator.addVisionMeasurement(visionPose, timer.get());
+			// }
 		}
 
 		Logger.getInstance().recordOutput("Odometry/Robot", pose);

@@ -1,6 +1,5 @@
 package frc.robot.commands.vision;
 
-import frc.robot.constants.AutoConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.io.VisionIO.Pipeline;
 import frc.robot.subsystems.Swerve;
@@ -183,7 +182,7 @@ public class AprilTagVision extends CommandBase {
 
 		// Generate a path using from pose2d to apriltag
 		PathPlannerTrajectory trajectory = PathPlanner.generatePath(
-			new PathConstraints(AutoConstants.maxVelocity_mps, AutoConstants.maxAcceleration_mps2),
+			new PathConstraints(2, 1.0),
 			new PathPoint(swerve.getPose().getTranslation(), swerve.getPose().getRotation(), swerve.getPose().getRotation()),
 			new PathPoint(new Translation2d(botpose_fieldGoToX_m, botpose_fieldGoToY_m),
 				Rotation2d.fromDegrees(180), Rotation2d.fromDegrees(180)));
@@ -199,6 +198,7 @@ public class AprilTagVision extends CommandBase {
 	@Override
 	public void end(boolean interrupted) {
 		cancelPPCommand();
+		swerve.stop();
 	}
 
 	// AprilTagVision.java does not end automatically if PathPlannerCommand.java is running
