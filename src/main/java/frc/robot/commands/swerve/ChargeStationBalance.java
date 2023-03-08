@@ -17,6 +17,22 @@ public class ChargeStationBalance extends CommandBase {
 
 	Swerve swerve;
 
+	public void geofence(double bluetopy, double bluebottomy, double blueleftx, double bluerightx, double redtopy,
+		double redbottomy, double redleftx, double redrightx) {
+		if (swerve.translationY > bluetopy - SwerveConstants.robotfence
+			&& swerve.translationY < bluebottomy - SwerveConstants.robotfence
+			&& swerve.translationX > blueleftx - SwerveConstants.robotfence
+			&& swerve.translationX < bluerightx - SwerveConstants.robotfence
+			&& swerve.translationY > redtopy - SwerveConstants.robotfence
+			&& swerve.translationY < redbottomy - SwerveConstants.robotfence
+			&& swerve.translationX > redleftx - SwerveConstants.robotfence
+			&& swerve.translationX < redrightx - SwerveConstants.robotfence) {
+
+		} else {
+
+		}
+	}
+
 	public ChargeStationBalance(Swerve swerve) {
 		this.swerve = swerve;
 		addRequirements(swerve);

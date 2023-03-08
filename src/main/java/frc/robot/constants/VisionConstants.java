@@ -1,13 +1,17 @@
 package frc.robot.constants;
 
 public final class VisionConstants {
-	/* apriltag grid */
-	public static final double zDistanceGridAprilTag_m = 0.4064;
-	public static final double xDistanceGridAprilTag_m = 0.5334;
-	public static final double maxZDistanceGridAprilTag_m = 1.778;
+	/* AprilTagVision */
+	public static final double maxZDistanceAprilTag_m = 1.8934684 /* grid to charge station */
+		- 0.5334; /* limelight to front bumper */
+	public static final double poseError_m = 1; // comparing visionPose to pose
 
-	/* apriltag substation */
-	public static final double zDistanceSubstationAprilTag_m = 0.4064;
-	public static final double xDistanceSubstationAprilTag_m = 1.016;
-	public static final double maxZDistanceSubstationAprilTag_m = 3.048;
+	/* RetroreflectiveVision */
+	public static final double rotateKp = 0;
+	public static final double rotateKd = 0;
+	public static final double crosshairTargetBoundRotateX_rad = 0.035;
+
+	/* ObjectDetectionVision */
+	public static final double crosshairObjectBoundTranslateZ_m = 0.559;
+	public static final double crosshairObjectBoundRotateX_rad = 0.035;
 };

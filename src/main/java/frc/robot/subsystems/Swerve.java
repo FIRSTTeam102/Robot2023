@@ -3,8 +3,10 @@ package frc.robot.subsystems;
 import static frc.robot.constants.SwerveConstants.*;
 
 import frc.robot.Robot;
+import frc.robot.constants.VisionConstants;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOInputsAutoLogged;
+import frc.robot.io.VisionIO.Pipeline;
 import frc.robot.swerve.SwerveModule;
 import frc.robot.swerve.SwerveModuleIOReal;
 import frc.robot.swerve.SwerveModuleIOSim;
@@ -61,7 +63,12 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 	public GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
 	private double gyroOffset_deg = 0.0;
 
-	public Swerve(GyroIO gyroIO) {
+	public double translationY;
+	public double translationX;
+
+	private Vision vision;
+
+	public Swerve(GyroIO gyroIO, Vision vision) {
 		modules = new SwerveModule[moduleConstants.length];
 		int moduleNumber = 0;
 		for (var mod : moduleConstants) {
@@ -78,6 +85,8 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 		timer.start();
 
 		SmartDashboard.putData("Field", fieldSim);
+
+		this.vision = vision;
 	}
 
 	/** update and return states */
@@ -131,10 +140,6 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 		poseEstimator.resetPosition(
 			getYaw(), getPositions(),
 			new Pose2d(state.poseMeters.getTranslation(), state.holonomicRotation));
-	}
-
-	public void addVisionMeasurement(Pose2d pose) {
-		poseEstimator.addVisionMeasurement(pose, timer.get());
 	}
 
 	/** @return gyro yaw including code offset */
@@ -257,7 +262,20 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 		// update odometry
 		poseEstimator.updateWithTime(timer.get(), getYaw(), modulePositions);
 		var pose = poseEstimator.getEstimatedPosition();
+		translationY = pose.getY();
+		translationX = pose.getX();
 		// todo: estimate without using gyro?
+
+		// Every 0.02s, updating pose2d
+		if (vision.inputs.pipeline == Pipeline.AprilTag.value && vision.isPipelineReady() && vision.inputs.target == true
+			&& vision.inputs.botpose_fieldTranslationZ_m < VisionConstants.maxZDistanceAprilTag_m) {
+			var visionPose = new Pose2d(vision.inputs.botpose_fieldTranslationX_m, vision.inputs.botpose_fieldTranslationY_m,
+				new Rotation2d(vision.inputs.botpose_fieldRotationZ_rad));
+			// if (Math.abs(vision.inputs.botpose_fieldTranslationX_m - translationX) < VisionConstants.poseError_m
+			// && Math.abs(vision.inputs.botpose_fieldTranslationY_m - translationY) < VisionConstants.poseError_m) {
+			poseEstimator.addVisionMeasurement(visionPose, timer.get());
+			// }
+		}
 
 		Logger.getInstance().recordOutput("Odometry/Robot", pose);
 		// Logger.getInstance().recordOutput("3DField", new Pose3d(pose));

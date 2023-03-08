@@ -5,6 +5,9 @@ import static frc.robot.constants.AutoConstants.*;
 import frc.robot.constants.AutoConstants;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.ScoringPosition;
+import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Swerve;
 
 import frc.robot.commands.arm.SetArmPosition;
@@ -42,24 +45,24 @@ public final class Autos {
 		return Commands.deadline(Commands.waitSeconds(time_s), commands);
 	}
 
-	public static Command allIn(RobotContainer robo) {
-		return new SetScoringPosition(robo.elevator, robo.arm, ScoringPosition.AllIn, AutoConstants.tolerance_m);
+	public static Command allIn(Elevator elevator, Arm arm) {
+		return new SetScoringPosition(elevator, arm, ScoringPosition.AllIn, AutoConstants.tolerance_m);
 	}
 
-	public static Command intakeGround(RobotContainer robo) {
+	public static Command intakeGround(Elevator elevator, Arm arm, Grabber grabber) {
 		return Commands.sequence(
 			// both sets are async
-			new SetArmPosition(robo.arm, ScoringPosition.Ground.armExtension_m),
-			new SetElevatorPosition(robo.elevator, ScoringPosition.Ground.elevatorHeight_m),
-			new GrabGrabberUntilGrabbed(robo.grabber));
+			new SetArmPosition(arm, ScoringPosition.Ground.armExtension_m),
+			new SetElevatorPosition(elevator, ScoringPosition.Ground.elevatorHeight_m),
+			new GrabGrabberUntilGrabbed(grabber));
 	}
 
-	public static Command score(RobotContainer robo, ScoringPosition pos) {
+	public static Command score(Elevator elevator, Arm arm, Grabber grabber, ScoringPosition pos) {
 		var sequence = new SequentialCommandGroup(
-			new SetScoringPosition(robo.elevator, robo.arm, pos, 0.1));
+			new SetScoringPosition(elevator, arm, pos, 0.1));
 		if (pos.moveDown)
-			sequence.addCommands(new MoveElevatorBy(robo.elevator, ElevatorConstants.coneMoveDownHeight_m));
-		sequence.addCommands(new ReleaseGrabber(robo.grabber));
+			sequence.addCommands(new MoveElevatorBy(elevator, ElevatorConstants.coneMoveDownHeight_m));
+		sequence.addCommands(new ReleaseGrabber(grabber));
 		return sequence;
 	}
 
@@ -79,13 +82,13 @@ public final class Autos {
 			return new PrintCommand("no path group");
 
 		return new SequentialCommandGroup(
-			score(robo, ScoringPosition.MidCone),
-			allIn(robo),
+			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCone),
+			allIn(robo.elevator, robo.arm),
 			runAutoPath(path.get(0), robo.swerve, true),
-			intakeGround(robo),
-			allIn(robo),
+			intakeGround(robo.elevator, robo.arm, robo.grabber),
+			allIn(robo.elevator, robo.arm),
 			runAutoPath(path.get(1), robo.swerve),
-			score(robo, ScoringPosition.HighCube),
-			allIn(robo));
+			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.HighCube),
+			allIn(robo.elevator, robo.arm));
 	}
 }

@@ -30,6 +30,7 @@ import frc.robot.commands.swerve.ChargeStationBalance;
 import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.swerve.XStance;
 import frc.robot.commands.vision.AprilTagVision;
+import frc.robot.commands.vision.GamePieceVision;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.HttpCamera;
@@ -77,8 +78,8 @@ public class RobotContainer {
 		: new GyroIOSim();
 
 	/* subsystems */
-	public final Swerve swerve = new Swerve(gyro);
 	public final Vision vision = new Vision();
+	public final Swerve swerve = new Swerve(gyro, vision);
 	public final Arm arm = new Arm();
 	public final Elevator elevator = new Elevator();
 	public final Grabber grabber = new Grabber();
@@ -140,25 +141,25 @@ public class RobotContainer {
 		 * R13 R14 R15 B16
 		 */
 
-		// go to grid (green)
-		operatorConsole.button(1)
-			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Left, vision, swerve));
-		operatorConsole.button(2)
-			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Middle, vision, swerve));
-		operatorConsole.button(3)
-			.whileTrue(new AprilTagVision(AprilTagVision.Routine.Right, vision, swerve));
+		// swerve to grid or double substation. swerve/arm/elevator game piece (green)
+		operatorConsole.button(1) // left grid or left double substation
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.BlueRedGridDoublesubstationLeft, vision, swerve));
+		operatorConsole.button(2) // middle grid
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.BlueRedGridMiddle, vision, swerve));
+		operatorConsole.button(3) // right grid or right double substation
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.BlueRedGridDoublesubstationRight, vision, swerve));
 
-		// move arm/elevator/score
+		// swerve or/and arm/elevator to grid or double substation (blue + orange)
 		operatorConsole.button(4) // double substation
 			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.DoubleSubstation));
 		operatorConsole.button(7) // high cone
 			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.HighCone));
-		// .whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Top, vision, swerve));
+		// .whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.BlueRedGridTop, vision, swerve));
 		operatorConsole.button(8) // high cube
 			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.HighCube));
 		operatorConsole.button(11) // mid cone
 			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.MidCone));
-		// .whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Middle, vision, swerve));
+		// .whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.BlueRedGridMiddle, vision, swerve));
 		operatorConsole.button(12) // mid cube
 			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.MidCube));
 		operatorConsole.button(15) // all in
@@ -166,8 +167,8 @@ public class RobotContainer {
 		operatorConsole.button(16) // ground
 			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.Ground));
 
-		// operatorConsole.button(5) // aim at game piece
-		// .whileTrue(new ObjectDetectionVision(ObjectDetectionVision.Routine.Ground, vision, swerve));
+		operatorConsole.button(5) // aim at game piece
+			.whileTrue(new GamePieceVision(GamePieceVision.Routine.Gamepiece, vision, elevator, arm, grabber, swerve));
 
 		/*
 		 * operator flight stick
@@ -190,6 +191,9 @@ public class RobotContainer {
 
 	@SuppressWarnings("unused")
 	private void configureCameras() {
+		if (!Robot.isReal())
+			return;
+
 		// camera
 		try {
 			var camera = CameraServer.startAutomaticCapture("arm", 0);
