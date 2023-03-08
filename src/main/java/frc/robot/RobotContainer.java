@@ -1,11 +1,11 @@
 package frc.robot;
 
-import frc.robot.constants.ArmConstants;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.CameraConstants;
 import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.constants.Constants.ShuffleboardConstants;
 import frc.robot.constants.ElevatorConstants;
+import frc.robot.constants.ScoringPosition;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
@@ -25,12 +25,11 @@ import frc.robot.commands.grabber.GrabGrabber;
 import frc.robot.commands.grabber.GrabGrabberUntilGrabbed;
 import frc.robot.commands.grabber.ReleaseGrabber;
 import frc.robot.commands.grabber.StopGrabber;
-import frc.robot.commands.scoring.SetElevatorArmPosition;
+import frc.robot.commands.scoring.SetScoringPosition;
 import frc.robot.commands.swerve.ChargeStationBalance;
 import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.swerve.XStance;
 import frc.robot.commands.vision.AprilTagVision;
-import frc.robot.commands.vision.ObjectDetectionVision;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.HttpCamera;
@@ -96,7 +95,7 @@ public class RobotContainer {
 
 		// setup autos
 		autoChooser.addDefaultOption("nothing", new InstantCommand());
-		autoChooser.addOption("2 piece", Autos.runAutoPath("2 piece", this));
+		autoChooser.addOption("2 piece", Autos.two(this));
 
 		// for testing
 		autoChooser.addOption("drive characterization",
@@ -151,31 +150,24 @@ public class RobotContainer {
 
 		// move arm/elevator/score
 		operatorConsole.button(4) // double substation
-			.onTrue(new SetElevatorArmPosition(elevator, arm,
-				ElevatorConstants.doubleSubstationHeight_m, ArmConstants.doubleSubstationExtension_m));
+			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.DoubleSubstation));
 		operatorConsole.button(7) // high cone
-			.onTrue(new SetElevatorArmPosition(elevator, arm,
-				ElevatorConstants.highConeHeight_m, ArmConstants.highConeExtension_m));
+			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.HighCone));
 		// .whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Top, vision, swerve));
 		operatorConsole.button(8) // high cube
-			.onTrue(new SetElevatorArmPosition(elevator, arm,
-				ElevatorConstants.highCubeHeight_m, ArmConstants.highCubeExtension_m));
+			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.HighCube));
 		operatorConsole.button(11) // mid cone
-			.onTrue(new SetElevatorArmPosition(elevator, arm,
-				ElevatorConstants.midConeHeight_m, ArmConstants.midConeExtension_m));
+			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.MidCone));
 		// .whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.Middle, vision, swerve));
 		operatorConsole.button(12) // mid cube
-			.onTrue(new SetElevatorArmPosition(elevator, arm,
-				ElevatorConstants.midCubeHeight_m, ArmConstants.midCubeExtension_m));
+			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.MidCube));
 		operatorConsole.button(15) // all in
-			.onTrue(new SetElevatorArmPosition(elevator, arm,
-				ElevatorConstants.inHeight_m, ArmConstants.inExtension_m));
+			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.AllIn));
 		operatorConsole.button(16) // ground
-			.onTrue(new SetElevatorArmPosition(elevator, arm,
-				ElevatorConstants.groundHeight_m, ArmConstants.groundExtension_m));
+			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.Ground));
 
-		operatorConsole.button(5) // aim at game piece
-			.whileTrue(new ObjectDetectionVision(ObjectDetectionVision.Routine.Ground, vision, swerve));
+		// operatorConsole.button(5) // aim at game piece
+		// .whileTrue(new ObjectDetectionVision(ObjectDetectionVision.Routine.Ground, vision, swerve));
 
 		/*
 		 * operator flight stick
