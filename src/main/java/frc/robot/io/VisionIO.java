@@ -31,6 +31,7 @@ public class VisionIO {
 		public double botpose_fieldRotationX_rad = 0.0;
 		public double botpose_fieldRotationY_rad = 0.0;
 		public double botpose_fieldRotationZ_rad = 0.0;
+		public double botpose_latency_s = 0.0;
 
 		public double targetAprilTag = 0.0;
 		public double targetObject = 0.0;
@@ -50,7 +51,7 @@ public class VisionIO {
 	private double[] botpose_targetspaceCache = new double[6];
 
 	private NetworkTableEntry botpose_fieldEntry = table.getEntry("botpose");
-	private double[] botpose_fieldCache = new double[6];
+	private double[] botpose_fieldCache = new double[7];
 
 	private NetworkTableEntry tidEntry = table.getEntry("tid");
 	private NetworkTableEntry tclassEntry = table.getEntry("tclass");
@@ -81,6 +82,7 @@ public class VisionIO {
 		inputs.botpose_fieldRotationX_rad = Math.toRadians(botpose_fieldCache[3]);
 		inputs.botpose_fieldRotationY_rad = Math.toRadians(botpose_fieldCache[4]);
 		inputs.botpose_fieldRotationZ_rad = Math.toRadians(botpose_fieldCache[5]);
+		inputs.botpose_latency_s = 1000 * botpose_fieldCache[6];
 
 		inputs.targetAprilTag = tidEntry.getDouble(inputs.targetAprilTag);
 		inputs.targetObject = tclassEntry.getDouble(inputs.targetObject);

@@ -12,10 +12,10 @@ public class RetroreflectiveVision extends CommandBase {
 	private Routine routine;
 	private Vision vision;
 	private Swerve swerve;
-	private double robotRotateVelocity_mps;
+	private double robotTranslateVelocity_mps;
 
 	public enum Routine {
-		BlueRedGridMiddle, BlueRedGridTop
+		BlueRedGridLeftRight
 	}
 
 	public RetroreflectiveVision(Routine routine, Vision vision, Swerve swerve) {
@@ -36,36 +36,40 @@ public class RetroreflectiveVision extends CommandBase {
 		if (!vision.isPipelineReady())
 			return;
 
-		// robotRotateVelocity_mps and PID loop using PIDcontroller class
-		// vision.inputs.crosshairToTargetErrorX_rad and VisionConstants.crosshairTargetBoundRotateX_rad
-
 		// When we see a grid retroreflective, we will rotate to it
 		switch (routine) {
-			case BlueRedGridMiddle:
-				System.out.println("Swerve --> BlueRedGridMiddle, Elevator --> BlueRedGridNodeMiddle");
-				System.out.println("crosshairToTargetErrorX_rad: " + vision.inputs.crosshairToTargetErrorX_rad);
-				swerve.drive(new Translation2d(0, 0), robotRotateVelocity_mps, false);
+			case BlueRedGridLeftRight:
+				if (-VisionConstants.crosshairTargetBoundTranslateX_rad > vision.inputs.crosshairToTargetErrorX_rad) {
+					robotTranslateVelocity_mps = VisionConstants.retroreflectiveTranslateKp
+						* -vision.inputs.crosshairToTargetErrorX_rad
+						- VisionConstants.retroreflectiveTranslateKd;
+				} else if (vision.inputs.crosshairToTargetErrorX_rad > VisionConstants.crosshairTargetBoundTranslateX_rad) {
+					robotTranslateVelocity_mps = VisionConstants.retroreflectiveTranslateKp
+						* vision.inputs.crosshairToTargetErrorX_rad
+						+ VisionConstants.retroreflectiveTranslateKd;
+				}
 				break;
 
-			case BlueRedGridTop:
-				System.out.println("Swerve --> BlueRedGridTop, Elevator --> BlueRedGridNodeTop");
-				System.out.println("crosshairToTargetErrorX_rad: " + vision.inputs.crosshairToTargetErrorX_rad);
-				swerve.drive(new Translation2d(0, 0), robotRotateVelocity_mps, false);
-				break;
+			default:
+				return;
 		}
+
+		// Generate a translation to retroreflective
+		System.out.println("Swerve --> BlueRedGridLeftRight");
+		swerve.drive(new Translation2d(robotTranslateVelocity_mps, 0), 0, false);
 	}
 
-	// Stop swerve and sets pipeline back to Apriltag
+	// Stop swerve and set pipeline back to Apriltag
 	@Override
 	public void end(boolean interrupted) {
 		swerve.stop();
 		vision.setPipeline(Pipeline.AprilTag);
 	}
 
-	// Feedback loop for PID until we meet crosshairTargetBoundRotateX_rad
+	// Feedback loop for PD until we meet crosshairTargetBoundRotateX_rad
 	@Override
 	public boolean isFinished() {
-		return ((-VisionConstants.crosshairTargetBoundRotateX_rad < vision.inputs.crosshairToTargetErrorX_rad)
-			&& (vision.inputs.crosshairToTargetErrorX_rad < VisionConstants.crosshairTargetBoundRotateX_rad));
+		return ((-VisionConstants.crosshairTargetBoundTranslateX_rad < vision.inputs.crosshairToTargetErrorX_rad)
+			&& (vision.inputs.crosshairToTargetErrorX_rad < VisionConstants.crosshairTargetBoundTranslateX_rad));
 	}
 }

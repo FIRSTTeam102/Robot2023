@@ -31,6 +31,7 @@ import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.swerve.XStance;
 import frc.robot.commands.vision.AprilTagVision;
 import frc.robot.commands.vision.GamePieceVision;
+import frc.robot.commands.vision.RetroreflectiveVision;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.HttpCamera;
@@ -162,13 +163,13 @@ public class RobotContainer {
 		operatorConsole.button(4) // double substation
 			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.DoubleSubstation));
 		operatorConsole.button(7) // high cone
-			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.HighCone));
-		// .whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.BlueRedGridTop, vision, swerve));
+			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.HighCone))
+			.whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.BlueRedGridLeftRight, vision, swerve));
 		operatorConsole.button(8) // high cube
 			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.HighCube));
 		operatorConsole.button(11) // mid cone
-			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.MidCone));
-		// .whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.BlueRedGridMiddle, vision, swerve));
+			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.MidCone))
+			.whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.BlueRedGridLeftRight, vision, swerve));
 		operatorConsole.button(12) // mid cube
 			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.MidCube));
 		operatorConsole.button(15) // all in
@@ -177,7 +178,7 @@ public class RobotContainer {
 			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.Ground));
 
 		operatorConsole.button(5) // aim at game piece
-			.whileTrue(new GamePieceVision(GamePieceVision.Routine.Gamepiece, vision, elevator, arm, grabber, swerve));
+			.whileTrue(new GamePieceVision(GamePieceVision.Routine.GamepieceGround, vision, swerve, elevator, arm, grabber));
 
 		/*
 		 * operator flight stick

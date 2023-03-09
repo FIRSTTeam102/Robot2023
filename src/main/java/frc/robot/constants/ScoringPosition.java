@@ -3,6 +3,7 @@ package frc.robot.constants;
 // @formatter:off
 public enum ScoringPosition {
 	Ground(0, .413),
+	GroundFar(0, .82),
 	MidCube(.702, .777),
 	MidCone(.9652, .82, true),
 	HighCube(.973, 1.213),

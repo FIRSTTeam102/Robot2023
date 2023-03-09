@@ -50,11 +50,19 @@ public final class Autos {
 		return new SetScoringPosition(elevator, arm, ScoringPosition.AllIn, AutoConstants.tolerance_m);
 	}
 
-	public static Command intakeGround(Elevator elevator, Arm arm, Grabber grabber) {
+	public static Command intakeGroundClose(Elevator elevator, Arm arm, Grabber grabber) {
 		return Commands.sequence(
 			// both sets are async
 			new SetArmPosition(arm, ScoringPosition.Ground.armExtension_m),
 			new SetElevatorPosition(elevator, ScoringPosition.Ground.elevatorHeight_m),
+			new GrabGrabberUntilGrabbed(grabber));
+	}
+
+	public static Command intakeGroundFar(Elevator elevator, Arm arm, Grabber grabber) {
+		return Commands.sequence(
+			// both sets are async
+			new SetArmPosition(arm, ScoringPosition.GroundFar.armExtension_m),
+			new SetElevatorPosition(elevator, ScoringPosition.GroundFar.elevatorHeight_m),
 			new GrabGrabberUntilGrabbed(grabber));
 	}
 
@@ -90,7 +98,7 @@ public final class Autos {
 			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCone),
 			allIn(robo.elevator, robo.arm),
 			runAutoPath(path.get(0), robo.swerve, true),
-			intakeGround(robo.elevator, robo.arm, robo.grabber),
+			intakeGroundClose(robo.elevator, robo.arm, robo.grabber),
 			allIn(robo.elevator, robo.arm),
 			runAutoPath(path.get(1), robo.swerve),
 			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.HighCube),

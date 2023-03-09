@@ -38,7 +38,7 @@ public class Vision extends SubsystemBase {
 
 	// Allows AprilTag commands to begin after pipeline switch time error
 	public boolean isPipelineReady() {
-		if (lastPipeline == inputs.pipeline || pipelineSwitchTimer.hasElapsed(0.5)) {
+		if (lastPipeline == inputs.pipeline || pipelineSwitchTimer.hasElapsed(0.9)) {
 			pipelineSwitchTimer.stop();
 			lastPipeline = inputs.pipeline;
 			return true;

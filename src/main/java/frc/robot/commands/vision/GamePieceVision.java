@@ -15,25 +15,23 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class GamePieceVision extends CommandBase {
 	private Routine routine;
 	private Vision vision;
+	private Swerve swerve;
 	private Elevator elevator;
 	private Arm arm;
 	private Grabber grabber;
-	private Swerve swerve;
 	private double robotRotateVelocity_mps;
-	private double robotTranslateVelocity_mps;
 
 	public enum Routine {
-		Gamepiece
+		GamepieceGround
 	}
 
-	public GamePieceVision(Routine routine, Vision vision, Elevator elevator, Arm arm, Grabber grabber,
-		Swerve swerve) {
+	public GamePieceVision(Routine routine, Vision vision, Swerve swerve, Elevator elevator, Arm arm, Grabber grabber) {
 		this.routine = routine;
 		this.vision = vision;
+		this.swerve = swerve;
 		this.elevator = elevator;
 		this.arm = arm;
 		this.grabber = grabber;
-		this.swerve = swerve;
 	}
 
 	@Override
@@ -48,36 +46,42 @@ public class GamePieceVision extends CommandBase {
 		if (!vision.isPipelineReady())
 			return;
 
-		// robotRotateVelocity_mps and PID loop using PIDcontroller class
-		// vision.inputs.crosshairToTargetErrorX_rad and VisionConstants.crosshairTargetBoundRotateX_rad
-
-		// robotTranslateVelocity_mps and PID loop using PIDcontroller class
-		// vision.inputs.botpose_targetspaceTranslationZ_m and VisionConstants.crosshairObjectBoundTranslateZ_m
-
-		// When we see a ground gamepiece, we will translate and rotate to it and put elevator down and put scissor arm out
+		// When we see a ground gamepiece, we will rotate to it
 		switch (routine) {
-			case Gamepiece:
-				System.out.println("Swerve --> Gamepiece, Elevator --> Gamepiece, Arm --> Gamepiece, Grabber --> Gamepiece");
-				System.out.println("botpose_targetspaceRotationZ_rad: " + vision.inputs.botpose_fieldRotationZ_rad
-					+ " crosshairToTargetErrorX_rad: " + vision.inputs.crosshairToTargetErrorX_rad);
-				swerve.drive(new Translation2d(0, robotTranslateVelocity_mps), robotRotateVelocity_mps, false);
-				Autos.intakeGround(elevator, arm, grabber).schedule();
+			case GamepieceGround:
+				if (-VisionConstants.crosshairGamePieceBoundRotateX_rad > vision.inputs.crosshairToTargetErrorX_rad) {
+					robotRotateVelocity_mps = VisionConstants.gamePieceRotateKp * -vision.inputs.crosshairToTargetErrorX_rad
+						- VisionConstants.gamePieceRotateKd;
+				} else if (vision.inputs.crosshairToTargetErrorX_rad > VisionConstants.crosshairGamePieceBoundRotateX_rad) {
+					robotRotateVelocity_mps = VisionConstants.gamePieceRotateKp * vision.inputs.crosshairToTargetErrorX_rad
+						+ VisionConstants.gamePieceRotateKd;
+				}
 				break;
+
+			default:
+				return;
 		}
+
+		// Generate a rotation to gamepiece
+		System.out.println("Swerve --> Gamepiece");
+		swerve.drive(new Translation2d(0, 0), robotRotateVelocity_mps, false);
 	}
 
-	// Stop swerve and sets pipeline back to Apriltag
+	// Stop swerve and generate a algorithm to get gamepiece and set pipeline back to Apriltag
 	@Override
 	public void end(boolean interrupted) {
 		swerve.stop();
+		System.out.println("Arm --> GroundFar, Elevator --> Ground, Grabber --> GamepieceUntilGrabbed");
+		Autos.intakeGroundFar(elevator, arm, grabber);
+		System.out.println("Arm --> AllIn, Elevator --> AllIn");
+		Autos.allIn(elevator, arm).schedule();
 		vision.setPipeline(Pipeline.AprilTag);
 	}
 
-	// Feedback loop for PID until we meet crosshairTargetBoundRotateX_rad and crosshairObjectBoundTranslateZ_m
+	// Feedback loop for PD until we meet crosshairTargetBoundRotateX_rad
 	@Override
 	public boolean isFinished() {
-		return ((-VisionConstants.crosshairObjectBoundRotateX_rad < vision.inputs.crosshairToTargetErrorX_rad)
-			&& (vision.inputs.crosshairToTargetErrorX_rad < VisionConstants.crosshairObjectBoundRotateX_rad))
-			&& (vision.inputs.botpose_fieldRotationZ_rad < VisionConstants.crosshairObjectBoundTranslateZ_m);
+		return ((-VisionConstants.crosshairGamePieceBoundRotateX_rad < vision.inputs.crosshairToTargetErrorX_rad)
+			&& (vision.inputs.crosshairToTargetErrorX_rad < VisionConstants.crosshairGamePieceBoundRotateX_rad));
 	}
 }
