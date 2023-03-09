@@ -127,7 +127,9 @@ public class Robot extends LoggedRobot {
 	}
 
 	@Override
-	public void disabledPeriodic() {}
+	public void disabledPeriodic() {
+		robotContainer.updateOIAlert();
+	}
 
 	/**
 	 * This autonomous runs the autonomous command selected by your
@@ -160,8 +162,6 @@ public class Robot extends LoggedRobot {
 		 */
 		if (autonomousCommand != null)
 			autonomousCommand.cancel();
-
-		robotContainer.updateOIAlert();
 	}
 
 	/** This function is called periodically during operator control. */

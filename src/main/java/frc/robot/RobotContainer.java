@@ -84,7 +84,7 @@ public class RobotContainer {
 	public final Elevator elevator = new Elevator();
 	public final Grabber grabber = new Grabber();
 
-	private LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto mode");
+	private LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("auto routine");
 
 	/** The container for the robot. Contains subsystems, OI devices, and commands. */
 	public RobotContainer() {
@@ -93,14 +93,24 @@ public class RobotContainer {
 		configureBindings();
 
 		// setup autos
+		// FW = field wall, LZ = loading zone barrier
 		autoChooser.addDefaultOption("nothing", new InstantCommand());
-		autoChooser.addOption("2 piece", Autos.two(this));
+		autoChooser.addOption("2 piece (FW cone)", Autos.twoPieceFW(this));
+		autoChooser.addOption("2 piece & balance (FW cone)", Autos.twoPieceChargeStation(this));
+		autoChooser.addOption("2 piece (LZ cone)", Autos.twoPieceLZ(this));
+		autoChooser.addOption("just loading zone (FW cube)", Autos.loadingZone(this));
+		autoChooser.addOption("[untested] coop backup & balance (cube)", Autos.coopBackup(this)); // todo: mobility bonus?
 
 		// for testing
-		autoChooser.addOption("drive characterization",
+		autoChooser.addOption("[testing] drive characterization",
 			new FeedForwardCharacterization(swerve, true, swerve::runCharacterization, swerve::getCharacterizationVelocity));
-		autoChooser.addOption("test balance", new ChargeStationBalance(swerve));
+		autoChooser.addOption("[testing] balance cmd", new ChargeStationBalance(swerve));
 
+		var driveTab = Shuffleboard.getTab(ShuffleboardConstants.driveTab);
+		driveTab.add("alerts", Alert.getAlertsSendable())
+			.withSize(2, 4).withPosition(15, 0);
+		driveTab.add("auto routine", autoChooser.getSendableChooser())
+			.withSize(4, 1).withPosition(0, 6);
 		configureCameras();
 	}
 
@@ -127,10 +137,10 @@ public class RobotContainer {
 			.whileTrue(teleopSwerve.holdToggleFieldRelative());
 
 		driverController.a().onTrue(teleopSwerve.toggleFieldRelative());
-		driverController.y().onTrue(teleopSwerve.zeroYaw());
+		driverController.y().onTrue(teleopSwerve.new ZeroYaw());
 		driverController.x().whileTrue(new XStance(swerve));
 
-		driverController.povUp().toggleOnTrue(new ChargeStationBalance(swerve));
+		driverController.povUp().whileTrue(new ChargeStationBalance(swerve));
 
 		/*
 		 * operator console
@@ -218,7 +228,8 @@ public class RobotContainer {
 				.add("camera", SendableCameraWrapper.wrap(camera))
 				// .addCamera("camera", "arm", cameraServ
 				.withWidget(BuiltInWidgets.kCameraStream)
-				.withSize(8, 6);
+				.withSize(8, 6)
+				.withPosition(0, 0);
 		} catch (edu.wpi.first.cscore.VideoException e) {
 			DriverStation.reportError("Failed to get camera: " + e.toString(), e.getStackTrace());
 		}
@@ -230,7 +241,8 @@ public class RobotContainer {
 				.add("limelight", limelightCamera)
 				.withProperties(Map.of("show crosshair", false, "show controls", false))
 				.withWidget(BuiltInWidgets.kCameraStream)
-				.withSize(7, 6);
+				.withSize(7, 6)
+				.withPosition(8, 0);
 		}
 	}
 
@@ -242,7 +254,7 @@ public class RobotContainer {
 		return autoChooser.get();
 	}
 
-	Alert controllerAlert = new Alert("OI not connected/in wrong spots (changed in teleopInit)", AlertType.Error);
+	Alert controllerAlert = new Alert("OI not connected/in wrong spots", AlertType.Error);
 
 	public void updateOIAlert() {
 		if (!driverController.getHID().isConnected()

@@ -80,8 +80,8 @@ public final class Autos {
 	}
 
 	/** 2 pice auto by field wall */
-	public static Command two(RobotContainer robo) {
-		var path = PathPlanner.loadPathGroup("2 piece",
+	public static Command twoPieceFW(RobotContainer robo) {
+		var path = PathPlanner.loadPathGroup("2 piece fw",
 			new PathConstraints(maxVelocity_mps, maxAcceleration_mps2));
 		if (path == null)
 			return new PrintCommand("no path group");
@@ -99,27 +99,27 @@ public final class Autos {
 
 	/** 2 piece auto w/ charge station by field wall */
 	public static Command twoPieceChargeStation(RobotContainer robo) {
-		var path = PathPlanner.loadPathGroup("charge station 2 piece",
+		var path = PathPlanner.loadPathGroup("charge station 2 piece fw",
 			new PathConstraints(maxVelocity_mps, maxAcceleration_mps2));
 		if (path == null)
 			return new PrintCommand("no path group");
 
 		return new SequentialCommandGroup(
-			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.HighCube),
+			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCone),
 			allIn(robo.elevator, robo.arm),
 			runAutoPath(path.get(0), robo.swerve, true),
 			intakeGround(robo.elevator, robo.arm, robo.grabber),
 			allIn(robo.elevator, robo.arm),
 			runAutoPath(path.get(1), robo.swerve),
-			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCone),
+			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.HighCube),
 			allIn(robo.elevator, robo.arm),
 			runAutoPath(path.get(2), robo.swerve),
 			balance(robo.swerve));
 	}
 
 	/** two piece by the loading zone wall */
-	public static Command twoPieceWall(RobotContainer robo) {
-		var path = PathPlanner.loadPathGroup("2 piece wall",
+	public static Command twoPieceLZ(RobotContainer robo) {
+		var path = PathPlanner.loadPathGroup("2 piece lz",
 			new PathConstraints(maxVelocity_mps, maxAcceleration_mps2));
 		if (path == null)
 			return new PrintCommand("no path group");
@@ -135,9 +135,9 @@ public final class Autos {
 			allIn(robo.elevator, robo.arm));
 	}
 
-	/** start by wall and leave fast */
+	/** start by loading zone, score high cube, and leave fast */
 	public static Command loadingZone(RobotContainer robo) {
-		var path = PathPlanner.loadPathGroup("2 piece top",
+		var path = PathPlanner.loadPathGroup("loading zone",
 			new PathConstraints(maxVelocity_mps, maxAcceleration_mps2));
 		if (path == null)
 			return new PrintCommand("no path group");

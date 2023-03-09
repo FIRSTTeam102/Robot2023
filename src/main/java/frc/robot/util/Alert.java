@@ -1,7 +1,5 @@
 package frc.robot.util;
 
-import frc.robot.constants.Constants.ShuffleboardConstants;
-
 // Copyright (c) 2023 FRC 6328 by an MIT-style license
 // https://github.com/Mechanical-Advantage/RobotCode2023/blob/main/src/main/java/org/littletonrobotics/frc2023/util/Alert.java
 
@@ -9,7 +7,6 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.ArrayList;
@@ -55,15 +52,17 @@ public class Alert {
 		if (!groups.containsKey(group)) {
 			groups.put(group, new SendableAlerts());
 			// 102 change
-			if (group == "Alerts")
-				Shuffleboard.getTab(ShuffleboardConstants.driveTab).add(group, groups.get(group));
-			else
+			if (group != "Alerts")
 				SmartDashboard.putData(group, groups.get(group));
 		}
 
 		this.text = text;
 		this.type = type;
 		groups.get(group).alerts.add(this);
+	}
+
+	public static SendableAlerts getAlertsSendable() {
+		return groups.get("Alerts");
 	}
 
 	/**

@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -30,8 +31,16 @@ public class TeleopSwerve extends CommandBase {
 			() -> fieldRelative = !fieldRelative);
 	};
 
-	public CommandBase zeroYaw() {
-		return Commands.runOnce(swerve::zeroYaw);
+	public class ZeroYaw extends InstantCommand {
+		@Override
+		public void initialize() {
+			swerve.zeroYaw();
+		}
+
+		@Override
+		public boolean runsWhenDisabled() {
+			return true;
+		}
 	}
 
 	private Swerve swerve;
