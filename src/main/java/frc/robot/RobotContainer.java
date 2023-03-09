@@ -86,9 +86,7 @@ public class RobotContainer {
 
 	private LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto mode");
 
-	/**
-	 * The container for the robot. Contains subsystems, OI devices, and commands.
-	 */
+	/** The container for the robot. Contains subsystems, OI devices, and commands. */
 	public RobotContainer() {
 		DriverStation.silenceJoystickConnectionWarning(true);
 
@@ -101,6 +99,7 @@ public class RobotContainer {
 		// for testing
 		autoChooser.addOption("drive characterization",
 			new FeedForwardCharacterization(swerve, true, swerve::runCharacterization, swerve::getCharacterizationVelocity));
+		autoChooser.addOption("test balance", new ChargeStationBalance(swerve));
 
 		configureCameras();
 	}

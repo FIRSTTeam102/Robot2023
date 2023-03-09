@@ -10,7 +10,7 @@ public final class ArmConstants {
 
 	public static final double sectionCount = 4;
 	public static final double armSectionLength_m = Units.inchesToMeters(13.75);
-	public static final double conversionFactor_m_per_rotation = Units.inchesToMeters(0.1) /* rotation of shaft */
+	public static final double conversionFactor_m_per_rotation = 0.005 /* rotation of shaft */
 		/ 3 /* gear ratio */;
 	public static final double conversionFactor_mps_per_rpm = conversionFactor_m_per_rotation / 60;
 

@@ -11,7 +11,6 @@ import frc.robot.swerve.SwerveModule;
 import frc.robot.swerve.SwerveModuleIOReal;
 import frc.robot.swerve.SwerveModuleIOSim;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -20,7 +19,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -154,16 +152,6 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 
 	public void zeroYaw() {
 		gyroIO.setYaw(0);
-	}
-
-	/** @return rotation around side-to-side axis (leaning forward/backward) */
-	public double getPitch_rad() {
-		return MathUtil.angleModulus(Units.degreesToRadians(gyroInputs.pitch_deg));
-	}
-
-	/** @return rotation around front-to-back axis (leaning left/right) */
-	public double getRoll_rad() {
-		return MathUtil.angleModulus(Units.degreesToRadians(gyroInputs.roll_deg));
 	}
 
 	/** turn off brake mode if we're disabled for long enough and not moving */

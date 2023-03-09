@@ -1,5 +1,8 @@
 package frc.robot.io;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.util.Units;
+
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.sensors.Pigeon2;
 
@@ -21,10 +24,10 @@ public class GyroIOPigeon2 implements GyroIO {
 		inputs.connected = gyro.getLastError().equals(ErrorCode.OK);
 		inputs.yaw_deg = ypr_deg[0];
 		inputs.yaw_dps = xyz_dps[0];
-		inputs.pitch_deg = ypr_deg[1];
-		inputs.pitch_dps = xyz_dps[1];
-		inputs.roll_deg = ypr_deg[2];
-		inputs.roll_dps = xyz_dps[2];
+		inputs.pitch_rad = MathUtil.angleModulus(Units.degreesToRadians(ypr_deg[1]));
+		inputs.pitch_radps = Units.degreesToRadians(xyz_dps[1]);
+		inputs.roll_rad = MathUtil.angleModulus(Units.degreesToRadians(ypr_deg[2]));
+		inputs.roll_radps = Units.degreesToRadians(xyz_dps[2]);
 		inputs.temperature_C = gyro.getTemp();
 	}
 

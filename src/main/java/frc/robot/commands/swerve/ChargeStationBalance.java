@@ -1,56 +1,48 @@
 package frc.robot.commands.swerve;
 
 import frc.robot.constants.SwerveConstants;
+import frc.robot.io.GyroIOInputsAutoLogged;
 import frc.robot.subsystems.Swerve;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
+import org.littletonrobotics.junction.Logger;
+
+// angles are between +/- pi
+
 public class ChargeStationBalance extends CommandBase {
-	private final double maxSpeed = 0.005 * SwerveConstants.maxVelocity_mps;
-	private final double maxTurn = 0.005 * SwerveConstants.maxAngularVelocity_radps;
+	private final double maxSpeed_mps = 0.1 * SwerveConstants.maxVelocity_mps;
+	// private final double maxTurn = 0.1 * SwerveConstants.maxAngularVelocity_radps;
 
-	private final PIDController driveController = new PIDController(0.1, 0, 0.0005);
+	private final double maxAngularVelocity_radps = 0.15;
 
-	Swerve swerve;
+	// stops driving when within
+	private final double maxAngle_rad = Units.degreesToRadians(3);
+	private final double minAngle_rad = -maxAngle_rad;
 
-	public void geofence(double bluetopy, double bluebottomy, double blueleftx, double bluerightx, double redtopy,
-		double redbottomy, double redleftx, double redrightx) {
-		if (swerve.translationY > bluetopy - SwerveConstants.robotfence
-			&& swerve.translationY < bluebottomy - SwerveConstants.robotfence
-			&& swerve.translationX > blueleftx - SwerveConstants.robotfence
-			&& swerve.translationX < bluerightx - SwerveConstants.robotfence
-			&& swerve.translationY > redtopy - SwerveConstants.robotfence
-			&& swerve.translationY < redbottomy - SwerveConstants.robotfence
-			&& swerve.translationX > redleftx - SwerveConstants.robotfence
-			&& swerve.translationX < redrightx - SwerveConstants.robotfence) {
+	// private final PIDController driveController = new PIDController(0.1, 0, 0.0005);
 
-		} else {
-
-		}
-	}
+	private Swerve swerve;
+	private GyroIOInputsAutoLogged gyro;
 
 	public ChargeStationBalance(Swerve swerve) {
 		this.swerve = swerve;
+		this.gyro = swerve.gyroInputs;
 		addRequirements(swerve);
 
-		SmartDashboard.putData("balance drive pid", driveController);
-
-		driveController.setTolerance(0.05, 0.05);
-		driveController.setSetpoint(0);
-		driveController.enableContinuousInput(-Math.PI, Math.PI);
+		// SmartDashboard.putData("balance drive pid", driveController);
+		// driveController.setTolerance(0.05, 0.05);
+		// driveController.setSetpoint(0);
+		// driveController.enableContinuousInput(-Math.PI, Math.PI);
 	}
-
-	private double pitch_rad;
-	private double roll_rad;
 
 	@Override
 	public void initialize() {
 		state = State.turn; // always reset state
 		swerve.stop();
+		angle_rad = Double.POSITIVE_INFINITY;
 	}
 
 	// stores the current state of the state machine
@@ -60,26 +52,43 @@ public class ChargeStationBalance extends CommandBase {
 
 	State state = State.turn;
 
-	private boolean withinDeadband(double input, double deadband) {
-		return Math.abs(input) < deadband;
-	}
-
-	private boolean withinDeadband(double input) {
-		return withinDeadband(input, 0.03);
+	private boolean angleZeroed(double angle_rad) {
+		return minAngle_rad < angle_rad && angle_rad < maxAngle_rad;
 	}
 
 	private double sign(double input) {
 		return input > 0.0 ? 1.0 : -1.0;
 	}
 
-	@Override
-	public void execute() {
-		// angles are between +/- pi
-		pitch_rad = swerve.getPitch_rad();
-		roll_rad = swerve.getRoll_rad();
+	double angle_rad;
 
-		boolean pitchZeroed = withinDeadband(pitch_rad),
-			rollZeroed = withinDeadband(roll_rad);
+	@Override
+	/**
+	 * @see https://github.com/Mechanical-Advantage/RobotCode2023/blob/main/src/main/java/org/littletonrobotics/frc2023/commands/AutoBalance.java
+	 */
+	public void execute() {
+		angle_rad = swerve.getYaw().getSin() * gyro.pitch_rad
+			+ swerve.getYaw().getCos() * gyro.roll_rad;
+		Logger.getInstance().recordOutput("Balance/angle_rad", angle_rad);
+
+		double angleVelocity_radps = swerve.getYaw().getSin() * gyro.pitch_radps
+			+ swerve.getYaw().getCos() * gyro.roll_radps;
+
+		boolean shouldStop = angle_rad < 0 && angleVelocity_radps > maxAngularVelocity_radps
+			|| angle_rad > 0 && angleVelocity_radps < -maxAngularVelocity_radps;
+
+		if (shouldStop)
+			swerve.stop();
+		else
+			swerve.drive(new Translation2d(
+				maxSpeed_mps * sign(angle_rad),
+				0), 0, true);
+	}
+
+	// @formatter:off
+	/*public void execute() {
+		boolean pitchZeroed = angleZeroed(gyro.pitch_rad),
+			rollZeroed = angleZeroed(gyro.roll_rad);
 
 		// already balanced for now
 		if (pitchZeroed && rollZeroed) {
@@ -87,14 +96,14 @@ public class ChargeStationBalance extends CommandBase {
 			return;
 		}
 
-		double shortestAngle_rad = (Math.abs(pitch_rad) < Math.abs(roll_rad)) ? pitch_rad : roll_rad;
+		double shortestAngle_rad = (Math.abs(gyro.pitch_rad) < Math.abs(gyro.roll_rad)) ? gyro.pitch_rad : gyro.roll_rad;
 
-		// todo: pid? to better aim instead of constant speed
 		// todo: move side to side to take up left space
 		// will these move in the right direction?
 		// track which way we came up? or see which direction yaw is pointed in?
 
 		switch (state) {
+			// todo:
 			case turn:
 				if (pitchZeroed || rollZeroed)
 					// move on
@@ -108,12 +117,14 @@ public class ChargeStationBalance extends CommandBase {
 					state = State.turn;
 
 				// fixme: when gyro is actually mounted fix the axises
-				double x = pitchZeroed ? 0 : driveController.calculate(pitch_rad),
-					y = rollZeroed ? 0 : driveController.calculate(roll_rad);
-
+				double x = pitchZeroed ? 0 : driveController.calculate(gyro.pitch_rad),
+				y = rollZeroed ? 0 : driveController.calculate(gyro.roll_rad);
 				swerve.drive(new Translation2d(maxSpeed * x, maxSpeed * y), 0.0, false);
 		}
-	}
+		
+		Logger.getInstance().recordOutput("Balance/state",state.toString());
+	}*/
+	// @formatter:on
 
 	@Override
 	public void end(boolean interrupted) {
@@ -125,12 +136,15 @@ public class ChargeStationBalance extends CommandBase {
 		return false;
 	}
 
-	@Override
-	public void initSendable(SendableBuilder builder) {
-		super.initSendable(builder);
-		// these won't be seen in the ui but you can see them in the tree
-		builder.addStringProperty("state", () -> state.toString(), null);
-		builder.addDoubleProperty("pitch", () -> swerve.getPitch_rad(), null);
-		builder.addDoubleProperty("roll", () -> swerve.getRoll_rad(), null);
+	public boolean geofence(double blueTopY, double blueBottomY, double blueLeftX, double blueRightX,
+		double redTopY, double redBottomY, double redLeftX, double redRightX) {
+		return (swerve.translationY > blueTopY - SwerveConstants.robotfence
+			&& swerve.translationY < blueBottomY - SwerveConstants.robotfence
+			&& swerve.translationX > blueLeftX - SwerveConstants.robotfence
+			&& swerve.translationX < blueRightX - SwerveConstants.robotfence)
+			|| (swerve.translationY > redTopY - SwerveConstants.robotfence
+				&& swerve.translationY < redBottomY - SwerveConstants.robotfence
+				&& swerve.translationX > redLeftX - SwerveConstants.robotfence
+				&& swerve.translationX < redRightX - SwerveConstants.robotfence);
 	}
 }
