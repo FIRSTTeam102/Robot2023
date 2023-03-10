@@ -4,6 +4,7 @@ import frc.robot.constants.ScoringPosition;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Elevator;
 
+import frc.robot.commands.arm.MoveArmBy;
 import frc.robot.commands.arm.SetArmPosition;
 import frc.robot.commands.elevator.SetElevatorPosition;
 
@@ -13,23 +14,33 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 
 public class SetScoringPosition extends ProxyCommand {
 	public SetScoringPosition(Elevator elevator, Arm arm, ScoringPosition pos) {
-		this(elevator, arm, pos, 0);
+		this(elevator, arm, pos, 0, 0);
 	}
 
-	public SetScoringPosition(Elevator elevator, Arm arm, ScoringPosition pos, double tolerance_m) {
-		this(elevator, arm, pos.elevatorHeight_m, pos.armExtension_m, tolerance_m);
+	/**
+	 * set tolerance to 0 to ignore it
+	 */
+	public SetScoringPosition(Elevator elevator, Arm arm, ScoringPosition pos,
+		double elevatorTolerance_m, double armTolerance_m) {
+		this(elevator, arm, pos.elevatorHeight_m, pos.armExtension_m, elevatorTolerance_m, armTolerance_m);
 	}
 
-	public SetScoringPosition(Elevator elevator, Arm arm, double elevatorPos_m, double armPos_m, double tolerance) {
-		super(() -> new SetElevatorArmPositionProxied(elevator, arm, elevatorPos_m, armPos_m, 0));
+	public SetScoringPosition(Elevator elevator, Arm arm, double elevatorPos_m, double armPos_m,
+		double elevatorTolerance_m, double armTolerance_m) {
+		super(() -> new SetElevatorArmPositionProxied(elevator, arm, elevatorPos_m, armPos_m,
+			elevatorTolerance_m, armTolerance_m));
 	}
 
 	private static class SetElevatorArmPositionProxied extends SequentialCommandGroup {
 		SetElevatorArmPositionProxied(Elevator elevator, Arm arm, double elevatorTarget_m, double armTarget_m,
-			double tolerance) {
+			double elevatorTolerance_m, double armTolerance_m) {
 			elevator.inManualMode = false;
 			arm.inManualMode = false;
 			if (elevatorTarget_m > elevator.inputs.position_m) {
+				// if we're on the ground, send arm a bit out first so cone lip doesn't get stuck on bumper
+				if (elevator.inputs.position_m - ScoringPosition.Ground.elevatorHeight_m < 0.08)
+					addCommands(new MoveArmBy(arm, 0.04));
+
 				// going up -> elevator first
 				addCommands(
 					new SetElevatorPosition(elevator, elevatorTarget_m),
@@ -57,10 +68,11 @@ public class SetScoringPosition extends ProxyCommand {
 					new SetElevatorPosition(elevator, elevatorTarget_m));
 			}
 
-			if (tolerance > 0) {
-				addCommands(new WaitUntilCommand(() -> Math.abs(elevator.inputs.position_m - elevatorTarget_m) < tolerance
-					&& Math.abs(arm.getArmDist_m() - armTarget_m) < tolerance));
-			}
+			if (elevatorTarget_m > 0)
+				addCommands(
+					new WaitUntilCommand(() -> Math.abs(elevator.inputs.position_m - elevatorTarget_m) < elevatorTarget_m));
+			if (armTolerance_m > 0)
+				addCommands(new WaitUntilCommand(() -> Math.abs(arm.getArmDist_m() - armTarget_m) < armTolerance_m));
 		}
 	}
 }

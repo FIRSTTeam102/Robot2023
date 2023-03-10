@@ -43,6 +43,6 @@ public final class ElevatorConstants {
 	public static final double minHeight_m = 0;
 	public static final double maxHeight_m = 1.22;
 	public static final double carriageMass_kg = Units
-		.lbsToKilograms(4.893 /* inner elevator */ + 8.166 /* carriage + arm */ + 6 /* grabber */);
+		.lbsToKilograms(4.893 /* inner elevator */ + 9 /* carriage + arm */ + 6 /* grabber */);
 	public static final double drumRadius_m = Units.inchesToMeters(0.5);
 }

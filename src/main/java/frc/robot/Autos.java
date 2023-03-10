@@ -2,7 +2,6 @@ package frc.robot;
 
 import static frc.robot.constants.AutoConstants.*;
 
-import frc.robot.constants.AutoConstants;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.ScoringPosition;
 import frc.robot.subsystems.Arm;
@@ -21,8 +20,11 @@ import frc.robot.commands.swerve.ChargeStationBalance;
 import frc.robot.commands.swerve.PathPlannerCommand;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
@@ -48,7 +50,7 @@ public final class Autos {
 	}
 
 	public static Command allIn(Elevator elevator, Arm arm) {
-		return new SetScoringPosition(elevator, arm, ScoringPosition.AllIn, AutoConstants.tolerance_m);
+		return new SetScoringPosition(elevator, arm, ScoringPosition.AllIn, armTolerance_m, elevatorTolerance_m);
 	}
 
 	public static Command intakeGroundClose(Elevator elevator, Arm arm, Grabber grabber) {
@@ -60,19 +62,19 @@ public final class Autos {
 	}
 
 	public static Command intakeGroundFar(Elevator elevator, Arm arm, Grabber grabber) {
-		return Commands.sequence(
+		return deadlineSeconds(3, Commands.sequence(
 			// both sets are async
 			new SetArmPosition(arm, ScoringPosition.GroundFar.armExtension_m),
 			new SetElevatorPosition(elevator, ScoringPosition.GroundFar.elevatorHeight_m),
-			new GrabGrabberUntilGrabbed(grabber));
+			new GrabGrabberUntilGrabbed(grabber)));
 	}
 
 	public static Command score(Elevator elevator, Arm arm, Grabber grabber, ScoringPosition pos) {
 		var sequence = new SequentialCommandGroup(
-			new SetScoringPosition(elevator, arm, pos, AutoConstants.tolerance_m));
+			new SetScoringPosition(elevator, arm, pos, armTolerance_m, elevatorTolerance_m));
 		if (pos.moveDown)
 			sequence.addCommands(new MoveElevatorBy(elevator, ElevatorConstants.coneMoveDownHeight_m));
-		sequence.addCommands(Commands.waitSeconds(0.8), new ReleaseGrabber(grabber), Commands.waitSeconds(0.3));
+		sequence.addCommands(new ReleaseGrabber(grabber), Commands.waitSeconds(0.3));
 		return sequence;
 	}
 
@@ -82,6 +84,20 @@ public final class Autos {
 
 	public static Command balance(Swerve swerve) {
 		return new ChargeStationBalance(swerve);
+	}
+
+	// angle = ppState.holonomicRotation
+	public static Command swerveAnglesTo(Swerve swerve, Rotation2d angle) {
+		var states = swerve.kinematics.toSwerveModuleStates(new ChassisSpeeds(0, 0, 0), swerve.getCenterRotation());
+		for (var state : states)
+			state.angle = angle;
+		return new InstantCommand(() -> {
+			swerve.setModuleStates(states, true, true);
+		});
+	}
+
+	public static Command swerveAnglesTo0(Swerve swerve) {
+		return swerveAnglesTo(swerve, new Rotation2d(0));
 	}
 
 	public static Command runAutoPath(PathPlannerTrajectory path, Swerve swerve) {
@@ -100,6 +116,7 @@ public final class Autos {
 			return new PrintCommand("no path group");
 
 		return new SequentialCommandGroup(
+			swerveAnglesTo0(robo.swerve),
 			grabTimed(robo.grabber),
 			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCone),
 			allIn(robo.elevator, robo.arm),
@@ -119,6 +136,7 @@ public final class Autos {
 			return new PrintCommand("no path group");
 
 		return new SequentialCommandGroup(
+			swerveAnglesTo0(robo.swerve),
 			grabTimed(robo.grabber),
 			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCone),
 			allIn(robo.elevator, robo.arm),
@@ -140,6 +158,7 @@ public final class Autos {
 			return new PrintCommand("no path group");
 
 		return new SequentialCommandGroup(
+			swerveAnglesTo0(robo.swerve),
 			grabTimed(robo.grabber),
 			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCone),
 			allIn(robo.elevator, robo.arm),
@@ -159,13 +178,14 @@ public final class Autos {
 			return new PrintCommand("no path group");
 
 		return new SequentialCommandGroup(
+			swerveAnglesTo0(robo.swerve),
 			grabTimed(robo.grabber),
 			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.HighCube),
 			allIn(robo.elevator, robo.arm),
 			runAutoPath(path.get(0), robo.swerve, true));
 	}
 
-	/** start in middle, backup, then go to charge station. LIKELY WILL NOT WORK! USE WITH CAUTION!!! */
+	/** start in middle, backup over CS to get mobility, then balance on charge station */
 	public static Command coopBackup(RobotContainer robo) {
 		var path = PathPlanner.loadPathGroup("coop backup",
 			new PathConstraints(maxVelocity_mps, maxAcceleration_mps2));
@@ -173,6 +193,7 @@ public final class Autos {
 			return new PrintCommand("no path group");
 
 		return new SequentialCommandGroup(
+			swerveAnglesTo0(robo.swerve),
 			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.HighCube),
 			allIn(robo.elevator, robo.arm),
 			runAutoPath(path.get(0), robo.swerve, true),

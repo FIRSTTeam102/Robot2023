@@ -233,6 +233,15 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 		return driveVelocityAverage / modules.length;
 	}
 
+	public SwerveModuleState[] getXStanceStates() {
+		var states = kinematics.toSwerveModuleStates(new ChassisSpeeds(0, 0, 0), new Translation2d(0, 0));
+		states[0].angle = new Rotation2d(3 * Math.PI / 2 - Math.atan(trackWidth_m / wheelBase_m));
+		states[1].angle = new Rotation2d(Math.PI / 2 + Math.atan(trackWidth_m / wheelBase_m));
+		states[3].angle = new Rotation2d(Math.PI / 2 + Math.atan(trackWidth_m / wheelBase_m));
+		states[2].angle = new Rotation2d(Math.PI / 2 - Math.atan(trackWidth_m / wheelBase_m));
+		return states;
+	}
+
 	@Override
 	public void periodic() {
 		gyroIO.updateInputs(gyroInputs);

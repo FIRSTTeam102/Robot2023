@@ -1,6 +1,11 @@
 {
 	"todohighlight.isCaseSensitive": false,
 	"todohighlight.include": ["src/**/*"],
+	"todohighlight.keywords": [{
+		"text": "@fieldcal",
+		"backgroundColor": "#f47100",
+		"color": "#fff"
+	}],
 	"java.configuration.updateBuildConfiguration": "automatic",
 	"java.server.launchMode": "Standard",
 	"files.exclude": {

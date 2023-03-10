@@ -6,6 +6,7 @@ import frc.robot.subsystems.Swerve;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import org.littletonrobotics.junction.Logger;
@@ -13,13 +14,13 @@ import org.littletonrobotics.junction.Logger;
 // angles are between +/- pi
 
 public class ChargeStationBalance extends CommandBase {
-	private final double maxSpeed_mps = 0.1 * SwerveConstants.maxVelocity_mps;
+	private final double maxSpeed_mps = 0.05 * SwerveConstants.maxVelocity_mps;
 	// private final double maxTurn = 0.1 * SwerveConstants.maxAngularVelocity_radps;
 
 	private final double maxAngularVelocity_radps = 0.15;
 
-	// stops driving when within
-	private final double maxAngle_rad = Units.degreesToRadians(3);
+	// stops driving when within @fieldcal
+	private final double maxAngle_rad = Units.degreesToRadians(2);
 	private final double minAngle_rad = -maxAngle_rad;
 
 	// private final PIDController driveController = new PIDController(0.1, 0, 0.0005);
@@ -40,17 +41,18 @@ public class ChargeStationBalance extends CommandBase {
 
 	@Override
 	public void initialize() {
-		state = State.turn; // always reset state
+		// state = State.turn; // always reset state
 		swerve.stop();
 		angle_rad = Double.POSITIVE_INFINITY;
+		angleZeroedTimer.reset();
 	}
 
 	// stores the current state of the state machine
-	private enum State {
-		turn, balance
-	}
+	// private enum State {
+	// turn, balance
+	// }
 
-	State state = State.turn;
+	// State state = State.turn;
 
 	private boolean angleZeroed(double angle_rad) {
 		return minAngle_rad < angle_rad && angle_rad < maxAngle_rad;
@@ -61,6 +63,7 @@ public class ChargeStationBalance extends CommandBase {
 	}
 
 	double angle_rad;
+	Timer angleZeroedTimer = new Timer();
 
 	@Override
 	/**
@@ -73,12 +76,26 @@ public class ChargeStationBalance extends CommandBase {
 
 		double angleVelocity_radps = swerve.getYaw().getSin() * gyro.pitch_radps
 			+ swerve.getYaw().getCos() * gyro.roll_radps;
+		Logger.getInstance().recordOutput("Balance/angleVelocity_radps", angleVelocity_radps);
 
 		boolean shouldStop = angle_rad < 0 && angleVelocity_radps > maxAngularVelocity_radps
 			|| angle_rad > 0 && angleVelocity_radps < -maxAngularVelocity_radps;
 
+		boolean angleZeroed = angleZeroed(angle_rad);
+		if (angleZeroed)
+			angleZeroedTimer.start();
+		else {
+			angleZeroedTimer.reset();
+			angleZeroedTimer.stop();
+		}
+		Logger.getInstance().recordOutput("Balance/angleZeroedTime_s", angleZeroedTimer.get());
+
+		// if we're going too fast, stop moving
 		if (shouldStop)
 			swerve.stop();
+		// if we've been within the target for long enough (so not super oscillating), lock the wheels
+		else if (angleZeroedTimer.hasElapsed(2))
+			swerve.setModuleStates(swerve.getXStanceStates());
 		else
 			swerve.drive(new Translation2d(
 				maxSpeed_mps * sign(angle_rad),
@@ -129,6 +146,7 @@ public class ChargeStationBalance extends CommandBase {
 	@Override
 	public void end(boolean interrupted) {
 		swerve.stop();
+		angleZeroedTimer.stop();
 	}
 
 	@Override
@@ -136,6 +154,7 @@ public class ChargeStationBalance extends CommandBase {
 		return false;
 	}
 
+	// todo:, also don't pass borders as parameters
 	public boolean geofence(double blueTopY, double blueBottomY, double blueLeftX, double blueRightX,
 		double redTopY, double redBottomY, double redLeftX, double redRightX) {
 		return (swerve.translationY > blueTopY - SwerveConstants.robotfence

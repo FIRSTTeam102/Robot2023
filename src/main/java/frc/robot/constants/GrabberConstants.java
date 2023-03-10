@@ -5,7 +5,7 @@ public final class GrabberConstants {
 
 	public static final double grabSpeed = 0.65;
 	public static final double holdSpeed = 0.2;
-	public static final double releaseSpeed = 0.2;
+	public static final double releaseSpeed = 0.3;
 	public static final double releaseTime_s = 0.5;
 
 	public static final int smartCurrentLimit_A = 50;

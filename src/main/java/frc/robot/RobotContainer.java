@@ -37,11 +37,13 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.HttpCamera;
 import edu.wpi.first.cscore.HttpCamera.HttpCameraKind;
 import edu.wpi.first.cscore.MjpegServer;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.SendableCameraWrapper;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
@@ -86,6 +88,7 @@ public class RobotContainer {
 	public final Grabber grabber = new Grabber();
 
 	private LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("auto routine");
+	private GenericEntry autoDelay;
 
 	/** The container for the robot. Contains subsystems, OI devices, and commands. */
 	public RobotContainer() {
@@ -100,7 +103,7 @@ public class RobotContainer {
 		autoChooser.addOption("2 piece & balance (FW cone)", Autos.twoPieceChargeStation(this));
 		autoChooser.addOption("2 piece (LZ cone)", Autos.twoPieceLZ(this));
 		autoChooser.addOption("just loading zone (FW cube)", Autos.loadingZone(this));
-		autoChooser.addOption("[untested] coop backup & balance (cube)", Autos.coopBackup(this)); // todo: mobility bonus?
+		autoChooser.addOption("backup & balance (co-op cube)", Autos.coopBackup(this));
 
 		// for testing
 		autoChooser.addOption("[testing] drive characterization",
@@ -112,6 +115,9 @@ public class RobotContainer {
 			.withSize(2, 4).withPosition(15, 0);
 		driveTab.add("auto routine", autoChooser.getSendableChooser())
 			.withSize(4, 1).withPosition(0, 6);
+		autoDelay = driveTab.add("auto delay", 0.0)
+			.withSize(2, 1).withPosition(0, 7)
+			.getEntry();
 		configureCameras();
 	}
 
@@ -252,12 +258,14 @@ public class RobotContainer {
 	 * @return the command to run in autonomous
 	 */
 	public Command getAutonomousCommand() {
+		if (autoDelay.getDouble(0) > 0)
+			return Commands.waitSeconds(autoDelay.getDouble(0)).andThen(autoChooser.get());
 		return autoChooser.get();
 	}
 
 	Alert driverControllerAlert = new Alert("driver controller not connected properly", AlertType.Error);
-	Alert operatorConsoleAlert = new Alert("driver controller not connected properly", AlertType.Error);
-	Alert operatorJoystickAlert = new Alert("driver controller not connected properly", AlertType.Error);
+	Alert operatorConsoleAlert = new Alert("operator console not connected properly", AlertType.Error);
+	Alert operatorJoystickAlert = new Alert("operator joystick not connected properly", AlertType.Error);
 
 	public void updateOIAlert() {
 		if (!driverController.getHID().isConnected()

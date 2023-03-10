@@ -24,7 +24,7 @@ public final class Constants {
 		public static final int height = 240;
 		public static final int fps = 30;
 		public static final int compression = 70;
-		// todo: config exposure at comp
+		// @fieldcal config exposure at comp
 		public static final int exposure = -1;
 	}
 
