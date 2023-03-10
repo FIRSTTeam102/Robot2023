@@ -40,9 +40,11 @@ public class Vision extends SubsystemBase {
 	public boolean isPipelineReady() {
 		if (lastPipeline == inputs.pipeline || pipelineSwitchTimer.hasElapsed(0.9)) {
 			pipelineSwitchTimer.stop();
+			pipelineSwitchTimer.reset();
 			lastPipeline = inputs.pipeline;
 			return true;
 		}
+		pipelineSwitchTimer.start();
 		return false;
 	}
 }

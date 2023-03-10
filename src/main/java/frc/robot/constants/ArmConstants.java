@@ -4,7 +4,7 @@ import edu.wpi.first.math.util.Units;
 
 public final class ArmConstants {
 	public static final double minNutDist_m = 0.34925;
-	public static final double maxNutDist_m = Units.inchesToMeters(4.92);
+	public static final double maxNutDist_m = 0.07;
 
 	public static final int motorId = 12;
 
@@ -15,7 +15,7 @@ public final class ArmConstants {
 	public static final double conversionFactor_mps_per_rpm = conversionFactor_m_per_rotation / 60;
 
 	/** minimum distance to not hit the swerve modules when elevator is down */
-	public static final double dangerZone_m = .39;
+	public static final double dangerZone_m = .32;
 	/** clipping distance for mid level on grid */
 	public static final double gridSafeZone_m = .7;
 
@@ -26,6 +26,6 @@ public final class ArmConstants {
 	public static final double kD = 0.08;
 	public static final double kF = 0;
 
-	public static final double maxOutput = .85;
+	public static final double maxOutput = .65;
 	public static final double minOutput = -maxOutput;
 }

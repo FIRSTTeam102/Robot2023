@@ -13,6 +13,7 @@ import frc.robot.subsystems.Swerve;
 import frc.robot.commands.arm.SetArmPosition;
 import frc.robot.commands.elevator.MoveElevatorBy;
 import frc.robot.commands.elevator.SetElevatorPosition;
+import frc.robot.commands.grabber.GrabGrabber;
 import frc.robot.commands.grabber.GrabGrabberUntilGrabbed;
 import frc.robot.commands.grabber.ReleaseGrabber;
 import frc.robot.commands.scoring.SetScoringPosition;
@@ -51,11 +52,11 @@ public final class Autos {
 	}
 
 	public static Command intakeGroundClose(Elevator elevator, Arm arm, Grabber grabber) {
-		return Commands.sequence(
+		return deadlineSeconds(3, Commands.sequence(
 			// both sets are async
 			new SetArmPosition(arm, ScoringPosition.Ground.armExtension_m),
 			new SetElevatorPosition(elevator, ScoringPosition.Ground.elevatorHeight_m),
-			new GrabGrabberUntilGrabbed(grabber));
+			new GrabGrabberUntilGrabbed(grabber)));
 	}
 
 	public static Command intakeGroundFar(Elevator elevator, Arm arm, Grabber grabber) {
@@ -68,11 +69,15 @@ public final class Autos {
 
 	public static Command score(Elevator elevator, Arm arm, Grabber grabber, ScoringPosition pos) {
 		var sequence = new SequentialCommandGroup(
-			new SetScoringPosition(elevator, arm, pos, 0.1));
+			new SetScoringPosition(elevator, arm, pos, AutoConstants.tolerance_m));
 		if (pos.moveDown)
 			sequence.addCommands(new MoveElevatorBy(elevator, ElevatorConstants.coneMoveDownHeight_m));
-		sequence.addCommands(new ReleaseGrabber(grabber));
+		sequence.addCommands(Commands.waitSeconds(0.8), new ReleaseGrabber(grabber), Commands.waitSeconds(0.3));
 		return sequence;
+	}
+
+	public static Command grabTimed(Grabber grabber) {
+		return deadlineSeconds(0.1, new GrabGrabber(grabber));
 	}
 
 	public static Command balance(Swerve swerve) {
@@ -95,6 +100,7 @@ public final class Autos {
 			return new PrintCommand("no path group");
 
 		return new SequentialCommandGroup(
+			grabTimed(robo.grabber),
 			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCone),
 			allIn(robo.elevator, robo.arm),
 			runAutoPath(path.get(0), robo.swerve, true),
@@ -113,10 +119,11 @@ public final class Autos {
 			return new PrintCommand("no path group");
 
 		return new SequentialCommandGroup(
+			grabTimed(robo.grabber),
 			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCone),
 			allIn(robo.elevator, robo.arm),
 			runAutoPath(path.get(0), robo.swerve, true),
-			intakeGround(robo.elevator, robo.arm, robo.grabber),
+			intakeGroundClose(robo.elevator, robo.arm, robo.grabber),
 			allIn(robo.elevator, robo.arm),
 			runAutoPath(path.get(1), robo.swerve),
 			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.HighCube),
@@ -133,10 +140,11 @@ public final class Autos {
 			return new PrintCommand("no path group");
 
 		return new SequentialCommandGroup(
+			grabTimed(robo.grabber),
 			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCone),
 			allIn(robo.elevator, robo.arm),
 			runAutoPath(path.get(0), robo.swerve, true),
-			intakeGround(robo.elevator, robo.arm, robo.grabber),
+			intakeGroundClose(robo.elevator, robo.arm, robo.grabber),
 			allIn(robo.elevator, robo.arm),
 			runAutoPath(path.get(1), robo.swerve),
 			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.HighCube),
@@ -151,6 +159,7 @@ public final class Autos {
 			return new PrintCommand("no path group");
 
 		return new SequentialCommandGroup(
+			grabTimed(robo.grabber),
 			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.HighCube),
 			allIn(robo.elevator, robo.arm),
 			runAutoPath(path.get(0), robo.swerve, true));

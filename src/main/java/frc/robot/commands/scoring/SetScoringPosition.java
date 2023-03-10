@@ -33,7 +33,7 @@ public class SetScoringPosition extends ProxyCommand {
 				// going up -> elevator first
 				addCommands(
 					new SetElevatorPosition(elevator, elevatorTarget_m),
-					new WaitUntilCommand(() -> arm.inManualMode || elevator.inputs.position_m > 0.6 * elevatorTarget_m), // Units.inchesToMeters(30)
+					new WaitUntilCommand(() -> arm.inManualMode || elevator.inputs.position_m > 0.9 * elevatorTarget_m), // Units.inchesToMeters(30)
 					new SetArmPosition(arm, armTarget_m));
 			} else {
 				// going down -> arm first

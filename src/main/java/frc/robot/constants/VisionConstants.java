@@ -8,9 +8,9 @@ public final class VisionConstants {
 		- 0.5334; /* limelight to front bumper */
 
 	/* RetroreflectiveVision */
-	public static final double retroreflectiveTranslateKp = 0;
-	public static final double retroreflectiveTranslateKd = 0;
-	public static final double crosshairTargetBoundTranslateX_rad = 0.035;
+	public static final double retroreflectiveTranslateKp = 0.2;
+	public static final double retroreflectiveTranslateKd = 0.025;
+	public static final double crosshairTargetBoundTranslateX_rad = Math.toRadians(1.5);
 
 	/* ObjectDetectionVision */
 	public static final double gamePieceRotateKp = 0;

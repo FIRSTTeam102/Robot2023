@@ -255,18 +255,27 @@ public class RobotContainer {
 		return autoChooser.get();
 	}
 
-	Alert controllerAlert = new Alert("OI not connected/in wrong spots", AlertType.Error);
+	Alert driverControllerAlert = new Alert("driver controller not connected properly", AlertType.Error);
+	Alert operatorConsoleAlert = new Alert("driver controller not connected properly", AlertType.Error);
+	Alert operatorJoystickAlert = new Alert("driver controller not connected properly", AlertType.Error);
 
 	public void updateOIAlert() {
 		if (!driverController.getHID().isConnected()
-			|| driverController.getHID().getName().indexOf("Xbox") < 0
-			|| !operatorConsole.getHID().isConnected()
-			|| operatorConsole.getHID().getName().indexOf("CyController") < 0
-			|| !operatorJoystick.getHID().isConnected()
-			|| operatorJoystick.getHID().getName().indexOf("Logitech") < 0) {
-			controllerAlert.set(true);
-		} else {
-			controllerAlert.set(false);
-		}
+			|| driverController.getHID().getName().indexOf("Xbox") < 0)
+			driverControllerAlert.set(true);
+		else
+			driverControllerAlert.set(false);
+
+		if (!operatorConsole.getHID().isConnected()
+			|| operatorConsole.getHID().getName().indexOf("CyController") < 0)
+			operatorConsoleAlert.set(true);
+		else
+			operatorConsoleAlert.set(false);
+
+		if (!operatorJoystick.getHID().isConnected()
+			|| operatorJoystick.getHID().getName().indexOf("Logitech") < 0)
+			operatorJoystickAlert.set(true);
+		else
+			operatorJoystickAlert.set(false);
 	}
 }

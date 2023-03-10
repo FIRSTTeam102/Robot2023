@@ -86,6 +86,8 @@ public class Arm extends SubsystemBase {
 		pidController.setReference(0, CANSparkMax.ControlType.kDutyCycle);
 	}
 
+	boolean hasDoneLimitReset = false;
+
 	@Override
 	public void periodic() {
 		updateInputs(inputs);
@@ -100,11 +102,13 @@ public class Arm extends SubsystemBase {
 		// if (inputs.backLimitSwitch)
 		// encoder.setPosition(maxNutDist_m - minNutDist_m);
 
-		if (inputs.limitSwitch)
+		if (inputs.limitSwitch && !hasDoneLimitReset) {
+			hasDoneLimitReset = true;
 			encoder.setPosition(minNutDist_m);
+		} else if (hasDoneLimitReset && armDist_m > 0.03)
+			hasDoneLimitReset = false;
 
-		// todo: bake danger zone
-		inDangerZone = (inputs.nutPosition_m < armDistToNutDist(dangerZone_m));
+		inDangerZone = armDist_m < dangerZone_m;
 	}
 
 	public static double armDistToNutDist(double armDistance_m) {

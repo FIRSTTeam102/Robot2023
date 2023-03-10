@@ -22,6 +22,7 @@ public class RetroreflectiveVision extends CommandBase {
 		this.routine = routine;
 		this.vision = vision;
 		this.swerve = swerve;
+		addRequirements(swerve);
 	}
 
 	@Override
@@ -69,7 +70,8 @@ public class RetroreflectiveVision extends CommandBase {
 	// Feedback loop for PD until we meet crosshairTargetBoundRotateX_rad
 	@Override
 	public boolean isFinished() {
-		return ((-VisionConstants.crosshairTargetBoundTranslateX_rad < vision.inputs.crosshairToTargetErrorX_rad)
-			&& (vision.inputs.crosshairToTargetErrorX_rad < VisionConstants.crosshairTargetBoundTranslateX_rad));
+		// return ((-VisionConstants.crosshairTargetBoundTranslateX_rad < vision.inputs.crosshairToTargetErrorX_rad)
+		// && (vision.inputs.crosshairToTargetErrorX_rad < VisionConstants.crosshairTargetBoundTranslateX_rad));
+		return false;
 	}
 }
