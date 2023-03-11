@@ -109,6 +109,8 @@ public class Robot extends LoggedRobot {
 		 */
 		CommandScheduler.getInstance().run();
 
+		Lights.periodic();
+
 		Logger.getInstance().recordOutput("Mechanism/Scoring", ScoringMechanism2d.mech);
 	}
 
@@ -120,6 +122,7 @@ public class Robot extends LoggedRobot {
 			default -> Lights.ControlMode.DisabledRed;
 		});
 
+		robotContainer.swerve.setGyroOffset_deg(0); // end of auto, clear PP offset or something
 		robotContainer.swerve.disabledTimeStart = Timer.getFPGATimestamp();
 
 		// keep elevator at current position when re-enabled
@@ -191,5 +194,9 @@ public class Robot extends LoggedRobot {
 	@Override
 	public void simulationPeriodic() {
 		REVPhysicsSim.getInstance().run();
+	}
+
+	public static boolean isBlue() {
+		return DriverStation.getAlliance() == DriverStation.Alliance.Blue;
 	}
 }

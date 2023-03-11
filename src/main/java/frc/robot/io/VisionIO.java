@@ -33,7 +33,7 @@ public class VisionIO {
 		public double botpose_fieldRotationZ_rad = 0.0;
 		public double botpose_latency_s = 0.0;
 
-		public double targetAprilTag = 0.0;
+		public long targetAprilTag = 0;
 		public double targetObject = 0.0;
 
 		public long pipeline = 0;
@@ -84,7 +84,7 @@ public class VisionIO {
 		inputs.botpose_fieldRotationZ_rad = Math.toRadians(botpose_fieldCache[5]);
 		inputs.botpose_latency_s = 1000 * botpose_fieldCache[6];
 
-		inputs.targetAprilTag = tidEntry.getDouble(inputs.targetAprilTag);
+		inputs.targetAprilTag = (int) tidEntry.getDouble(inputs.targetAprilTag);
 		inputs.targetObject = tclassEntry.getDouble(inputs.targetObject);
 
 		inputs.pipeline = pipelineEntry.getNumber(inputs.pipeline).intValue();

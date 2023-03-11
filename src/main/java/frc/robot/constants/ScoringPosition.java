@@ -9,7 +9,7 @@ public enum ScoringPosition {
 	MidCone(.9652, .82, true),
 	HighCube(1, 1.213),
 	HighCone(ElevatorConstants.maxHeight_m, 1.39, true),
-	DoubleSubstation(.96, .382),
+	DoubleSubstation(1, .382),
 	AllIn(.19, 0);
 
 // @formatter:on

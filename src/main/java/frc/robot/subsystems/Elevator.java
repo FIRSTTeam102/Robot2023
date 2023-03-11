@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import static frc.robot.constants.ElevatorConstants.*;
 
 import frc.robot.Robot;
+import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
 import frc.robot.util.BuildManager;
 import frc.robot.util.ScoringMechanism2d;
@@ -40,6 +41,7 @@ public class Elevator extends SubsystemBase {
 	// feedforward is for velocity control mode
 	// private ElevatorFeedforward feedforward = new ElevatorFeedforward(kS, kG, kV, kA);
 
+	@Getter
 	private double targetPosition_m = 0.0;
 
 	@Getter
@@ -86,12 +88,21 @@ public class Elevator extends SubsystemBase {
 		pidController.setReference(0, ControlType.kDutyCycle, 0, feedForward_V);
 	}
 
+	public void killMotor() {
+		inManualMode = true;
+		pidController.setReference(0, ControlType.kVoltage, 0, 0);
+	}
+
 	public void setPosition(double position_m) {
 		targetPosition_m = position_m;
 		// double feed = feedforward.calculate();
 		pidController.setReference(
 			MathUtil.clamp(targetPosition_m, Arm.isInDangerZone() ? dangerZone_m : 0, maxHeight_m),
 			ControlType.kPosition, 0, feedForward_V);
+	}
+
+	public boolean withinTargetPosition() {
+		return Math.abs(inputs.position_m - targetPosition_m) < AutoConstants.elevatorTolerance_m;
 	}
 
 	@Override

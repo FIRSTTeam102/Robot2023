@@ -71,30 +71,39 @@ public class TeleopSwerve extends CommandBase {
 
 	private double rotation;
 	private Translation2d translation;
+	private double driveMaxPercent = 1.0;
+	private double turnMaxPercent = 1.0;
 
-	private double maxPercent = 1.0;
-	private static double maxArmDist_m = Arm.nutDistToArmDist(ArmConstants.maxNutDist_m) - ArmConstants.dangerZone_m;
+	private static final double normalMaxPercent = 0.8;
+	private static final double maxArmDist_m = Arm.nutDistToArmDist(ArmConstants.maxNutDist_m)
+		- ArmConstants.dangerZone_m;
 
 	@Override
 	public void execute() {
-		maxPercent = overrideSpeedSupplier.getAsBoolean() ? 1.0
-			: 1 - 0.5 * (
+		if (overrideSpeedSupplier.getAsBoolean()) {
+			driveMaxPercent = 1.0;
+			turnMaxPercent = 0.9;
+		} else {
+			driveMaxPercent = normalMaxPercent * (1 - 0.4 /* how much of the decrease to use */ * (
 			// bigger coefficient = more of a speed decrease the farther out it is
-			1 * (arm.getArmDist_m() / maxArmDist_m)
-				+ 0.5 * ((elevator.inputs.position_m - ArmConstants.dangerZone_m) / ElevatorConstants.maxHeight_m));
+			0.9 * (arm.getArmDist_m() / maxArmDist_m)
+				+ 0.4 * ((elevator.inputs.position_m - ArmConstants.dangerZone_m) / ElevatorConstants.maxHeight_m)));
+			turnMaxPercent = driveMaxPercent * 0.9;
+		}
 
-		if (preciseModeSupplier.getAsBoolean())
-			maxPercent *= 0.3;
+		if (preciseModeSupplier.getAsBoolean()) {
+			driveMaxPercent *= 0.35;
+			turnMaxPercent *= 0.4;
+		}
 
 		translation = new Translation2d(
 			modifyAxis(driveSupplier.getAsDouble()),
 			modifyAxis(strafeSupplier.getAsDouble()))
-				.times(SwerveConstants.maxVelocity_mps * maxPercent);
+				.times(SwerveConstants.maxVelocity_mps * driveMaxPercent);
 
 		rotation = modifyAxis(turnSupplier.getAsDouble())
 			* SwerveConstants.maxAngularVelocity_radps
-			* maxPercent;
-		// * (overrideSpeedSupplier.getAsBoolean() ? 0.7 : 0.5);
+			* turnMaxPercent;
 
 		swerve.drive(translation, rotation, fieldRelative);
 	}

@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import static frc.robot.constants.GrabberConstants.*;
 
 import frc.robot.Robot;
-import frc.robot.constants.GrabberConstants;
 import frc.robot.util.BuildManager;
 import frc.robot.util.ScoringMechanism2d;
 
@@ -48,7 +47,7 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 	private int grabbedCounter = 0;
 
 	public boolean hasGrabbed() {
-		if (inputs.current_A > GrabberConstants.grabbedCurrent_A)
+		if (inputs.current_A > grabbedCurrent_A)
 			grabbedCounter++;
 		else
 			grabbedCounter = 0;
@@ -71,7 +70,11 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 				DriverStation.reportWarning("grabber over current!", false);
 				stop();
 			}
-		}
+			Lights.setStatus(Lights.Group.Grabber, Lights.Status.Center);
+		} else
+			Lights.setStatus(Lights.Group.Grabber,
+				inputs.current_A > grabbedCurrent_A ? Lights.Status.All : Lights.Status.None);
+
 	}
 
 	/**
@@ -81,7 +84,7 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 	public static class GrabberIOInputs {
 		public double percentOutput = 0.0;
 		public double current_A = 0.0;
-		public double temperature_C = 0.0;
+		// public double temperature_C = 0.0;
 	}
 
 	public GrabberIOInputsAutoLogged inputs = new GrabberIOInputsAutoLogged();
@@ -89,7 +92,7 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 	private void updateInputs(GrabberIOInputs inputs) {
 		inputs.percentOutput = Robot.isReal() ? motor.getAppliedOutput() : motor.get();
 		inputs.current_A = motor.getOutputCurrent();
-		inputs.temperature_C = motor.getMotorTemperature();
+		// inputs.temperature_C = motor.getMotorTemperature();
 	}
 
 	@Override

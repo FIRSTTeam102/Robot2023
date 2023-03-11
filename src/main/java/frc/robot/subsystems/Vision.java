@@ -21,10 +21,25 @@ public class Vision extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-
-		// Every 0.02s, updating networktable variables
+		// every 0.02s, updating networktable variables
 		io.updateInputs(inputs);
 		Logger.getInstance().processInputs(getName(), inputs);
+
+		Lights.setStatus(Lights.Group.LMAprilTag, switch ((int) inputs.targetAprilTag) {
+			case 1, 6 -> Lights.Status.Right; // right
+			case 2, 7 -> Lights.Status.Center; // center
+			case 3, 8 -> Lights.Status.Left; // left
+			case 4, 5 -> Lights.Status.LeftRight; // substation
+			default -> Lights.Status.None;
+		});
+		Lights.setStatus(Lights.Group.LMRetroreflective, (inputs.pipeline == Pipeline.Retroreflective.value &&
+			inputs.target)
+				? (inputs.crosshairToTargetErrorX_rad < 0 ? Lights.Status.Left
+					: inputs.crosshairToTargetErrorX_rad > 0 ? Lights.Status.Right
+						: Lights.Status.All)
+				: Lights.Status.None);
+		Lights.setStatus(Lights.Group.Coral.value,
+			inputs.pipeline == Pipeline.GamePiece.value ? (int) inputs.targetObject : Lights.Status.None.value);
 	}
 
 	// Creates set pipeline

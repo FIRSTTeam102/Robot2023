@@ -21,11 +21,11 @@ public final class ArmConstants {
 
 	// todo: tuning
 	public static final double kP = 17.0;
-	public static final double kI = 0.005;
+	public static final double kI = 0.01;
 	public static final double kIZone = 0.05;
 	public static final double kD = 0.08;
 	public static final double kF = 0;
 
-	public static final double maxOutput = .65;
-	public static final double minOutput = -maxOutput;
+	public static final double maxOutput = .85;
+	public static final double minOutput = -.65;
 }

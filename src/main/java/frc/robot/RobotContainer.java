@@ -12,6 +12,7 @@ import frc.robot.io.GyroIOSim;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Grabber;
+import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
 import frc.robot.util.Alert;
@@ -37,12 +38,12 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.HttpCamera;
 import edu.wpi.first.cscore.HttpCamera.HttpCameraKind;
 import edu.wpi.first.cscore.MjpegServer;
-import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.SendableCameraWrapper;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
@@ -87,7 +88,7 @@ public class RobotContainer {
 	public final Grabber grabber = new Grabber();
 
 	private LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("auto routine");
-	private GenericEntry autoDelay;
+	// private GenericEntry autoDelay;
 
 	/** The container for the robot. Contains subsystems, OI devices, and commands. */
 	public RobotContainer() {
@@ -101,7 +102,8 @@ public class RobotContainer {
 		autoChooser.addOption("2 piece (FW cone)", Autos.twoPieceFW(this));
 		autoChooser.addOption("2 piece & balance (FW cone)", Autos.twoPieceChargeStation(this));
 		autoChooser.addOption("2 piece (LZ cone)", Autos.twoPieceLZ(this));
-		autoChooser.addOption("just loading zone (LZ cube)", Autos.loadingZone(this));
+		autoChooser.addOption("1 piece (LZ cube)", Autos.loadingZone(this));
+		autoChooser.addOption("1 piece (FW Cube)", Autos.fieldWallOnePiece(this));
 		autoChooser.addOption("backup & balance (co-op cube)", Autos.coopBackup(this));
 
 		// for testing
@@ -114,9 +116,9 @@ public class RobotContainer {
 			.withSize(2, 4).withPosition(15, 0);
 		driveTab.add("auto routine", autoChooser.getSendableChooser())
 			.withSize(4, 1).withPosition(0, 6);
-		autoDelay = driveTab.add("auto delay", 0.0)
-			.withSize(2, 1).withPosition(0, 7)
-			.getEntry();
+		// autoDelay = driveTab.add("auto delay", 0.0)
+		// .withSize(2, 1).withPosition(0, 7)
+		// .getEntry();
 		configureCameras();
 	}
 
@@ -184,6 +186,14 @@ public class RobotContainer {
 
 		operatorConsole.button(5) // aim at game piece
 			.whileTrue(new GamePieceVision(GamePieceVision.Routine.GamepieceGround, vision, swerve, elevator, arm, grabber));
+
+		operatorConsole.button(14)
+			.whileTrue(Commands.run(elevator::killMotor, elevator));
+		// .whileTrue(arm.tempDisableLimits);
+
+		// human player request
+		operatorConsole.button(9).onTrue(Lights.requestGamePiece(Lights.Status.Cone));
+		operatorConsole.button(13).onTrue(Lights.requestGamePiece(Lights.Status.Cube));
 
 		/*
 		 * operator flight stick

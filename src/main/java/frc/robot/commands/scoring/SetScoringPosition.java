@@ -1,10 +1,10 @@
 package frc.robot.commands.scoring;
 
+import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.ScoringPosition;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Elevator;
 
-import frc.robot.commands.arm.MoveArmBy;
 import frc.robot.commands.arm.SetArmPosition;
 import frc.robot.commands.elevator.SetElevatorPosition;
 
@@ -51,13 +51,21 @@ public class SetScoringPosition extends ProxyCommand {
 			arm.inManualMode = false;
 			if (elevatorTarget_m > elevator.inputs.position_m) {
 				// if we're on the ground, send arm a bit out first so cone lip doesn't get stuck on bumper
-				if (elevator.inputs.position_m - ScoringPosition.Ground.elevatorHeight_m < 0.08)
-					addCommands(new MoveArmBy(arm, 0.04));
+				// if (Math.abs(elevator.inputs.position_m - ScoringPosition.Ground.elevatorHeight_m) < 0.08)
+				// addCommands(new MoveArmBy(arm, 0.08));
 
 				// going up -> elevator first
 				addCommands(
 					new SetElevatorPosition(elevator, elevatorTarget_m),
-					new WaitUntilCommand(() -> arm.inManualMode || elevator.inputs.position_m > 0.9 * elevatorTarget_m), // Units.inchesToMeters(30)
+					new WaitUntilCommand(() -> {
+						if (arm.inManualMode)
+							return true;
+
+						if (elevator.inputs.position_m < ElevatorConstants.dangerZone_m)
+							return false; // until we get above
+
+						return elevator.inputs.position_m > 0.9 * elevatorTarget_m;
+					}), // Units.inchesToMeters(30)
 					new SetArmPosition(arm, armTarget_m));
 			} else {
 				// going down -> arm first
@@ -74,7 +82,7 @@ public class SetScoringPosition extends ProxyCommand {
 							return arm.getArmDist_m() > 0.6 * armTarget_m;
 						// arm going in
 						else
-							return arm.getArmDist_m() < armTarget_m + 0.08; // when going to 0
+							return arm.getArmDist_m() < armTarget_m + 0.15; // when going to 0
 
 						// return Math.abs(arm.getArmDist_m() - armTarget_m) <= 0.1;
 					}),
