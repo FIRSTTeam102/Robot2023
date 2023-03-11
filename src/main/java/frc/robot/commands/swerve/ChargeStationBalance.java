@@ -14,10 +14,10 @@ import org.littletonrobotics.junction.Logger;
 // angles are between +/- pi
 
 public class ChargeStationBalance extends CommandBase {
-	private final double maxSpeed_mps = 0.05 * SwerveConstants.maxVelocity_mps;
+	private final double maxSpeed_mps = 0.1 * SwerveConstants.maxVelocity_mps;
 	// private final double maxTurn = 0.1 * SwerveConstants.maxAngularVelocity_radps;
 
-	private final double maxAngularVelocity_radps = 0.15;
+	private final double maxAngularVelocity_radps = 0.04;
 
 	// stops driving when within @fieldcal
 	private final double maxAngle_rad = Units.degreesToRadians(2);
@@ -45,6 +45,8 @@ public class ChargeStationBalance extends CommandBase {
 		swerve.stop();
 		angle_rad = Double.POSITIVE_INFINITY;
 		angleZeroedTimer.reset();
+		shouldStopTimer.reset();
+		isTimedOut = false;
 	}
 
 	// stores the current state of the state machine
@@ -63,7 +65,14 @@ public class ChargeStationBalance extends CommandBase {
 	}
 
 	double angle_rad;
+
 	Timer angleZeroedTimer = new Timer();
+	static final double angleZeroedTrigger_s = 2;
+
+	Timer shouldStopTimer = new Timer();
+	static final double shouldStopTrigger_s = 0.2;
+	static final double shouldStopWait_s = 1;
+	boolean isTimedOut = false;
 
 	@Override
 	/**
@@ -78,28 +87,43 @@ public class ChargeStationBalance extends CommandBase {
 			+ swerve.getYaw().getCos() * gyro.roll_radps;
 		Logger.getInstance().recordOutput("Balance/angleVelocity_radps", angleVelocity_radps);
 
-		boolean shouldStop = angle_rad < 0 && angleVelocity_radps > maxAngularVelocity_radps
+		boolean tiltedTooFast = angle_rad < 0 && angleVelocity_radps > maxAngularVelocity_radps
 			|| angle_rad > 0 && angleVelocity_radps < -maxAngularVelocity_radps;
+		if (tiltedTooFast)
+			shouldStopTimer.start();
+		else if (!shouldStopTimer.hasElapsed(shouldStopTrigger_s)) {
+			shouldStopTimer.stop();
+			shouldStopTimer.reset();
+		}
 
 		boolean angleZeroed = angleZeroed(angle_rad);
 		if (angleZeroed)
 			angleZeroedTimer.start();
 		else {
-			angleZeroedTimer.reset();
 			angleZeroedTimer.stop();
+			angleZeroedTimer.reset();
 		}
 		Logger.getInstance().recordOutput("Balance/angleZeroedTime_s", angleZeroedTimer.get());
 
+		if (!isTimedOut)
+			isTimedOut = shouldStopTimer.hasElapsed(shouldStopTrigger_s);
+
 		// if we're going too fast, stop moving
-		if (shouldStop)
+		if (isTimedOut && !shouldStopTimer.hasElapsed(shouldStopWait_s))
 			swerve.stop();
-		// if we've been within the target for long enough (so not super oscillating), lock the wheels
-		else if (angleZeroedTimer.hasElapsed(2))
-			swerve.setModuleStates(swerve.getXStanceStates());
-		else
-			swerve.drive(new Translation2d(
-				maxSpeed_mps * sign(angle_rad),
-				0), 0, true);
+		else {
+			// we've been timed out enough and can go back to normal behavior
+			isTimedOut = false;
+
+			// if we've been within the target for long enough (so not super oscillating), lock the wheels
+			if (angleZeroedTimer.hasElapsed(angleZeroedTrigger_s))
+				swerve.setModuleStates(swerve.getXStanceStates());
+
+			else
+				swerve.drive(new Translation2d(
+					maxSpeed_mps * sign(angle_rad),
+					0), 0, true);
+		}
 	}
 
 	// @formatter:off
@@ -147,6 +171,7 @@ public class ChargeStationBalance extends CommandBase {
 	public void end(boolean interrupted) {
 		swerve.stop();
 		angleZeroedTimer.stop();
+		shouldStopTimer.stop();
 	}
 
 	@Override
