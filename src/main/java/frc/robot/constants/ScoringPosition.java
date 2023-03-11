@@ -2,12 +2,13 @@ package frc.robot.constants;
 
 // @formatter:off
 public enum ScoringPosition {
-	Ground(0, .44),
+	// @fieldcal
+	Ground(0, .55),
 	GroundFar(0, .82),
 	MidCube(.702, .777),
 	MidCone(.9652, .82, true),
 	HighCube(1, 1.213),
-	HighCone(ElevatorConstants.maxHeight_m, 1.345, true),
+	HighCone(ElevatorConstants.maxHeight_m, 1.39, true),
 	DoubleSubstation(.96, .382),
 	AllIn(.19, 0);
 

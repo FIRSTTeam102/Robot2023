@@ -1,5 +1,6 @@
 package frc.robot.commands.arm;
 
+import frc.robot.constants.AutoConstants;
 import frc.robot.subsystems.Arm;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -23,7 +24,7 @@ public class MoveArmBy extends CommandBase {
 
 	@Override
 	public boolean isFinished() {
-		return Math.abs(targetPos_m - arm.getArmDist_m()) <= 0.01;
+		return Math.abs(targetPos_m - arm.getArmDist_m()) <= AutoConstants.armTolerance_m;
 	}
 
 	@Override

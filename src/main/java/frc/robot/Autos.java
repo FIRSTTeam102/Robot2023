@@ -4,6 +4,7 @@ import static frc.robot.constants.AutoConstants.*;
 
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.ScoringPosition;
+import frc.robot.constants.SwerveConstants;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Grabber;
@@ -21,6 +22,7 @@ import frc.robot.commands.swerve.PathPlannerCommand;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -50,31 +52,41 @@ public final class Autos {
 	}
 
 	public static Command allIn(Elevator elevator, Arm arm) {
-		return new SetScoringPosition(elevator, arm, ScoringPosition.AllIn, armTolerance_m, elevatorTolerance_m);
+		return new SetScoringPosition(elevator, arm, ScoringPosition.AllIn, 0.2, 0.2);
 	}
 
-	public static Command intakeGroundClose(Elevator elevator, Arm arm, Grabber grabber) {
+	public static Command goForward(Swerve swerve) {
+		return Commands.startEnd(
+			() -> swerve.drive(new Translation2d(SwerveConstants.maxVelocity_mps * 0.2, 0), 0, true),
+			() -> swerve.stop(), swerve);
+	}
+
+	public static Command intakeGroundClose(Swerve swerve, Elevator elevator, Arm arm, Grabber grabber) {
 		return deadlineSeconds(3, Commands.sequence(
 			// both sets are async
 			new SetArmPosition(arm, ScoringPosition.Ground.armExtension_m),
 			new SetElevatorPosition(elevator, ScoringPosition.Ground.elevatorHeight_m),
-			new GrabGrabberUntilGrabbed(grabber)));
+			Commands.deadline(new GrabGrabberUntilGrabbed(grabber), goForward(swerve))));
 	}
 
-	public static Command intakeGroundFar(Elevator elevator, Arm arm, Grabber grabber) {
+	public static Command intakeGroundFar(Swerve swerve, Elevator elevator, Arm arm, Grabber grabber) {
 		return deadlineSeconds(3, Commands.sequence(
 			// both sets are async
 			new SetArmPosition(arm, ScoringPosition.GroundFar.armExtension_m),
 			new SetElevatorPosition(elevator, ScoringPosition.GroundFar.elevatorHeight_m),
-			new GrabGrabberUntilGrabbed(grabber)));
+			Commands.deadline(new GrabGrabberUntilGrabbed(grabber), goForward(swerve))));
 	}
 
 	public static Command score(Elevator elevator, Arm arm, Grabber grabber, ScoringPosition pos) {
 		var sequence = new SequentialCommandGroup(
-			new SetScoringPosition(elevator, arm, pos, armTolerance_m, elevatorTolerance_m));
+			Commands.print("setting scoring position"),
+			new SetScoringPosition(elevator, arm, pos, elevatorTolerance_m, armTolerance_m),
+			// fixme: why does this get stuck here
+			Commands.print("scoring position set"));
 		if (pos.moveDown)
-			sequence.addCommands(new MoveElevatorBy(elevator, ElevatorConstants.coneMoveDownHeight_m));
-		sequence.addCommands(new ReleaseGrabber(grabber), Commands.waitSeconds(0.3));
+			sequence.addCommands(new MoveElevatorBy(elevator, ElevatorConstants.coneMoveDownHeight_m),
+				Commands.print("moved down"));
+		sequence.addCommands(Commands.print("releasing"), new ReleaseGrabber(grabber), Commands.waitSeconds(0.3));
 		return sequence;
 	}
 
@@ -121,7 +133,7 @@ public final class Autos {
 			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCone),
 			allIn(robo.elevator, robo.arm),
 			runAutoPath(path.get(0), robo.swerve, true),
-			intakeGroundClose(robo.elevator, robo.arm, robo.grabber),
+			intakeGroundClose(robo.swerve, robo.elevator, robo.arm, robo.grabber),
 			allIn(robo.elevator, robo.arm),
 			runAutoPath(path.get(1), robo.swerve),
 			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.HighCube),
@@ -138,10 +150,10 @@ public final class Autos {
 		return new SequentialCommandGroup(
 			swerveAnglesTo0(robo.swerve),
 			grabTimed(robo.grabber),
-			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCone),
+			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.HighCube),
 			allIn(robo.elevator, robo.arm),
 			runAutoPath(path.get(0), robo.swerve, true),
-			intakeGroundClose(robo.elevator, robo.arm, robo.grabber),
+			intakeGroundClose(robo.swerve, robo.elevator, robo.arm, robo.grabber),
 			allIn(robo.elevator, robo.arm),
 			runAutoPath(path.get(1), robo.swerve),
 			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.HighCube),
@@ -163,7 +175,7 @@ public final class Autos {
 			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCone),
 			allIn(robo.elevator, robo.arm),
 			runAutoPath(path.get(0), robo.swerve, true),
-			intakeGroundClose(robo.elevator, robo.arm, robo.grabber),
+			intakeGroundClose(robo.swerve, robo.elevator, robo.arm, robo.grabber),
 			allIn(robo.elevator, robo.arm),
 			runAutoPath(path.get(1), robo.swerve),
 			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.HighCube),

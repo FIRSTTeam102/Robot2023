@@ -8,6 +8,7 @@ import frc.robot.commands.arm.MoveArmBy;
 import frc.robot.commands.arm.SetArmPosition;
 import frc.robot.commands.elevator.SetElevatorPosition;
 
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
@@ -29,6 +30,18 @@ public class SetScoringPosition extends ProxyCommand {
 		double elevatorTolerance_m, double armTolerance_m) {
 		super(() -> new SetElevatorArmPositionProxied(elevator, arm, elevatorPos_m, armPos_m,
 			elevatorTolerance_m, armTolerance_m));
+	}
+
+	@Override
+	public void end(boolean interrupted) {
+		super.end(true);
+		System.out.println("SetScoringPosition ended");
+	}
+
+	@Override
+	public void initialize() {
+		super.initialize();
+		System.out.println("SetScoringPosition init");
 	}
 
 	private static class SetElevatorArmPositionProxied extends SequentialCommandGroup {
@@ -68,11 +81,16 @@ public class SetScoringPosition extends ProxyCommand {
 					new SetElevatorPosition(elevator, elevatorTarget_m));
 			}
 
-			if (elevatorTarget_m > 0)
+			if (elevatorTolerance_m > 0)
 				addCommands(
-					new WaitUntilCommand(() -> Math.abs(elevator.inputs.position_m - elevatorTarget_m) < elevatorTarget_m));
+					new WaitUntilCommand(() -> {
+						return Math.abs(elevator.inputs.position_m - elevatorTarget_m) < elevatorTolerance_m;
+					}));
 			if (armTolerance_m > 0)
-				addCommands(new WaitUntilCommand(() -> Math.abs(arm.getArmDist_m() - armTarget_m) < armTolerance_m));
+				addCommands(new WaitUntilCommand(() -> {
+					return Math.abs(arm.getArmDist_m() - armTarget_m) < armTolerance_m;
+				}));
+			addCommands(Commands.print("SetScoringPosition done"));
 		}
 	}
 }

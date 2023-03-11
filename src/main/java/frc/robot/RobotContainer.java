@@ -43,7 +43,6 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.SendableCameraWrapper;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
@@ -102,7 +101,7 @@ public class RobotContainer {
 		autoChooser.addOption("2 piece (FW cone)", Autos.twoPieceFW(this));
 		autoChooser.addOption("2 piece & balance (FW cone)", Autos.twoPieceChargeStation(this));
 		autoChooser.addOption("2 piece (LZ cone)", Autos.twoPieceLZ(this));
-		autoChooser.addOption("just loading zone (FW cube)", Autos.loadingZone(this));
+		autoChooser.addOption("just loading zone (LZ cube)", Autos.loadingZone(this));
 		autoChooser.addOption("backup & balance (co-op cube)", Autos.coopBackup(this));
 
 		// for testing
@@ -258,8 +257,8 @@ public class RobotContainer {
 	 * @return the command to run in autonomous
 	 */
 	public Command getAutonomousCommand() {
-		if (autoDelay.getDouble(0) > 0)
-			return Commands.waitSeconds(autoDelay.getDouble(0)).andThen(autoChooser.get());
+		// if (autoDelay.getDouble(0) > 0)
+		// return Commands.waitSeconds(autoDelay.getDouble(0)).andThen(autoChooser.get());
 		return autoChooser.get();
 	}
 

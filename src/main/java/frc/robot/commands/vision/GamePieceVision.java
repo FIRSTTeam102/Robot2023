@@ -72,7 +72,7 @@ public class GamePieceVision extends CommandBase {
 	public void end(boolean interrupted) {
 		swerve.stop();
 		System.out.println("Arm --> GroundFar, Elevator --> Ground, Grabber --> GamepieceUntilGrabbed");
-		Autos.intakeGroundFar(elevator, arm, grabber);
+		Autos.intakeGroundFar(swerve, elevator, arm, grabber);
 		System.out.println("Arm --> AllIn, Elevator --> AllIn");
 		Autos.allIn(elevator, arm).schedule();
 		vision.setPipeline(Pipeline.AprilTag);
