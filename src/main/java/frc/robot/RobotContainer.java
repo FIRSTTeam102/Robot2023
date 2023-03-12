@@ -5,6 +5,7 @@ import frc.robot.constants.Constants.CameraConstants;
 import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.constants.Constants.ShuffleboardConstants;
 import frc.robot.constants.ElevatorConstants;
+import frc.robot.constants.GrabberConstants;
 import frc.robot.constants.ScoringPosition;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
@@ -23,7 +24,6 @@ import frc.robot.commands.arm.ManualArmControl;
 import frc.robot.commands.elevator.ManualElevatorControl;
 import frc.robot.commands.elevator.MoveElevatorBy;
 import frc.robot.commands.grabber.GrabGrabber;
-import frc.robot.commands.grabber.GrabGrabberUntilGrabbed;
 import frc.robot.commands.grabber.ReleaseGrabber;
 import frc.robot.commands.grabber.StopGrabber;
 import frc.robot.commands.scoring.SetScoringPosition;
@@ -39,6 +39,7 @@ import edu.wpi.first.cscore.HttpCamera;
 import edu.wpi.first.cscore.HttpCamera.HttpCameraKind;
 import edu.wpi.first.cscore.MjpegServer;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.SendableCameraWrapper;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -103,8 +104,9 @@ public class RobotContainer {
 		autoChooser.addOption("2 piece & balance (FW cone)", Autos.twoPieceChargeStation(this));
 		autoChooser.addOption("2 piece (LZ cone)", Autos.twoPieceLZ(this));
 		autoChooser.addOption("1 piece (LZ cube)", Autos.loadingZone(this));
-		autoChooser.addOption("1 piece (FW Cube)", Autos.fieldWallOnePiece(this));
+		autoChooser.addOption("1 piece (FW cube)", Autos.fieldWallOnePiece(this));
 		autoChooser.addOption("backup & balance (co-op cube)", Autos.coopBackup(this));
+		autoChooser.addOption("just score (cube)", Autos.justScore(this));
 
 		// for testing
 		autoChooser.addOption("[testing] drive characterization",
@@ -145,8 +147,11 @@ public class RobotContainer {
 			.whileTrue(teleopSwerve.holdToggleFieldRelative());
 
 		driverController.a().onTrue(teleopSwerve.toggleFieldRelative());
-		driverController.y().onTrue(teleopSwerve.new ZeroYaw());
 		driverController.x().whileTrue(new XStance(swerve));
+
+		var zeroYaw = teleopSwerve.new ZeroYaw();
+		driverController.y().onTrue(zeroYaw);
+		new Trigger(RobotController::getUserButton).onTrue(zeroYaw);
 
 		driverController.povUp().whileTrue(new ChargeStationBalance(swerve));
 
@@ -183,6 +188,8 @@ public class RobotContainer {
 			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.AllIn));
 		operatorConsole.button(16) // ground
 			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.Ground));
+		operatorConsole.button(10)
+			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.SingleSubstationCube));
 
 		operatorConsole.button(5) // aim at game piece
 			.whileTrue(new GamePieceVision(GamePieceVision.Routine.GamepieceGround, vision, swerve, elevator, arm, grabber));
@@ -202,7 +209,9 @@ public class RobotContainer {
 		elevator.setDefaultCommand(new ManualElevatorControl(elevator, () -> operatorJoystick.getY()));
 		// todo: what happens when both pressed?
 		operatorJoystick.trigger()
-			.whileTrue(new GrabGrabber(grabber));
+			.whileTrue(new GrabGrabber(grabber, GrabberConstants.cubeGrabSpeed));
+		operatorJoystick.button(5)
+			.whileTrue(new GrabGrabber(grabber, GrabberConstants.grabSpeed));
 		operatorJoystick.button(2)
 			.whileTrue(new ReleaseGrabber(grabber));
 		operatorJoystick.button(3)
@@ -210,8 +219,8 @@ public class RobotContainer {
 				.andThen(new ReleaseGrabber(grabber)));
 		operatorJoystick.button(4)
 			.onTrue(new StopGrabber(grabber));
-		operatorJoystick.button(5)
-			.onTrue(new GrabGrabberUntilGrabbed(grabber));
+		// operatorJoystick.button(5)
+		// .onTrue(new GrabGrabberUntilGrabbed(grabber));
 	}
 
 	@SuppressWarnings("unused")

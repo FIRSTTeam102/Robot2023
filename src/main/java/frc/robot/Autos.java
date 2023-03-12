@@ -198,6 +198,14 @@ public final class Autos {
 			runAutoPath(path.get(0), robo.swerve, true));
 	}
 
+	public static Command justScore(RobotContainer robo) {
+		return new SequentialCommandGroup(
+			swerveAnglesTo0(robo.swerve),
+			grabTimed(robo.grabber),
+			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.HighCube),
+			allIn(robo.elevator, robo.arm));
+	}
+
 	public static Command fieldWallOnePiece(RobotContainer robo) {
 		var path = PathPlanner.loadPathGroup("field wall 1 piece",
 			new PathConstraints(maxVelocity_mps, maxAcceleration_mps2));

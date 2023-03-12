@@ -6,10 +6,11 @@ public enum ScoringPosition {
 	Ground(0, .55),
 	GroundFar(0, .82),
 	MidCube(.702, .777),
-	MidCone(.9652, .82, true),
+	MidCone(.9652, .8, true),
 	HighCube(1, 1.213),
 	HighCone(ElevatorConstants.maxHeight_m, 1.39, true),
-	DoubleSubstation(1, .382),
+	DoubleSubstation(1.05, .382),
+	SingleSubstationCube(.58, 0),
 	AllIn(.19, 0);
 
 // @formatter:on
