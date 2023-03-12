@@ -16,6 +16,7 @@ public class ManualElevatorControl extends CommandBase {
 		this.elevator = elevator;
 		this.inputSupplier = inputSupplier;
 		addRequirements(elevator);
+		elevator.setManualModeInput(inputSupplier);
 	}
 
 	@Override
@@ -23,12 +24,9 @@ public class ManualElevatorControl extends CommandBase {
 
 	@Override
 	public void execute() {
-		// todo: invert input?
-		if (Math.abs(inputSupplier.getAsDouble()) > OperatorConstants.stickDeadband)
-			elevator.inManualMode = true;
-
 		if (elevator.inManualMode)
-			elevator.setSpeed(MathUtil.applyDeadband(inputSupplier.getAsDouble(), OperatorConstants.stickDeadband) * -.4);
+			elevator.setSpeed(
+				MathUtil.applyDeadband(inputSupplier.getAsDouble(), OperatorConstants.operatorJoystickDeadband) * -.4);
 	}
 
 	@Override

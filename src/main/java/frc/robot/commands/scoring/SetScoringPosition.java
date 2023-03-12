@@ -58,7 +58,7 @@ public class SetScoringPosition extends ProxyCommand {
 				addCommands(
 					new SetElevatorPosition(elevator, elevatorTarget_m),
 					new WaitUntilCommand(() -> {
-						if (arm.inManualMode)
+						if (elevator.inManualMode || arm.inManualMode)
 							return true;
 
 						if (elevator.inputs.position_m < ElevatorConstants.dangerZone_m)
@@ -72,7 +72,7 @@ public class SetScoringPosition extends ProxyCommand {
 				addCommands(
 					new SetArmPosition(arm, armTarget_m),
 					new WaitUntilCommand(() -> {
-						if (elevator.inManualMode)
+						if (elevator.inManualMode || arm.inManualMode)
 							return true;
 
 						// Units.inchesToMeters(36)

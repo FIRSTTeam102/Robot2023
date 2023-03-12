@@ -19,6 +19,7 @@ import frc.robot.commands.grabber.ReleaseGrabber;
 import frc.robot.commands.scoring.SetScoringPosition;
 import frc.robot.commands.swerve.ChargeStationBalance;
 import frc.robot.commands.swerve.PathPlannerCommand;
+import frc.robot.commands.swerve.XStance;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -95,7 +96,7 @@ public final class Autos {
 	}
 
 	public static Command balance(Swerve swerve) {
-		return new ChargeStationBalance(swerve);
+		return Commands.sequence(deadlineSeconds(4, new ChargeStationBalance(swerve)), new XStance(swerve));
 	}
 
 	// angle = ppState.holonomicRotation
@@ -221,10 +222,25 @@ public final class Autos {
 			runAutoPath(path.get(0), robo.swerve, true));
 	}
 
+	public static Command fieldWallOnePieceBalance(RobotContainer robo) {
+		var path = PathPlanner.loadPathGroup("charge station 1 piece fw",
+			new PathConstraints(maxVelocity_mps, maxAcceleration_mps2));
+		if (path == null)
+			return new PrintCommand("no path group");
+
+		return new SequentialCommandGroup(
+			swerveAnglesTo0(robo.swerve),
+			grabTimed(robo.grabber),
+			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.HighCube),
+			allIn(robo.elevator, robo.arm),
+			runAutoPath(path.get(0), robo.swerve, true),
+			balance(robo.swerve));
+	}
+
 	/** start in middle, backup over CS to get mobility, then balance on charge station */
 	public static Command coopBackup(RobotContainer robo) {
 		var path = PathPlanner.loadPathGroup("coop backup",
-			new PathConstraints(maxVelocity_mps, maxAcceleration_mps2));
+			new PathConstraints(4, maxAcceleration_mps2));
 		if (path == null)
 			return new PrintCommand("no path group");
 

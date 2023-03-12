@@ -5,6 +5,7 @@ import static frc.robot.constants.ElevatorConstants.*;
 import frc.robot.Robot;
 import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
+import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.util.BuildManager;
 import frc.robot.util.ScoringMechanism2d;
 import frc.robot.util.SendableSparkMaxPIDController;
@@ -29,7 +30,10 @@ import com.revrobotics.SparkMaxPIDController;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
+import java.util.function.DoubleSupplier;
+
 import lombok.Getter;
+import lombok.Setter;
 
 public class Elevator extends SubsystemBase {
 	private CANSparkMax motor = new CANSparkMax(motorId, MotorType.kBrushless);
@@ -48,6 +52,8 @@ public class Elevator extends SubsystemBase {
 	// if within module bounds so arm knows to not go down too far
 	private static boolean inDangerZone = false;
 
+	@Setter
+	private DoubleSupplier manualModeInput = null;
 	public boolean inManualMode = true;
 
 	public Elevator() {
@@ -121,6 +127,10 @@ public class Elevator extends SubsystemBase {
 			encoder.setPosition(maxHeight_m);
 
 		inDangerZone = (encoder.getPosition() < dangerZone_m);
+
+		if (manualModeInput != null
+			&& Math.abs(manualModeInput.getAsDouble()) > OperatorConstants.operatorJoystickDeadband)
+			inManualMode = true;
 	}
 
 	/**

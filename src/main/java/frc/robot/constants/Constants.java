@@ -14,7 +14,8 @@ public final class Constants {
 		public static final int operatorConsolePort = 1;
 		public static final int operatorJoystickPort = 2;
 
-		public static final double stickDeadband = 0.2;
+		public static final double xboxStickDeadband = 0.1;
+		public static final double operatorJoystickDeadband = 0.2;
 		public static final double boolTriggerThreshold = 0.3;
 	}
 
@@ -22,8 +23,8 @@ public final class Constants {
 		// must be a supported resolution or will fail
 		public static final int width = 426;
 		public static final int height = 240;
-		public static final int fps = 30;
-		public static final int compression = 70;
+		public static final int fps = 15;
+		public static final int compression = 80;
 		// @fieldcal config exposure at comp
 		public static final int exposure = -1;
 	}

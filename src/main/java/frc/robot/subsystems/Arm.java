@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import static frc.robot.constants.ArmConstants.*;
 
 import frc.robot.constants.AutoConstants;
+import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.util.BuildManager;
 import frc.robot.util.ScoringMechanism2d;
 import frc.robot.util.SendableSparkMaxPIDController;
@@ -24,7 +25,10 @@ import com.revrobotics.SparkMaxPIDController;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
+import java.util.function.DoubleSupplier;
+
 import lombok.Getter;
+import lombok.Setter;
 
 public class Arm extends SubsystemBase {
 	private CANSparkMax motor = new CANSparkMax(motorId, MotorType.kBrushless);
@@ -44,6 +48,8 @@ public class Arm extends SubsystemBase {
 	// is within swerve module bounds so elevator doesn't go down too far
 	private static boolean inDangerZone = false;
 
+	@Setter
+	private DoubleSupplier manualModeInput = null;
 	public boolean inManualMode = true;
 
 	public Arm() {
@@ -116,6 +122,10 @@ public class Arm extends SubsystemBase {
 			hasDoneLimitReset = false;
 
 		inDangerZone = armDist_m < dangerZone_m;
+
+		if (manualModeInput != null
+			&& Math.abs(manualModeInput.getAsDouble()) >= OperatorConstants.operatorJoystickDeadband)
+			inManualMode = true;
 	}
 
 	public static double armDistToNutDist(double armDistance_m) {
@@ -129,13 +139,15 @@ public class Arm extends SubsystemBase {
 		return sectionCount * Math.copySign(Math.sqrt(Math.abs(x)), x);
 	}
 
-	public final Command tempDisableLimits = Commands.startEnd(() -> {
-		limitSwitch.enableLimitSwitch(false);
-		motor.enableSoftLimit(SoftLimitDirection.kReverse, false);
-		pidController.setOutputRange(-0.4, 0.4);
+	public final Command stop = Commands.startEnd(() -> {
+		// limitSwitch.enableLimitSwitch(false);
+		// motor.enableSoftLimit(SoftLimitDirection.kReverse, false);
+		pidController.setOutputRange(0, 0);
+		pidController.setReference(0, CANSparkMax.ControlType.kVoltage, 0, 0);
+		inManualMode = true;
 	}, () -> {
-		limitSwitch.enableLimitSwitch(true);
-		motor.enableSoftLimit(SoftLimitDirection.kReverse, true);
+		// limitSwitch.enableLimitSwitch(true);
+		// motor.enableSoftLimit(SoftLimitDirection.kReverse, true);
 		pidController.setOutputRange(minOutput, maxOutput);
 	});
 

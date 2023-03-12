@@ -35,8 +35,6 @@ import frc.robot.commands.vision.GamePieceVision;
 import frc.robot.commands.vision.RetroreflectiveVision;
 
 import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.cscore.HttpCamera;
-import edu.wpi.first.cscore.HttpCamera.HttpCameraKind;
 import edu.wpi.first.cscore.MjpegServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
@@ -52,8 +50,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-
-import java.util.Map;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -234,6 +230,7 @@ public class RobotContainer {
 			camera.setConnectVerbose(0);
 			camera.setFPS(CameraConstants.fps);
 			camera.setResolution(CameraConstants.width, CameraConstants.height);
+			// camera.setPixelFormat(PixelFormat.kGray);
 			if (CameraConstants.exposure >= 0)
 				camera.setExposureManual(CameraConstants.exposure);
 			else
@@ -247,7 +244,6 @@ public class RobotContainer {
 			cameraServer.setFPS(CameraConstants.fps);
 			cameraServer.setResolution(CameraConstants.width, CameraConstants.height);
 			cameraServer.setCompression(CameraConstants.compression);
-			cameraServer.setDefaultCompression(CameraConstants.compression);
 
 			Shuffleboard.getTab(ShuffleboardConstants.driveTab)
 				.add("camera", SendableCameraWrapper.wrap(camera))
@@ -259,16 +255,16 @@ public class RobotContainer {
 			DriverStation.reportError("Failed to get camera: " + e.toString(), e.getStackTrace());
 		}
 
-		if (Robot.isReal()) {
-			var limelightCamera = new HttpCamera("limelightStream", "http://limelight.local:5800/stream.mjpg",
-				HttpCameraKind.kMJPGStreamer);
-			Shuffleboard.getTab(ShuffleboardConstants.driveTab)
-				.add("limelight", limelightCamera)
-				.withProperties(Map.of("show crosshair", false, "show controls", false))
-				.withWidget(BuiltInWidgets.kCameraStream)
-				.withSize(7, 6)
-				.withPosition(8, 0);
-		}
+		// if (Robot.isReal()) {
+		// var limelightCamera = new HttpCamera("limelightStream", "http://limelight.local:5800/stream.mjpg",
+		// HttpCameraKind.kMJPGStreamer);
+		// Shuffleboard.getTab(ShuffleboardConstants.driveTab)
+		// .add("limelight", limelightCamera)
+		// .withProperties(Map.of("show crosshair", false, "show controls", false))
+		// .withWidget(BuiltInWidgets.kCameraStream)
+		// .withSize(7, 6)
+		// .withPosition(8, 0);
+		// }
 	}
 
 	/**

@@ -122,11 +122,11 @@ public class TeleopSwerve extends CommandBase {
 	// custom input scaling
 	// @see https://desmos.com/calculator/7wy4gmgdpv
 	private static double modifyAxis(double value) {
-		// value = MathUtil.applyDeadband(value, OperatorConstants.stickDeadband);
+		// value = MathUtil.applyDeadband(value, OperatorConstants.xboxStickDeadband);
 		// return Math.copySign(value * value, value);
 
 		double absValue = Math.abs(value);
-		return (absValue < OperatorConstants.stickDeadband) ? 0
+		return (absValue < OperatorConstants.xboxStickDeadband) ? 0
 			: Math.copySign(
 				(cubicWeight * Math.pow(absValue, weightExponent) + (1 - cubicWeight) * absValue + minOutput) / (1 + minOutput),
 				value);

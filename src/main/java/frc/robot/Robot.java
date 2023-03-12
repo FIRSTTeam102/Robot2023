@@ -6,6 +6,7 @@ import frc.robot.constants.BuildConstants;
 import frc.robot.subsystems.Lights;
 import frc.robot.util.ScoringMechanism2d;
 
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
@@ -175,6 +176,9 @@ public class Robot extends LoggedRobot {
 	public void testInit() {
 		// Cancels all running commands at the start of test mode.
 		CommandScheduler.getInstance().cancelAll();
+
+		// initialize? swerve so it doesn't spin the wheels
+		robotContainer.swerve.setChasisSpeeds(new ChassisSpeeds(0, 0, 0));
 
 		PathPlannerServer.startServer(5811);
 		SmartDashboard.putData("PP x pid", Autos.ppXController);

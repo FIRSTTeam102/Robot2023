@@ -264,10 +264,14 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 		// todo: estimate without using gyro?
 
 		// Every 0.02s, updating pose2d
-		if (vision.inputs.pipeline == Pipeline.AprilTag.value && vision.isPipelineReady() && vision.inputs.target == true
-			&& vision.inputs.botpose_fieldTranslationZ_m < VisionConstants.maxZDistanceAprilTag_m) {
+		// todo:?
+		// if (DriverStation.isAutonomous() || // in auto, always use the data
+		// in teleop, only use if it's close
+		if ((vision.inputs.pipeline == Pipeline.AprilTag.value && vision.isPipelineReady() && vision.inputs.target == true
+			&& vision.inputs.botpose_fieldTranslationZ_m < VisionConstants.maxZDistanceAprilTag_m)) {
 			var visionPose = new Pose2d(vision.inputs.botpose_fieldTranslationX_m, vision.inputs.botpose_fieldTranslationY_m,
 				new Rotation2d(vision.inputs.botpose_fieldRotationZ_rad));
+			Logger.getInstance().recordOutput("Odometry/VisionPose", visionPose);
 			poseEstimator.addVisionMeasurement(visionPose, timer.get() - vision.inputs.botpose_latency_s);
 			// }
 		}
