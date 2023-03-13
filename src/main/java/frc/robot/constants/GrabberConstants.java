@@ -8,6 +8,8 @@ public final class GrabberConstants {
 	public static final double holdSpeed = 0.28;
 	public static final double releaseSpeed = 0.3;
 	public static final double releaseTime_s = 0.5;
+	public static final double shootSpeed = -0.8;
+	public static final int shootTime = 1;
 
 	public static final int smartCurrentLimit_A = 50;
 	public static final int hardCurrentLimit_A = 60;

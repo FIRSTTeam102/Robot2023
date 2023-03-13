@@ -214,8 +214,8 @@ public class RobotContainer {
 				.andThen(new ReleaseGrabber(grabber)));
 		operatorJoystick.button(4)
 			.onTrue(new StopGrabber(grabber));
-		// operatorJoystick.button(5)
-		// .onTrue(new GrabGrabberUntilGrabbed(grabber));
+		operatorJoystick.button(5)
+			.onTrue(new ReleaseGrabber(grabber, GrabberConstants.shootSpeed, GrabberConstants.shootTime));
 	}
 
 	@SuppressWarnings("unused")
