@@ -123,7 +123,7 @@ public class Robot extends LoggedRobot {
 			default -> Lights.ControlMode.DisabledRed;
 		});
 
-		robotContainer.swerve.setGyroOffset_deg(0); // end of auto, clear PP offset or something
+		// robotContainer.swerve.setGyroOffset_deg(0); // end of auto, clear PP offset or something
 		robotContainer.swerve.disabledTimeStart = Timer.getFPGATimestamp();
 
 		// keep elevator at current position when re-enabled

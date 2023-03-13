@@ -20,7 +20,7 @@ public class ChargeStationBalance extends CommandBase {
 	private final double maxAngularVelocity_radps = 0.04;
 
 	// stops driving when within @fieldcal
-	private final double maxAngle_rad = Units.degreesToRadians(2);
+	private final double maxAngle_rad = Units.degreesToRadians(4);
 	private final double minAngle_rad = -maxAngle_rad;
 
 	// private final PIDController driveController = new PIDController(0.1, 0, 0.0005);
@@ -67,7 +67,7 @@ public class ChargeStationBalance extends CommandBase {
 	double angle_rad;
 
 	Timer angleZeroedTimer = new Timer();
-	static final double angleZeroedTrigger_s = 2;
+	static final double angleZeroedTrigger_s = 1.5;
 
 	Timer shouldStopTimer = new Timer();
 	static final double shouldStopTrigger_s = 0.2;
@@ -116,13 +116,13 @@ public class ChargeStationBalance extends CommandBase {
 			isTimedOut = false;
 
 			// if we've been within the target for long enough (so not super oscillating), lock the wheels
-			if (angleZeroedTimer.hasElapsed(angleZeroedTrigger_s))
-				swerve.setModuleStates(swerve.getXStanceStates());
+			// if (angleZeroedTimer.hasElapsed(angleZeroedTrigger_s))
+			swerve.setModuleStates(swerve.getXStanceStates());
 
-			else
-				swerve.drive(new Translation2d(
-					maxSpeed_mps * sign(angle_rad),
-					0), 0, true);
+			// else
+			swerve.drive(new Translation2d(
+				maxSpeed_mps * sign(angle_rad),
+				0), 0, true);
 		}
 	}
 

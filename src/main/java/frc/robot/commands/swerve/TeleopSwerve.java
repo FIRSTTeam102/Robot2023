@@ -90,12 +90,14 @@ public class TeleopSwerve extends CommandBase {
 			// bigger coefficient = more of a speed decrease the farther out it is
 			0.9 * (arm.getArmDist_m() / maxArmDist_m)
 				+ 0.4 * ((elevator.inputs.position_m - ArmConstants.dangerZone_m) / ElevatorConstants.maxHeight_m)));
+			if (driveMaxPercent <= 0.1) // bug?
+				driveMaxPercent = 0.1;
 			turnMaxPercent = driveMaxPercent * 0.9;
 		}
 
 		if (preciseModeSupplier.getAsBoolean()) {
 			driveMaxPercent *= 0.35;
-			turnMaxPercent *= 0.4;
+			turnMaxPercent *= 0.25;
 		}
 
 		translation = new Translation2d(

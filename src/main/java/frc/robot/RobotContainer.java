@@ -35,7 +35,6 @@ import frc.robot.commands.vision.GamePieceVision;
 import frc.robot.commands.vision.RetroreflectiveVision;
 
 import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.cscore.MjpegServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -228,8 +227,8 @@ public class RobotContainer {
 		try {
 			var camera = CameraServer.startAutomaticCapture("arm", 0);
 			camera.setConnectVerbose(0);
-			camera.setFPS(CameraConstants.fps);
-			camera.setResolution(CameraConstants.width, CameraConstants.height);
+			// camera.setFPS(CameraConstants.fps);
+			// camera.setResolution(CameraConstants.width, CameraConstants.height);
 			// camera.setPixelFormat(PixelFormat.kGray);
 			if (CameraConstants.exposure >= 0)
 				camera.setExposureManual(CameraConstants.exposure);
@@ -240,10 +239,10 @@ public class RobotContainer {
 			// camera server is evil
 			// var cameraServer = CameraServer.addSwitchedCamera("camera");
 			// var cameraServer = CameraServer.startAutomaticCapture(camera);
-			var cameraServer = (MjpegServer) CameraServer.getServer();
-			cameraServer.setFPS(CameraConstants.fps);
-			cameraServer.setResolution(CameraConstants.width, CameraConstants.height);
-			cameraServer.setCompression(CameraConstants.compression);
+			// var cameraServer = (MjpegServer) CameraServer.getServer();
+			// cameraServer.setFPS(CameraConstants.fps);
+			// cameraServer.setResolution(CameraConstants.width, CameraConstants.height);
+			// cameraServer.setCompression(CameraConstants.compression);
 
 			Shuffleboard.getTab(ShuffleboardConstants.driveTab)
 				.add("camera", SendableCameraWrapper.wrap(camera))

@@ -130,8 +130,7 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 	 */
 	public void resetOdometry(PathPlannerState state) {
 		// fixme:?
-		// setGyroOffset_deg(state.holonomicRotation.getDegrees());
-		setGyroOffset_deg(state.holonomicRotation.getDegrees()); // (Robot.isBlue() ? 0 : 180)
+		// setGyroOffset_deg(state.holonomicRotation.getDegrees()); // (Robot.isBlue() ? 0 : 180)
 		// gyroIO.setYaw(0);
 
 		// estimatedPoseWithoutGyro = new Pose2d(state.poseMeters.getTranslation(), state.holonomicRotation);
@@ -273,7 +272,6 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 				new Rotation2d(vision.inputs.botpose_fieldRotationZ_rad));
 			Logger.getInstance().recordOutput("Odometry/VisionPose", visionPose);
 			poseEstimator.addVisionMeasurement(visionPose, timer.get() - vision.inputs.botpose_latency_s);
-			// }
 		}
 
 		Logger.getInstance().recordOutput("Odometry/Robot", pose);
