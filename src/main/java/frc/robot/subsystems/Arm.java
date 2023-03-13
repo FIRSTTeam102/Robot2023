@@ -2,12 +2,16 @@ package frc.robot.subsystems;
 
 import static frc.robot.constants.ArmConstants.*;
 
+import frc.robot.constants.AutoConstants;
+import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.util.BuildManager;
 import frc.robot.util.ScoringMechanism2d;
 import frc.robot.util.SendableSparkMaxPIDController;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.CANSparkMax;
@@ -21,7 +25,10 @@ import com.revrobotics.SparkMaxPIDController;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
+import java.util.function.DoubleSupplier;
+
 import lombok.Getter;
+import lombok.Setter;
 
 public class Arm extends SubsystemBase {
 	private CANSparkMax motor = new CANSparkMax(motorId, MotorType.kBrushless);
@@ -31,6 +38,7 @@ public class Arm extends SubsystemBase {
 	private SparkMaxLimitSwitch limitSwitch = motor.getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);
 	// private SparkMaxLimitSwitch backLimitSwitch = motor.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);
 
+	@Getter
 	private double targetPosition_m = 0;
 
 	@Getter
@@ -40,6 +48,8 @@ public class Arm extends SubsystemBase {
 	// is within swerve module bounds so elevator doesn't go down too far
 	private static boolean inDangerZone = false;
 
+	@Setter
+	private DoubleSupplier manualModeInput = null;
 	public boolean inManualMode = true;
 
 	public Arm() {
@@ -61,6 +71,8 @@ public class Arm extends SubsystemBase {
 
 		motor.setSecondaryCurrentLimit(40);
 
+		motor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+
 		BuildManager.burnSpark(motor);
 
 		SmartDashboard.putData(new SendableSparkMaxPIDController(pidController, ControlType.kPosition, "arm pid"));
@@ -72,7 +84,7 @@ public class Arm extends SubsystemBase {
 		pidController.setReference(
 			MathUtil.clamp(armDistToNutDist(armLength_m),
 				Elevator.isInDangerZone() ? armDistToNutDist(dangerZone_m) : maxNutDist_m,
-				minNutDist_m),
+				minNutDist_m + .3),
 			CANSparkMax.ControlType.kPosition);
 	}
 
@@ -83,6 +95,12 @@ public class Arm extends SubsystemBase {
 	public void stop() {
 		pidController.setReference(0, CANSparkMax.ControlType.kDutyCycle);
 	}
+
+	public boolean withinTargetPosition() {
+		return Math.abs(armDist_m - targetPosition_m) < AutoConstants.armTolerance_m;
+	}
+
+	boolean hasDoneLimitReset = false;
 
 	@Override
 	public void periodic() {
@@ -97,12 +115,17 @@ public class Arm extends SubsystemBase {
 
 		// if (inputs.backLimitSwitch)
 		// encoder.setPosition(maxNutDist_m - minNutDist_m);
-
-		if (inputs.limitSwitch)
+		if (inputs.limitSwitch && !hasDoneLimitReset) {
+			hasDoneLimitReset = true;
 			encoder.setPosition(minNutDist_m);
+		} else if (hasDoneLimitReset && armDist_m > 0.01)
+			hasDoneLimitReset = false;
 
-		// todo: bake danger zone
-		inDangerZone = (inputs.nutPosition_m < armDistToNutDist(dangerZone_m));
+		inDangerZone = armDist_m < dangerZone_m;
+
+		if (manualModeInput != null
+			&& Math.abs(manualModeInput.getAsDouble()) >= OperatorConstants.operatorJoystickDeadband)
+			inManualMode = true;
 	}
 
 	public static double armDistToNutDist(double armDistance_m) {
@@ -115,6 +138,18 @@ public class Arm extends SubsystemBase {
 		var x = Math.pow(armSectionLength_m, 2) - Math.pow(nutDistance_m, 2);
 		return sectionCount * Math.copySign(Math.sqrt(Math.abs(x)), x);
 	}
+
+	public final Command stop = Commands.startEnd(() -> {
+		// limitSwitch.enableLimitSwitch(false);
+		// motor.enableSoftLimit(SoftLimitDirection.kReverse, false);
+		pidController.setOutputRange(0, 0);
+		pidController.setReference(0, CANSparkMax.ControlType.kVoltage, 0, 0);
+		inManualMode = true;
+	}, () -> {
+		// limitSwitch.enableLimitSwitch(true);
+		// motor.enableSoftLimit(SoftLimitDirection.kReverse, true);
+		pidController.setOutputRange(minOutput, maxOutput);
+	});
 
 	/**
 	 * inputs

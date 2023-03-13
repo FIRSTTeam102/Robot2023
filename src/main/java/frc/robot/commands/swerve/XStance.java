@@ -1,12 +1,7 @@
 package frc.robot.commands.swerve;
 
-import static frc.robot.constants.SwerveConstants.*;
-
 import frc.robot.subsystems.Swerve;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 /**
@@ -16,29 +11,19 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
  */
 public class XStance extends CommandBase {
 	private Swerve swerve;
-	private SwerveModuleState[] states;
 
 	public XStance(Swerve swerve) {
 		addRequirements(swerve);
 		this.swerve = swerve;
-
-		ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
-		states = swerve.kinematics.toSwerveModuleStates(chassisSpeeds, swerve.getCenterRotation());
-		// fixme: make all angles inward
-		states[0].angle = new Rotation2d(Math.PI / 2 - Math.atan(trackWidth_m / wheelBase_m));
-		states[1].angle = new Rotation2d(Math.PI / 2 + Math.atan(trackWidth_m / wheelBase_m));
-		states[2].angle = new Rotation2d(Math.PI / 2 + Math.atan(trackWidth_m / wheelBase_m));
-		states[3].angle = new Rotation2d(Math.PI * 3.0 / 2.0 - Math.atan(trackWidth_m / wheelBase_m));
 	}
 
 	@Override
-	public void initialize() {}
+	public void initialize() {
+		swerve.setModuleStates(swerve.getXStanceStates(), true, true);
+	}
 
 	@Override
-	public void execute() {
-		// todo: do we want closed loop?
-		swerve.setModuleStates(states, true, true);
-	}
+	public void execute() {}
 
 	@Override
 	public void end(boolean interrupted) {

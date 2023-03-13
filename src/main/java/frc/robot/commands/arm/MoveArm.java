@@ -4,7 +4,6 @@ import frc.robot.subsystems.Arm;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-/** @deprecated should not be used outside of testing */
 @Deprecated
 public class MoveArm extends CommandBase {
 	private Arm arm;

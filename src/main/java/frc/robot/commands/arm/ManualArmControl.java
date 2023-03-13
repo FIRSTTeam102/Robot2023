@@ -16,6 +16,7 @@ public class ManualArmControl extends CommandBase {
 		this.arm = arm;
 		this.inputSupplier = inputSupplier;
 		addRequirements(arm);
+		arm.setManualModeInput(inputSupplier);
 	}
 
 	@Override
@@ -23,12 +24,9 @@ public class ManualArmControl extends CommandBase {
 
 	@Override
 	public void execute() {
-		// todo: invert input?
-		if (Math.abs(inputSupplier.getAsDouble()) >= OperatorConstants.stickDeadband)
-			arm.inManualMode = true;
-
 		if (arm.inManualMode)
-			arm.setSpeed(scaleInput(MathUtil.applyDeadband(inputSupplier.getAsDouble(), OperatorConstants.stickDeadband)));
+			arm.setSpeed(
+				scaleInput(MathUtil.applyDeadband(inputSupplier.getAsDouble(), OperatorConstants.operatorJoystickDeadband)));
 	}
 
 	@Override
@@ -44,6 +42,6 @@ public class ManualArmControl extends CommandBase {
 	public static double scaleInput(double input) {
 		return input == 0
 			? 0
-			: Math.copySign(.55 * Math.abs(input) + .4, input);
+			: Math.copySign(.5 * Math.abs(input) + .2, input);
 	}
 }

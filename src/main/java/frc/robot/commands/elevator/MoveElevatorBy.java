@@ -23,7 +23,7 @@ public class MoveElevatorBy extends CommandBase {
 
 	@Override
 	public boolean isFinished() {
-		return Math.abs(targetPos_m - elevator.inputs.position_m) <= 0.01;
+		return elevator.inManualMode || Math.abs(targetPos_m - elevator.inputs.position_m) <= 0.05;
 	}
 
 	@Override

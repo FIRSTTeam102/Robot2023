@@ -59,6 +59,9 @@ public final class SwerveConstants {
 		/ 60.0 / angleGearRatio / Math.hypot(trackWidth_m / 2.0, wheelBase_m / 2.0);
 	public static final double maxCoastVelocity_mps = 0.05;
 
+	/* robot dimensions */
+	public static final double robotfence = 0.35; // from botpose to the bumper
+
 	/* drive motor PID values */
 	public static final double driveKp = 0.05; // todo: calibrate
 	public static final double driveKi = 0.0;

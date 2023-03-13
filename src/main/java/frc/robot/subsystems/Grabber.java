@@ -15,10 +15,10 @@ import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
 public class Grabber extends SubsystemBase implements AutoCloseable {
-	private CANSparkMax motor = new CANSparkMax(motorId, CANSparkMax.MotorType.kBrushless);
+	private CANSparkMax motor = new CANSparkMax(motorId, CANSparkMax.MotorType.kBrushed);
 
 	public Grabber() {
-		motor.setInverted(true);
+		motor.setInverted(false);
 
 		motor.setSmartCurrentLimit(smartCurrentLimit_A);
 		motor.setSecondaryCurrentLimit(hardCurrentLimit_A);
@@ -44,6 +44,16 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 		motor.set(holdSpeed);
 	}
 
+	private int grabbedCounter = 0;
+
+	public boolean hasGrabbed() {
+		if (inputs.current_A > grabbedCurrent_A)
+			grabbedCounter++;
+		else
+			grabbedCounter = 0;
+		return grabbedCounter > 6;
+	}
+
 	private int overCurrentCounter = 0;
 
 	@Override
@@ -60,7 +70,11 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 				DriverStation.reportWarning("grabber over current!", false);
 				stop();
 			}
-		}
+			Lights.setStatus(Lights.Group.Grabber, Lights.Status.Center);
+		} else
+			Lights.setStatus(Lights.Group.Grabber,
+				inputs.current_A > grabbedCurrent_A ? Lights.Status.All : Lights.Status.None);
+
 	}
 
 	/**
@@ -70,7 +84,7 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 	public static class GrabberIOInputs {
 		public double percentOutput = 0.0;
 		public double current_A = 0.0;
-		public double temperature_C = 0.0;
+		// public double temperature_C = 0.0;
 	}
 
 	public GrabberIOInputsAutoLogged inputs = new GrabberIOInputsAutoLogged();
@@ -78,7 +92,7 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 	private void updateInputs(GrabberIOInputs inputs) {
 		inputs.percentOutput = Robot.isReal() ? motor.getAppliedOutput() : motor.get();
 		inputs.current_A = motor.getOutputCurrent();
-		inputs.temperature_C = motor.getMotorTemperature();
+		// inputs.temperature_C = motor.getMotorTemperature();
 	}
 
 	@Override

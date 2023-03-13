@@ -3,17 +3,10 @@ package frc.robot.constants;
 import edu.wpi.first.math.util.Units;
 
 public final class ElevatorConstants {
-	/* target heights */
-	// fixme: actual values
-	public static final double groundHeight_m = 0;
-	public static final double midConeHeight_m = Units.inchesToMeters(38);
-	public static final double midCubeHeight_m = .702;
-	public static final double highConeHeight_m = Units.inchesToMeters(47.95);
-	public static final double highCubeHeight_m = .973;
-	public static final double doubleSubstationHeight_m = .952; // todo:
-
-	public static final double dangerZone_m = .13;
+	public static final double dangerZone_m = .11;
 	public static final double gridSafeZone_m = .7;
+
+	public static final double coneMoveDownHeight_m = -0.15;
 
 	/* ports */
 	public static final int motorId = 11;
@@ -47,9 +40,9 @@ public final class ElevatorConstants {
 		* (1 / gearRatio) /* rotation/rotation of main shaft */
 		* 0.2282; /* m/rotation */
 	public static final double conversionFactor_mps_per_rpm = conversionFactor_m_per_rotation / 60;
-	public static final double minHeight_m = Units.inchesToMeters(0);
-	public static final double maxHeight_m = Units.inchesToMeters(47.95);
+	public static final double minHeight_m = 0;
+	public static final double maxHeight_m = 1.22;
 	public static final double carriageMass_kg = Units
-		.lbsToKilograms(4.893 /* inner elevator */ + 8.166 /* carriage + arm */ + 6 /* grabber */);
+		.lbsToKilograms(4.893 /* inner elevator */ + 9 /* carriage + arm */ + 6 /* grabber */);
 	public static final double drumRadius_m = Units.inchesToMeters(0.5);
 }

@@ -3,7 +3,9 @@ package frc.robot.subsystems;
 import static frc.robot.constants.ElevatorConstants.*;
 
 import frc.robot.Robot;
+import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
+import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.util.BuildManager;
 import frc.robot.util.ScoringMechanism2d;
 import frc.robot.util.SendableSparkMaxPIDController;
@@ -28,7 +30,10 @@ import com.revrobotics.SparkMaxPIDController;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
+import java.util.function.DoubleSupplier;
+
 import lombok.Getter;
+import lombok.Setter;
 
 public class Elevator extends SubsystemBase {
 	private CANSparkMax motor = new CANSparkMax(motorId, MotorType.kBrushless);
@@ -40,12 +45,15 @@ public class Elevator extends SubsystemBase {
 	// feedforward is for velocity control mode
 	// private ElevatorFeedforward feedforward = new ElevatorFeedforward(kS, kG, kV, kA);
 
+	@Getter
 	private double targetPosition_m = 0.0;
 
 	@Getter
 	// if within module bounds so arm knows to not go down too far
 	private static boolean inDangerZone = false;
 
+	@Setter
+	private DoubleSupplier manualModeInput = null;
 	public boolean inManualMode = true;
 
 	public Elevator() {
@@ -86,12 +94,21 @@ public class Elevator extends SubsystemBase {
 		pidController.setReference(0, ControlType.kDutyCycle, 0, feedForward_V);
 	}
 
+	public void killMotor() {
+		inManualMode = true;
+		pidController.setReference(0, ControlType.kVoltage, 0, 0);
+	}
+
 	public void setPosition(double position_m) {
 		targetPosition_m = position_m;
 		// double feed = feedforward.calculate();
 		pidController.setReference(
 			MathUtil.clamp(targetPosition_m, Arm.isInDangerZone() ? dangerZone_m : 0, maxHeight_m),
 			ControlType.kPosition, 0, feedForward_V);
+	}
+
+	public boolean withinTargetPosition() {
+		return Math.abs(inputs.position_m - targetPosition_m) < AutoConstants.elevatorTolerance_m;
 	}
 
 	@Override
@@ -110,6 +127,10 @@ public class Elevator extends SubsystemBase {
 			encoder.setPosition(maxHeight_m);
 
 		inDangerZone = (encoder.getPosition() < dangerZone_m);
+
+		if (manualModeInput != null
+			&& Math.abs(manualModeInput.getAsDouble()) > OperatorConstants.operatorJoystickDeadband)
+			inManualMode = true;
 	}
 
 	/**

@@ -6,6 +6,7 @@ import frc.robot.constants.BuildConstants;
 import frc.robot.subsystems.Lights;
 import frc.robot.util.ScoringMechanism2d;
 
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
@@ -63,7 +64,7 @@ public class Robot extends LoggedRobot {
 				Logger.getInstance().addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
 			}
 			case ACTIVE -> {
-				// logger.addDataReceiver(new WPILOGWriter("/media/sda2/")); // todo: sd card
+				logger.addDataReceiver(new WPILOGWriter("/media/sda1/logs/")); // todo: sd card? /home/lvuser/logs/
 				logger.addDataReceiver(new NT4Publisher()); // publish data to NetworkTables
 				if (isReal()) {
 					LoggedPowerDistribution.getInstance(); // enable power distribution logging
@@ -109,6 +110,8 @@ public class Robot extends LoggedRobot {
 		 */
 		CommandScheduler.getInstance().run();
 
+		Lights.periodic();
+
 		Logger.getInstance().recordOutput("Mechanism/Scoring", ScoringMechanism2d.mech);
 	}
 
@@ -120,6 +123,7 @@ public class Robot extends LoggedRobot {
 			default -> Lights.ControlMode.DisabledRed;
 		});
 
+		// robotContainer.swerve.setGyroOffset_deg(0); // end of auto, clear PP offset or something
 		robotContainer.swerve.disabledTimeStart = Timer.getFPGATimestamp();
 
 		// keep elevator at current position when re-enabled
@@ -127,7 +131,9 @@ public class Robot extends LoggedRobot {
 	}
 
 	@Override
-	public void disabledPeriodic() {}
+	public void disabledPeriodic() {
+		robotContainer.updateOIAlert();
+	}
 
 	/**
 	 * This autonomous runs the autonomous command selected by your
@@ -171,6 +177,9 @@ public class Robot extends LoggedRobot {
 		// Cancels all running commands at the start of test mode.
 		CommandScheduler.getInstance().cancelAll();
 
+		// initialize? swerve so it doesn't spin the wheels
+		robotContainer.swerve.setChasisSpeeds(new ChassisSpeeds(0, 0, 0));
+
 		PathPlannerServer.startServer(5811);
 		SmartDashboard.putData("PP x pid", Autos.ppXController);
 		SmartDashboard.putData("PP y pid", Autos.ppYController);
@@ -189,5 +198,9 @@ public class Robot extends LoggedRobot {
 	@Override
 	public void simulationPeriodic() {
 		REVPhysicsSim.getInstance().run();
+	}
+
+	public static boolean isBlue() {
+		return DriverStation.getAlliance() == DriverStation.Alliance.Blue;
 	}
 }

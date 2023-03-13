@@ -7,7 +7,7 @@ import frc.robot.subsystems.Grabber;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class GrabGrabber extends CommandBase {
-	private Grabber grabber;
+	protected Grabber grabber;
 	private double speed;
 
 	public GrabGrabber(Grabber grabber) {

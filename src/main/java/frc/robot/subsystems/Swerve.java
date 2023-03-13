@@ -3,13 +3,14 @@ package frc.robot.subsystems;
 import static frc.robot.constants.SwerveConstants.*;
 
 import frc.robot.Robot;
+import frc.robot.constants.VisionConstants;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOInputsAutoLogged;
+import frc.robot.io.VisionIO.Pipeline;
 import frc.robot.swerve.SwerveModule;
 import frc.robot.swerve.SwerveModuleIOReal;
 import frc.robot.swerve.SwerveModuleIOSim;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -18,7 +19,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -61,7 +61,12 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 	public GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
 	private double gyroOffset_deg = 0.0;
 
-	public Swerve(GyroIO gyroIO) {
+	public double translationY;
+	public double translationX;
+
+	private Vision vision;
+
+	public Swerve(GyroIO gyroIO, Vision vision) {
 		modules = new SwerveModule[moduleConstants.length];
 		int moduleNumber = 0;
 		for (var mod : moduleConstants) {
@@ -78,6 +83,8 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 		timer.start();
 
 		SmartDashboard.putData("Field", fieldSim);
+
+		this.vision = vision;
 	}
 
 	/** update and return states */
@@ -123,18 +130,13 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 	 */
 	public void resetOdometry(PathPlannerState state) {
 		// fixme:?
-		// setGyroOffset_deg(state.holonomicRotation.getDegrees());
-		gyroIO.setYaw(state.holonomicRotation.getDegrees() + 180);
+		// setGyroOffset_deg(state.holonomicRotation.getDegrees()); // (Robot.isBlue() ? 0 : 180)
 		// gyroIO.setYaw(0);
 
 		// estimatedPoseWithoutGyro = new Pose2d(state.poseMeters.getTranslation(), state.holonomicRotation);
 		poseEstimator.resetPosition(
 			getYaw(), getPositions(),
 			new Pose2d(state.poseMeters.getTranslation(), state.holonomicRotation));
-	}
-
-	public void addVisionMeasurement(Pose2d pose) {
-		poseEstimator.addVisionMeasurement(pose, timer.get());
 	}
 
 	/** @return gyro yaw including code offset */
@@ -149,16 +151,6 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 
 	public void zeroYaw() {
 		gyroIO.setYaw(0);
-	}
-
-	/** @return rotation around side-to-side axis (leaning forward/backward) */
-	public double getPitch_rad() {
-		return MathUtil.angleModulus(Units.degreesToRadians(gyroInputs.pitch_deg));
-	}
-
-	/** @return rotation around front-to-back axis (leaning left/right) */
-	public double getRoll_rad() {
-		return MathUtil.angleModulus(Units.degreesToRadians(gyroInputs.roll_deg));
 	}
 
 	/** turn off brake mode if we're disabled for long enough and not moving */
@@ -240,6 +232,15 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 		return driveVelocityAverage / modules.length;
 	}
 
+	public SwerveModuleState[] getXStanceStates() {
+		var states = kinematics.toSwerveModuleStates(new ChassisSpeeds(0, 0, 0), new Translation2d(0, 0));
+		states[0].angle = new Rotation2d(3 * Math.PI / 2 - Math.atan(trackWidth_m / wheelBase_m));
+		states[1].angle = new Rotation2d(Math.PI / 2 + Math.atan(trackWidth_m / wheelBase_m));
+		states[3].angle = new Rotation2d(Math.PI / 2 + Math.atan(trackWidth_m / wheelBase_m));
+		states[2].angle = new Rotation2d(Math.PI / 2 - Math.atan(trackWidth_m / wheelBase_m));
+		return states;
+	}
+
 	@Override
 	public void periodic() {
 		gyroIO.updateInputs(gyroInputs);
@@ -257,7 +258,21 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 		// update odometry
 		poseEstimator.updateWithTime(timer.get(), getYaw(), modulePositions);
 		var pose = poseEstimator.getEstimatedPosition();
+		translationY = pose.getY();
+		translationX = pose.getX();
 		// todo: estimate without using gyro?
+
+		// Every 0.02s, updating pose2d
+		// todo:?
+		// if (DriverStation.isAutonomous() || // in auto, always use the data
+		// in teleop, only use if it's close
+		if ((vision.inputs.pipeline == Pipeline.AprilTag.value && vision.isPipelineReady() && vision.inputs.target == true
+			&& vision.inputs.botpose_fieldTranslationZ_m < VisionConstants.maxZDistanceAprilTag_m)) {
+			var visionPose = new Pose2d(vision.inputs.botpose_fieldTranslationX_m, vision.inputs.botpose_fieldTranslationY_m,
+				new Rotation2d(vision.inputs.botpose_fieldRotationZ_rad));
+			Logger.getInstance().recordOutput("Odometry/VisionPose", visionPose);
+			poseEstimator.addVisionMeasurement(visionPose, timer.get() - vision.inputs.botpose_latency_s);
+		}
 
 		Logger.getInstance().recordOutput("Odometry/Robot", pose);
 		// Logger.getInstance().recordOutput("3DField", new Pose3d(pose));
