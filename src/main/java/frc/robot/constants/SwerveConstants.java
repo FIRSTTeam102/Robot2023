@@ -63,7 +63,7 @@ public final class SwerveConstants {
 	public static final double robotfence = 0.35; // from botpose to the bumper
 
 	/* drive motor PID values */
-	public static final double driveKp = 0.05; // todo: calibrate
+	public static final double driveKp = 0.000030509;
 	public static final double driveKi = 0.0;
 	public static final double driveKd = 0.0;
 	public static final double driveKf = 0.0;
@@ -104,12 +104,11 @@ public final class SwerveConstants {
 	 * kS=0.69428
 	 * kV=1.07837
 	 */
-	public static final double driveKs = 0.0029032;
-	public static final double driveKv = 0.016325;
+	public static final double driveKs = 0.0092198;
+	public static final double driveKv = 0.23218;
 	/* sim drive motor characterization */
 	public static final double simDriveKs = 0.117;
 	public static final double simDriveKv = 0.133;
-	public static final double simDriveKa = 0.0;
 
 	/* angle motor characterization */
 	// public static final double angleKs = 0;

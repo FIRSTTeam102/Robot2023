@@ -29,7 +29,7 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 	private boolean isDriveOpenLoop = true;
 	private double driveSetpoint_mps = 0.0;
 
-	private SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(simDriveKs, simDriveKv, simDriveKa);
+	private SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(simDriveKs, simDriveKv);
 	private PIDController driveController = new PIDController(simDriveKp, simDriveKi, simDriveKd);
 
 	@Override
