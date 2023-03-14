@@ -105,6 +105,9 @@ public class TeleopSwerve extends CommandBase {
 			modifyAxis(strafeSupplier.getAsDouble()))
 				.times(SwerveConstants.maxVelocity_mps * driveMaxPercent);
 
+		// Logger.getInstance().recordOutput("TeleopSwerve/translationX_mps", translation.getX());
+		// Logger.getInstance().recordOutput("TeleopSwerve/translationY_mps", translation.getY());
+
 		rotation = modifyAxis(turnSupplier.getAsDouble())
 			* SwerveConstants.maxAngularVelocity_radps
 			* turnMaxPercent;

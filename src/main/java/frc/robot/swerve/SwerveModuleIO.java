@@ -12,6 +12,7 @@ public interface SwerveModuleIO extends AutoCloseable {
 		double driveAppliedPercentage = 0.0;
 		double driveCurrent_A = 0.0;
 		double driveTemperature_C = 0.0;
+		double driveVoltage_V = 0.0;
 
 		double angleAbsolutePosition_rad = 0.0;
 		double anglePosition_rad = 0.0;

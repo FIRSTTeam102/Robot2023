@@ -111,6 +111,9 @@ public class SwerveModule implements AutoCloseable {
 		// update velocity based on angle error
 		optimizedState.speedMetersPerSecond *= Math.cos(anglePIDController.getPositionError());
 
+		Logger.getInstance().recordOutput("SwerveModule " + moduleNumber + "/targetSpeed_mps",
+			optimizedState.speedMetersPerSecond);
+
 		// run drive
 		if (isOpenLoop) {
 			double percentOutput = optimizedState.speedMetersPerSecond / maxVelocity_mps;

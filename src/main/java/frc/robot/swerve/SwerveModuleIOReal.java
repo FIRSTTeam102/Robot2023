@@ -137,6 +137,7 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		inputs.driveAppliedPercentage = driveMotor.getMotorOutputPercent();
 		inputs.driveCurrent_A = driveMotor.getStatorCurrent();
 		inputs.driveTemperature_C = driveMotor.getTemperature();
+		inputs.driveVoltage_V = driveMotor.getMotorOutputVoltage();
 
 		// inputs.angleAbsolutePosition_rad = angleMotorAbsoluteEncoder.getPosition();
 		inputs.anglePosition_rad = angleCancoder.getPosition();
