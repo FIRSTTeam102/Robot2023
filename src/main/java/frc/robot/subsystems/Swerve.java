@@ -144,6 +144,12 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 		return Rotation2d.fromDegrees(gyroInputs.yaw_deg + gyroOffset_deg);
 	}
 
+	public double getTilt() {
+		double yaw_rad = getYaw().getRadians();
+
+		return (gyroInputs.pitch_rad * Math.sin(yaw_rad)) + (gyroInputs.roll_rad * Math.cos(yaw_rad));
+	}
+
 	/** sets the rotation of the robot to the specified value by changing code gyro offset */
 	public void setGyroOffset_deg(double expectedYaw_deg) {
 		gyroOffset_deg = expectedYaw_deg - gyroInputs.yaw_deg;
