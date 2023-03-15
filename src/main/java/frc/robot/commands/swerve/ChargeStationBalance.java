@@ -1,72 +1,52 @@
 package frc.robot.commands.swerve;
 
 import frc.robot.constants.SwerveConstants;
-import frc.robot.io.GyroIOInputsAutoLogged;
 import frc.robot.subsystems.Swerve;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+
+import org.littletonrobotics.junction.Logger;
 
 // angles are between +/- pi
 
 public class ChargeStationBalance extends CommandBase {
-	private final double maxSpeed_mps = 0.1 * SwerveConstants.maxVelocity_mps;
-	// private final double maxTurn = 0.1 * SwerveConstants.maxAngularVelocity_radps;
-
+	private final double maxSpeed_mps = 0.2 * SwerveConstants.maxVelocity_mps;
 	// private final double maxAngularVelocity_radps = 0.04;
 
-	// stops driving when within @fieldcal
-	private final double maxAngle_rad = Units.degreesToRadians(4);
+	/** stops driving when within @fieldcal */
+	private final double maxAngle_rad = Units.degreesToRadians(3);
 
-	private final PIDController driveController = new PIDController(0.3, 0, 0.01);
+	private final PIDController driveController = new PIDController(2.1, 0, 0.025);
 
 	private Swerve swerve;
-	private GyroIOInputsAutoLogged gyro;
 
 	public ChargeStationBalance(Swerve swerve) {
 		this.swerve = swerve;
-		this.gyro = swerve.gyroInputs;
 		addRequirements(swerve);
 
-		// SmartDashboard.putData("balance drive pid", driveController);
+		SmartDashboard.putData("balance drive pid", driveController);
 		driveController.setTolerance(maxAngle_rad);
 		driveController.setSetpoint(0);
 		driveController.enableContinuousInput(-Math.PI, Math.PI);
 	}
 
 	@Override
-	public void initialize() {
-		// state = State.turn; // always reset state
-		// swerve.stop();
-	}
-
-	// // stores the current state of the state machine
-	// // private enum State {
-	// // turn, balance
-	// // }
-
-	// // State state = State.turn;
-
-	// private boolean angleZeroed(double angle_rad) {
-	// return minAngle_rad < angle_rad && angle_rad < maxAngle_rad;
-	// }
-
-	// private double sign(double input) {
-	// return input > 0.0 ? 1.0 : -1.0;
-	// }
+	public void initialize() {}
 
 	@Override
 	public void execute() {
-		var outputSpeed = driveController.calculate(swerve.getTilt());
+		var tilt_rad = swerve.getTilt_rad();
+		Logger.getInstance().recordOutput("Balance/tilt_rad", tilt_rad);
 
-		if (outputSpeed > maxSpeed_mps) {
-			outputSpeed = maxSpeed_mps;
-		}
+		// var outputVelocity_mps = MathUtil.clamp(driveController.calculate(tilt_rad), -maxSpeed_mps, maxSpeed_mps);
+		var outputVelocity_mps = driveController.calculate(tilt_rad, 0);
+		Logger.getInstance().recordOutput("Balance/outputVelocity_mps", outputVelocity_mps);
 
-		swerve.drive(new Translation2d(outputSpeed, new Rotation2d(0)), 0, true);
+		swerve.drive(new Translation2d(outputVelocity_mps, 0), 0, true);
 	}
 
 	@Override
@@ -77,6 +57,7 @@ public class ChargeStationBalance extends CommandBase {
 	@Override
 	public boolean isFinished() {
 		return driveController.atSetpoint();
+		// return false;
 	}
 
 	// // todo:, also don't pass borders as parameters
