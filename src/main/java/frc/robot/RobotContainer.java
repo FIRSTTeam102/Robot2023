@@ -96,18 +96,18 @@ public class RobotContainer {
 		// setup autos
 		// FW = field wall, LZ = loading zone barrier
 		autoChooser.addDefaultOption("nothing", new InstantCommand());
-		autoChooser.addOption("2 piece (FW cone)", Autos.twoPieceFW(this));
-		autoChooser.addOption("2 piece & balance (FW cone)", Autos.twoPieceChargeStation(this));
-		autoChooser.addOption("2 piece (LZ cone)", Autos.twoPieceLZ(this));
-		autoChooser.addOption("1 piece (LZ cube)", Autos.loadingZone(this));
-		autoChooser.addOption("1 piece (FW cube)", Autos.fieldWallOnePiece(this));
-		autoChooser.addOption("backup & balance (co-op cube)", Autos.coopBackup(this));
-		autoChooser.addOption("just score (cube)", Autos.justScore(this));
+		autoChooser.addOption("2 piece (FW)", Autos.twoPieceFW(this));
+		autoChooser.addOption("2 piece & balance (FW)", Autos.twoPieceFWChargeStation(this));
+		autoChooser.addOption("2 piece (LZ)", Autos.twoPieceLZ(this));
+		autoChooser.addOption("2 piece & balance (LZ)", Autos.twoPieceLZChargeStation(this));
+		autoChooser.addOption("1 piece (LZ)", Autos.loadingZone(this));
+		autoChooser.addOption("1 piece (FW)", Autos.fieldWallOnePiece(this));
+		autoChooser.addOption("backup & balance (co-op)", Autos.coopBackup(this));
+		autoChooser.addOption("just score", Autos.justScore(this));
 
 		// for testing
 		autoChooser.addOption("[testing] drive characterization",
 			new FeedForwardCharacterization(swerve, true, swerve::runCharacterization, swerve::getCharacterizationVelocity));
-		autoChooser.addOption("[testing] balance cmd", new ChargeStationBalance(swerve));
 
 		var driveTab = Shuffleboard.getTab(ShuffleboardConstants.driveTab);
 		driveTab.add("alerts", Alert.getAlertsSendable())

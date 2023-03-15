@@ -137,18 +137,18 @@ public final class Autos {
 		return new SequentialCommandGroup(
 			swerveAnglesTo0(robo.swerve),
 			grabTimed(robo.grabber),
-			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCone),
+			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.HighCube),
 			allIn(robo.elevator, robo.arm),
 			runAutoPath(path.get(0), robo.swerve, true),
 			intakeGroundClose(robo.swerve, robo.elevator, robo.arm, robo.grabber),
 			allIn(robo.elevator, robo.arm),
 			runAutoPath(path.get(1), robo.swerve),
-			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.HighCube),
+			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCube),
 			allIn(robo.elevator, robo.arm));
 	}
 
 	/** 2 piece auto w/ charge station by field wall */
-	public static Command twoPieceChargeStation(RobotContainer robo) {
+	public static Command twoPieceFWChargeStation(RobotContainer robo) {
 		var path = PathPlanner.loadPathGroup("charge station 2 piece fw",
 			new PathConstraints(maxVelocity_mps, maxAcceleration_mps2));
 		if (path == null)
@@ -179,14 +179,35 @@ public final class Autos {
 		return new SequentialCommandGroup(
 			swerveAnglesTo0(robo.swerve),
 			grabTimed(robo.grabber),
-			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCone),
+			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.HighCube),
 			allIn(robo.elevator, robo.arm),
 			runAutoPath(path.get(0), robo.swerve, true),
 			intakeGroundClose(robo.swerve, robo.elevator, robo.arm, robo.grabber),
 			allIn(robo.elevator, robo.arm),
 			runAutoPath(path.get(1), robo.swerve),
-			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.HighCube),
+			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCube),
 			allIn(robo.elevator, robo.arm));
+	}
+
+	public static Command twoPieceLZChargeStation(RobotContainer robo) {
+		var path = PathPlanner.loadPathGroup("charge station 2 piece lz",
+			new PathConstraints(maxVelocity_mps, maxAcceleration_mps2));
+		if (path == null)
+			return new PrintCommand("no path group");
+
+		return new SequentialCommandGroup(
+			swerveAnglesTo0(robo.swerve),
+			grabTimed(robo.grabber),
+			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.HighCube),
+			allIn(robo.elevator, robo.arm),
+			runAutoPath(path.get(0), robo.swerve, true),
+			intakeGroundClose(robo.swerve, robo.elevator, robo.arm, robo.grabber),
+			allIn(robo.elevator, robo.arm),
+			runAutoPath(path.get(1), robo.swerve),
+			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCube),
+			allIn(robo.elevator, robo.arm),
+			runAutoPath(path.get(2), robo.swerve),
+			balance(robo.swerve));
 	}
 
 	/** start by loading zone, score high cube, and leave fast */
