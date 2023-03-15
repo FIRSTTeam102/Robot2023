@@ -19,6 +19,7 @@ import frc.robot.subsystems.Vision;
 import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
 
+import frc.robot.commands.Autos;
 import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.arm.ManualArmControl;
 import frc.robot.commands.elevator.ManualElevatorControl;

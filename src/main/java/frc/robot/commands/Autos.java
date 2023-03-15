@@ -1,7 +1,8 @@
-package frc.robot;
+package frc.robot.commands;
 
 import static frc.robot.constants.AutoConstants.*;
 
+import frc.robot.RobotContainer;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.ScoringPosition;
 import frc.robot.constants.SwerveConstants;
@@ -25,6 +26,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -96,7 +98,11 @@ public final class Autos {
 	}
 
 	public static Command balance(Swerve swerve) {
-		return Commands.sequence(deadlineSeconds(4, new ChargeStationBalance(swerve)), new XStance(swerve));
+		return Commands.sequence(
+			// run until either we're balanced or auto is about to end
+			Commands.race(Commands.waitUntil(() -> DriverStation.getMatchTime() < 0.5),
+				new ChargeStationBalance(swerve)),
+			new XStance(swerve));
 	}
 
 	// angle = ppState.holonomicRotation

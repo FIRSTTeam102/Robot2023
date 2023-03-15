@@ -6,6 +6,8 @@ import frc.robot.constants.BuildConstants;
 import frc.robot.subsystems.Lights;
 import frc.robot.util.ScoringMechanism2d;
 
+import frc.robot.commands.Autos;
+
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.DriverStation;

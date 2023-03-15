@@ -3,6 +3,7 @@ package frc.robot.commands.swerve;
 import frc.robot.constants.SwerveConstants;
 import frc.robot.subsystems.Swerve;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
@@ -14,8 +15,7 @@ import org.littletonrobotics.junction.Logger;
 // angles are between +/- pi
 
 public class ChargeStationBalance extends CommandBase {
-	private final double maxSpeed_mps = 0.2 * SwerveConstants.maxVelocity_mps;
-	// private final double maxAngularVelocity_radps = 0.04;
+	private final double maxSpeed_mps = 0.15 * SwerveConstants.maxVelocity_mps;
 
 	/** stops driving when within @fieldcal */
 	private final double maxAngle_rad = Units.degreesToRadians(3);
@@ -42,8 +42,7 @@ public class ChargeStationBalance extends CommandBase {
 		var tilt_rad = swerve.getTilt_rad();
 		Logger.getInstance().recordOutput("Balance/tilt_rad", tilt_rad);
 
-		// var outputVelocity_mps = MathUtil.clamp(driveController.calculate(tilt_rad), -maxSpeed_mps, maxSpeed_mps);
-		var outputVelocity_mps = driveController.calculate(tilt_rad, 0);
+		var outputVelocity_mps = MathUtil.clamp(driveController.calculate(tilt_rad), -maxSpeed_mps, maxSpeed_mps);
 		Logger.getInstance().recordOutput("Balance/outputVelocity_mps", outputVelocity_mps);
 
 		swerve.drive(new Translation2d(outputVelocity_mps, 0), 0, true);
@@ -57,7 +56,6 @@ public class ChargeStationBalance extends CommandBase {
 	@Override
 	public boolean isFinished() {
 		return driveController.atSetpoint();
-		// return false;
 	}
 
 	// // todo:, also don't pass borders as parameters
