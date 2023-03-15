@@ -163,7 +163,7 @@ public final class Autos {
 			intakeGroundClose(robo.swerve, robo.elevator, robo.arm, robo.grabber),
 			allIn(robo.elevator, robo.arm),
 			runAutoPath(path.get(1), robo.swerve),
-			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.HighCube),
+			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCube),
 			allIn(robo.elevator, robo.arm),
 			runAutoPath(path.get(2), robo.swerve),
 			balance(robo.swerve));
