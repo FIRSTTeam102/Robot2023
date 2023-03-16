@@ -1,7 +1,5 @@
 package frc.robot.commands.grabber;
 
-import static frc.robot.constants.GrabberConstants.grabSpeed;
-
 import frc.robot.subsystems.Grabber;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -9,10 +7,6 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class GrabGrabber extends CommandBase {
 	protected Grabber grabber;
 	private double speed;
-
-	public GrabGrabber(Grabber grabber) {
-		this(grabber, grabSpeed);
-	}
 
 	public GrabGrabber(Grabber grabber, double speed) {
 		this.grabber = grabber;

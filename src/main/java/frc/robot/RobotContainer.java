@@ -207,7 +207,7 @@ public class RobotContainer {
 		operatorJoystick.trigger()
 			.whileTrue(new GrabGrabber(grabber, GrabberConstants.cubeGrabSpeed));
 		operatorJoystick.button(5)
-			.whileTrue(new GrabGrabber(grabber, GrabberConstants.grabSpeed));
+			.whileTrue(new GrabGrabber(grabber, GrabberConstants.coneGrabSpeed));
 		operatorJoystick.button(2)
 			.whileTrue(new ReleaseGrabber(grabber));
 		operatorJoystick.button(3)

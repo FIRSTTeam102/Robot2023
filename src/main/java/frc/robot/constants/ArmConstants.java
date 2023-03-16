@@ -3,7 +3,7 @@ package frc.robot.constants;
 import edu.wpi.first.math.util.Units;
 
 public final class ArmConstants {
-	public static final double minNutDist_m = 0.34925;
+	public static final double minNutDist_m = 0.34798;
 	public static final double maxNutDist_m = 0.07;
 
 	public static final int motorId = 12;

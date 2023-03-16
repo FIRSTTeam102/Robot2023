@@ -11,8 +11,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 /**
  * Passes status information to the Arduino coprocessor.
- * Each subsystem has it's own block of lights, and it/its
- * commands can update them independantly of other subsystems.
+ * Each subsystem/group has it's own block of lights, and it/its
+ * commands can update them independantly of other groups.
  * @see https://github.com/FIRSTTeam102/ArduinoLights2023
  */
 public class Lights {
@@ -113,8 +113,6 @@ public class Lights {
 			requestedGamePieceClear.reset();
 		}
 
-		// todo: not doing this at midnight, should be within auto error and methods in respictive classes,
-		// offload to lights periodic
 		byte eleArmStatus = 0;
 		if (RobotContainer.getInstance().elevator.withinTargetPosition())
 			eleArmStatus += 0b001;

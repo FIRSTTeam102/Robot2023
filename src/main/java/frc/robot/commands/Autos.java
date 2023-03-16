@@ -4,6 +4,7 @@ import static frc.robot.constants.AutoConstants.*;
 
 import frc.robot.RobotContainer;
 import frc.robot.constants.ElevatorConstants;
+import frc.robot.constants.GrabberConstants;
 import frc.robot.constants.ScoringPosition;
 import frc.robot.constants.SwerveConstants;
 import frc.robot.subsystems.Arm;
@@ -69,7 +70,7 @@ public final class Autos {
 			// both sets are async
 			new SetArmPosition(arm, ScoringPosition.Ground.armExtension_m),
 			new SetElevatorPosition(elevator, ScoringPosition.Ground.elevatorHeight_m),
-			Commands.deadline(new GrabGrabberUntilGrabbed(grabber), goForward(swerve))));
+			Commands.deadline(new GrabGrabberUntilGrabbed(grabber, GrabberConstants.cubeGrabSpeed), goForward(swerve))));
 	}
 
 	public static Command intakeGroundFar(Swerve swerve, Elevator elevator, Arm arm, Grabber grabber) {
@@ -77,7 +78,7 @@ public final class Autos {
 			// both sets are async
 			new SetArmPosition(arm, ScoringPosition.GroundFar.armExtension_m),
 			new SetElevatorPosition(elevator, ScoringPosition.GroundFar.elevatorHeight_m),
-			Commands.deadline(new GrabGrabberUntilGrabbed(grabber), goForward(swerve))));
+			Commands.deadline(new GrabGrabberUntilGrabbed(grabber, GrabberConstants.cubeGrabSpeed), goForward(swerve))));
 	}
 
 	public static Command score(Elevator elevator, Arm arm, Grabber grabber, ScoringPosition pos) {
@@ -94,7 +95,7 @@ public final class Autos {
 	}
 
 	public static Command grabTimed(Grabber grabber) {
-		return deadlineSeconds(0.1, new GrabGrabber(grabber));
+		return deadlineSeconds(0.1, new GrabGrabber(grabber, GrabberConstants.coneGrabSpeed));
 	}
 
 	public static Command balance(Swerve swerve) {

@@ -33,6 +33,10 @@ public class TeleopSwerve extends CommandBase {
 	};
 
 	public class ZeroYaw extends InstantCommand {
+		public ZeroYaw() {
+			SmartDashboard.putBoolean("did zero yaw", false);
+		}
+
 		@Override
 		public void initialize() {
 			swerve.zeroYaw();
@@ -58,8 +62,8 @@ public class TeleopSwerve extends CommandBase {
 	 * @param overrideSpeedSupplier forces swerve to run at normal speed when held, instead of slow if scoring mechanism is out
 	 */
 	public TeleopSwerve(DoubleSupplier driveSupplier, DoubleSupplier strafeSupplier, DoubleSupplier turnSupplier,
-		BooleanSupplier overrideSpeedSupplier, BooleanSupplier preciseModeSupplier, Swerve swerve, Arm arm,
-		Elevator elevator) {
+		BooleanSupplier overrideSpeedSupplier, BooleanSupplier preciseModeSupplier,
+		Swerve swerve, Arm arm, Elevator elevator) {
 		addRequirements(swerve);
 		this.driveSupplier = driveSupplier;
 		this.strafeSupplier = strafeSupplier;
@@ -86,18 +90,18 @@ public class TeleopSwerve extends CommandBase {
 			driveMaxPercent = 1.0;
 			turnMaxPercent = 0.9;
 		} else {
-			driveMaxPercent = normalMaxPercent * (1 - 0.4 /* how much of the decrease to use */ * (
+			driveMaxPercent = normalMaxPercent * (1 - (0.4 /* how much of the decrease to use */ * (
 			// bigger coefficient = more of a speed decrease the farther out it is
 			0.9 * (arm.getArmDist_m() / maxArmDist_m)
-				+ 0.4 * ((elevator.inputs.position_m - ArmConstants.dangerZone_m) / ElevatorConstants.maxHeight_m)));
-			if (driveMaxPercent <= 0.1) // bug?
+				+ 0.4 * ((elevator.inputs.position_m - ArmConstants.dangerZone_m) / ElevatorConstants.maxHeight_m))));
+			if (driveMaxPercent < 0.1) // bug?
 				driveMaxPercent = 0.1;
 			turnMaxPercent = driveMaxPercent * 0.9;
 		}
 
 		if (preciseModeSupplier.getAsBoolean()) {
-			driveMaxPercent *= 0.35;
-			turnMaxPercent *= 0.25;
+			driveMaxPercent *= 0.3;
+			turnMaxPercent *= 0.2;
 		}
 
 		translation = new Translation2d(
