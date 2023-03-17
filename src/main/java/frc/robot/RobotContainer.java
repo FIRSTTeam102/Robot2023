@@ -96,14 +96,15 @@ public class RobotContainer {
 		// setup autos
 		// FW = field wall, LZ = loading zone barrier
 		autoChooser.addDefaultOption("nothing", new InstantCommand());
-		autoChooser.addOption("2 piece (FW)", Autos.twoPieceFW(this));
-		autoChooser.addOption("2 piece & balance (FW)", Autos.twoPieceFWChargeStation(this));
-		autoChooser.addOption("2 piece (LZ)", Autos.twoPieceLZ(this));
-		autoChooser.addOption("2 piece & balance (LZ)", Autos.twoPieceLZChargeStation(this));
-		autoChooser.addOption("1 piece (LZ)", Autos.loadingZone(this));
-		autoChooser.addOption("1 piece (FW)", Autos.fieldWallOnePiece(this));
-		autoChooser.addOption("backup & balance (co-op)", Autos.coopBackup(this));
-		autoChooser.addOption("just score", Autos.justScore(this));
+		autoChooser.addOption("cube and nothing", Autos.initAndScore(this, ScoringPosition.HighCube));
+
+		autoChooser.addOption("lz cube", Autos.lzCube(this));
+
+		autoChooser.addOption("fw cube", Autos.fwCube(this));
+		autoChooser.addOption("fw cube balance", Autos.fwCubeBalance(this));
+
+		autoChooser.addOption("coop cube balance", Autos.coopCubeBalance(this));
+		autoChooser.addOption("coop cube mobility balance", Autos.coopCubeMobilityBalance(this));
 
 		// for testing
 		autoChooser.addOption("[testing] drive characterization",

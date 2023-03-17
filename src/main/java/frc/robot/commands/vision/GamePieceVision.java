@@ -8,8 +8,6 @@ import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
 
-import frc.robot.commands.Autos;
-
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
@@ -72,10 +70,10 @@ public class GamePieceVision extends CommandBase {
 	@Override
 	public void end(boolean interrupted) {
 		swerve.stop();
-		System.out.println("Arm --> GroundFar, Elevator --> Ground, Grabber --> GamepieceUntilGrabbed");
-		Autos.intakeGroundFar(swerve, elevator, arm, grabber);
-		System.out.println("Arm --> AllIn, Elevator --> AllIn");
-		Autos.allIn(elevator, arm).schedule();
+		// System.out.println("Arm --> GroundFar, Elevator --> Ground, Grabber --> GamepieceUntilGrabbed");
+		// Autos.intakeGroundFar(swerve, elevator, arm, grabber);
+		// System.out.println("Arm --> AllIn, Elevator --> AllIn");
+		// Autos.allIn(elevator, arm).schedule();
 		vision.setPipeline(Pipeline.AprilTag);
 	}
 

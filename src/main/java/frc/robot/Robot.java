@@ -151,7 +151,12 @@ public class Robot extends LoggedRobot {
 
 		autonomousCommand = robotContainer.getAutonomousCommand();
 		if (autonomousCommand != null)
-			autonomousCommand.schedule();
+			try {
+				Autos.pathCount = 0; // we presumably reset the position on the field so we can reset odometry
+				autonomousCommand.schedule();
+			} catch (Exception e) {
+				DriverStation.reportError("failedto schedule auto", e.getStackTrace());
+			}
 	}
 
 	/** This function is called periodically during autonomous. */

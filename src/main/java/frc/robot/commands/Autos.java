@@ -31,7 +31,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 import com.pathplanner.lib.PathConstraints;
@@ -98,9 +97,9 @@ public final class Autos {
 		return deadlineSeconds(0.1, new GrabGrabber(grabber, GrabberConstants.coneGrabSpeed));
 	}
 
+	/** runs balance until balanced or auto is about to end, then locks the wheels */
 	public static Command balance(Swerve swerve) {
 		return Commands.sequence(
-			// run until either we're balanced or auto is about to end
 			Commands.race(Commands.waitUntil(() -> DriverStation.getMatchTime() < 0.5),
 				new ChargeStationBalance(swerve)),
 			new XStance(swerve));
@@ -120,163 +119,142 @@ public final class Autos {
 		return swerveAnglesTo(swerve, new Rotation2d(0));
 	}
 
-	public static Command runAutoPath(PathPlannerTrajectory path, Swerve swerve) {
-		return runAutoPath(path, swerve, false);
+	public static int pathCount = 0;
+
+	public static Command autoPath(Swerve swerve, PathPlannerTrajectory path) {
+		return new PathPlannerCommand(path, swerve, true, pathCount++ == 0);
 	}
 
-	public static Command runAutoPath(PathPlannerTrajectory path, Swerve swerve, boolean firstPathEver) {
-		return new PathPlannerCommand(path, swerve, true, firstPathEver);
-	}
+	/*
+	 * routines
+	 * for naming: start location (lz, fw, coop) then one-word description for each part (cube, cone, balance, ...)
+	 */
 
-	/** 2 pice auto by field wall */
-	public static Command twoPieceFW(RobotContainer robo) {
-		var path = PathPlanner.loadPathGroup("2 piece fw",
-			new PathConstraints(maxVelocity_mps, maxAcceleration_mps2));
-		if (path == null)
-			return new PrintCommand("no path group");
-
+	public static Command initAndScore(RobotContainer robo, ScoringPosition position) {
 		return new SequentialCommandGroup(
 			swerveAnglesTo0(robo.swerve),
 			grabTimed(robo.grabber),
-			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.HighCube),
-			allIn(robo.elevator, robo.arm),
-			runAutoPath(path.get(0), robo.swerve, true),
+			score(robo.elevator, robo.arm, robo.grabber, position),
+			allIn(robo.elevator, robo.arm));
+	}
+
+	public static Command coopCubeBalance(RobotContainer robo) {
+		var path = PathPlanner.loadPathGroup("coopCubeBalance",
+			new PathConstraints(2, maxAcceleration_mps2));
+
+		return new SequentialCommandGroup(
+			initAndScore(robo, ScoringPosition.HighCube),
+			autoPath(robo.swerve, path.get(0)),
+			balance(robo.swerve));
+	}
+
+	public static Command coopCubeMobilityBalance(RobotContainer robo) {
+		var path = PathPlanner.loadPathGroup("coopCubeMobilityBalance",
+			new PathConstraints(3, maxAcceleration_mps2),
+			new PathConstraints(2, maxAcceleration_mps2));
+
+		return new SequentialCommandGroup(
+			initAndScore(robo, ScoringPosition.HighCube),
+			autoPath(robo.swerve, path.get(0)),
+			Commands.waitSeconds(3), // wait for charge station to stabilize first
+			autoPath(robo.swerve, path.get(1)),
+			balance(robo.swerve));
+	}
+
+	public static Command lzCube(RobotContainer robo) {
+		var path = PathPlanner.loadPathGroup("lzCube",
+			new PathConstraints(maxVelocity_mps, maxAcceleration_mps2));
+
+		return new SequentialCommandGroup(
+			initAndScore(robo, ScoringPosition.HighCube),
+			autoPath(robo.swerve, path.get(0)));
+	}
+
+	public static Command fwCube(RobotContainer robo) {
+		var path = PathPlanner.loadPathGroup("fwCube",
+			new PathConstraints(maxVelocity_mps, maxAcceleration_mps2));
+
+		return new SequentialCommandGroup(
+			initAndScore(robo, ScoringPosition.HighCube),
+			autoPath(robo.swerve, path.get(0)));
+	}
+
+	public static Command fwCubeBalance(RobotContainer robo) {
+		var path = PathPlanner.loadPathGroup("fwCubeBalance",
+			new PathConstraints(maxVelocity_mps, maxAcceleration_mps2),
+			new PathConstraints(2, maxAcceleration_mps2));
+
+		return new SequentialCommandGroup(
+			// initAndScore(robo, ScoringPosition.HighCube),
+			autoPath(robo.swerve, path.get(0)),
+			autoPath(robo.swerve, path.get(1)),
+			balance(robo.swerve));
+	}
+
+	/** 2 pice auto by field wall */
+	@Deprecated
+	public static Command fw2Cube(RobotContainer robo) {
+		var path = PathPlanner.loadPathGroup("fw2Cube",
+			new PathConstraints(maxVelocity_mps, maxAcceleration_mps2));
+
+		return new SequentialCommandGroup(
+			initAndScore(robo, ScoringPosition.HighCube),
+			autoPath(robo.swerve, path.get(0)),
 			intakeGroundClose(robo.swerve, robo.elevator, robo.arm, robo.grabber),
 			allIn(robo.elevator, robo.arm),
-			runAutoPath(path.get(1), robo.swerve),
+			autoPath(robo.swerve, path.get(1)),
 			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCube),
 			allIn(robo.elevator, robo.arm));
 	}
 
 	/** 2 piece auto w/ charge station by field wall */
-	public static Command twoPieceFWChargeStation(RobotContainer robo) {
-		var path = PathPlanner.loadPathGroup("charge station 2 piece fw",
+	@Deprecated
+	public static Command fw2CubeBalance(RobotContainer robo) {
+		var path = PathPlanner.loadPathGroup("fw2CubeBalance",
 			new PathConstraints(maxVelocity_mps, maxAcceleration_mps2));
-		if (path == null)
-			return new PrintCommand("no path group");
 
 		return new SequentialCommandGroup(
-			swerveAnglesTo0(robo.swerve),
-			grabTimed(robo.grabber),
-			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.HighCube),
-			allIn(robo.elevator, robo.arm),
-			runAutoPath(path.get(0), robo.swerve, true),
+			initAndScore(robo, ScoringPosition.HighCube),
+			autoPath(robo.swerve, path.get(0)),
 			intakeGroundClose(robo.swerve, robo.elevator, robo.arm, robo.grabber),
 			allIn(robo.elevator, robo.arm),
-			runAutoPath(path.get(1), robo.swerve),
+			autoPath(robo.swerve, path.get(1)),
 			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCube),
 			allIn(robo.elevator, robo.arm),
-			runAutoPath(path.get(2), robo.swerve),
+			autoPath(robo.swerve, path.get(2)),
 			balance(robo.swerve));
 	}
 
 	/** two piece by the loading zone wall */
-	public static Command twoPieceLZ(RobotContainer robo) {
-		var path = PathPlanner.loadPathGroup("2 piece lz",
+	@Deprecated
+	public static Command lz2Cube(RobotContainer robo) {
+		var path = PathPlanner.loadPathGroup("lz2Cube",
 			new PathConstraints(maxVelocity_mps, maxAcceleration_mps2));
-		if (path == null)
-			return new PrintCommand("no path group");
 
 		return new SequentialCommandGroup(
-			swerveAnglesTo0(robo.swerve),
-			grabTimed(robo.grabber),
-			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.HighCube),
-			allIn(robo.elevator, robo.arm),
-			runAutoPath(path.get(0), robo.swerve, true),
+			initAndScore(robo, ScoringPosition.HighCube),
+			autoPath(robo.swerve, path.get(0)),
 			intakeGroundClose(robo.swerve, robo.elevator, robo.arm, robo.grabber),
 			allIn(robo.elevator, robo.arm),
-			runAutoPath(path.get(1), robo.swerve),
+			autoPath(robo.swerve, path.get(1)),
 			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCube),
 			allIn(robo.elevator, robo.arm));
 	}
 
-	public static Command twoPieceLZChargeStation(RobotContainer robo) {
-		var path = PathPlanner.loadPathGroup("charge station 2 piece lz",
+	@Deprecated
+	public static Command lz2CubeBalance(RobotContainer robo) {
+		var path = PathPlanner.loadPathGroup("lz2CubeBalance",
 			new PathConstraints(maxVelocity_mps, maxAcceleration_mps2));
-		if (path == null)
-			return new PrintCommand("no path group");
 
 		return new SequentialCommandGroup(
-			swerveAnglesTo0(robo.swerve),
-			grabTimed(robo.grabber),
-			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.HighCube),
-			allIn(robo.elevator, robo.arm),
-			runAutoPath(path.get(0), robo.swerve, true),
+			initAndScore(robo, ScoringPosition.HighCube),
+			autoPath(robo.swerve, path.get(0)),
 			intakeGroundClose(robo.swerve, robo.elevator, robo.arm, robo.grabber),
 			allIn(robo.elevator, robo.arm),
-			runAutoPath(path.get(1), robo.swerve),
+			autoPath(robo.swerve, path.get(1)),
 			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCube),
 			allIn(robo.elevator, robo.arm),
-			runAutoPath(path.get(2), robo.swerve),
-			balance(robo.swerve));
-	}
-
-	/** start by loading zone, score high cube, and leave fast */
-	public static Command loadingZone(RobotContainer robo) {
-		var path = PathPlanner.loadPathGroup("loading zone",
-			new PathConstraints(maxVelocity_mps, maxAcceleration_mps2));
-		if (path == null)
-			return new PrintCommand("no path group");
-
-		return new SequentialCommandGroup(
-			swerveAnglesTo0(robo.swerve),
-			grabTimed(robo.grabber),
-			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.HighCube),
-			allIn(robo.elevator, robo.arm),
-			Commands.print("ready to go!"),
-			runAutoPath(path.get(0), robo.swerve, true));
-	}
-
-	public static Command justScore(RobotContainer robo) {
-		return new SequentialCommandGroup(
-			swerveAnglesTo0(robo.swerve),
-			grabTimed(robo.grabber),
-			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.HighCube),
-			allIn(robo.elevator, robo.arm));
-	}
-
-	public static Command fieldWallOnePiece(RobotContainer robo) {
-		var path = PathPlanner.loadPathGroup("field wall 1 piece",
-			new PathConstraints(maxVelocity_mps, maxAcceleration_mps2));
-		if (path == null)
-			return new PrintCommand("no path group");
-
-		return new SequentialCommandGroup(
-			swerveAnglesTo0(robo.swerve),
-			grabTimed(robo.grabber),
-			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.HighCube),
-			allIn(robo.elevator, robo.arm),
-			Commands.print("ready to go!"),
-			runAutoPath(path.get(0), robo.swerve, true));
-	}
-
-	public static Command fieldWallOnePieceBalance(RobotContainer robo) {
-		var path = PathPlanner.loadPathGroup("charge station 1 piece fw",
-			new PathConstraints(maxVelocity_mps, maxAcceleration_mps2));
-		if (path == null)
-			return new PrintCommand("no path group");
-
-		return new SequentialCommandGroup(
-			swerveAnglesTo0(robo.swerve),
-			grabTimed(robo.grabber),
-			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.HighCube),
-			allIn(robo.elevator, robo.arm),
-			runAutoPath(path.get(0), robo.swerve, true),
-			balance(robo.swerve));
-	}
-
-	/** start in middle, backup over CS to get mobility, then balance on charge station */
-	public static Command coopBackup(RobotContainer robo) {
-		var path = PathPlanner.loadPathGroup("coop backup",
-			new PathConstraints(4, maxAcceleration_mps2));
-		if (path == null)
-			return new PrintCommand("no path group");
-
-		return new SequentialCommandGroup(
-			swerveAnglesTo0(robo.swerve),
-			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.HighCube),
-			allIn(robo.elevator, robo.arm),
-			runAutoPath(path.get(0), robo.swerve, true),
+			autoPath(robo.swerve, path.get(2)),
 			balance(robo.swerve));
 	}
 }
