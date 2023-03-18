@@ -1,6 +1,5 @@
 package frc.robot.commands.swerve;
 
-import frc.robot.constants.SwerveConstants;
 import frc.robot.subsystems.Swerve;
 
 import edu.wpi.first.math.MathUtil;
@@ -15,10 +14,10 @@ import org.littletonrobotics.junction.Logger;
 // angles are between +/- pi
 
 public class ChargeStationBalance extends CommandBase {
-	private final double maxSpeed_mps = 0.15 * SwerveConstants.maxVelocity_mps;
+	private final double maxSpeed_mps = 0.5;
 
 	/** stops driving when within @fieldcal */
-	private final double maxAngle_rad = Units.degreesToRadians(3);
+	private final double maxAngle_rad = Units.degreesToRadians(5); // 3
 
 	private final PIDController driveController = new PIDController(2.1, 0, 0.025);
 

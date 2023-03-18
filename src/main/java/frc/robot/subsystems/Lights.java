@@ -6,7 +6,6 @@ import frc.robot.RobotContainer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 /**
@@ -28,7 +27,7 @@ public class Lights {
 	private Lights() {}
 
 	public enum Group {
-		Control(0), LMRetroreflective(1), LMAprilTag(2), Coral(3), ElevatorArm(4), Grabber(5), HumanPlayer(6);
+		Control(0), HumanPlayer(15), LMRetroreflective(1), LMAprilTag(2), Coral(3), ElevatorArm(4), Grabber(5);
 
 		public final int value;
 
@@ -91,8 +90,15 @@ public class Lights {
 	private static Status requestedGamePiece = Status.None;
 	private static Timer requestedGamePieceClear = new Timer();
 
-	public static Command requestGamePiece(Status piece) {
-		return new InstantCommand(() -> {
+	public static class RequestGamePiece extends InstantCommand {
+		Status piece;
+
+		public RequestGamePiece(Status piece) {
+			this.piece = piece;
+		}
+
+		@Override
+		public void initialize() {
 			if (requestedGamePiece == piece) {
 				requestedGamePiece = Status.None; // toggle request
 				requestedGamePieceClear.stop();
@@ -102,7 +108,12 @@ public class Lights {
 				requestedGamePieceClear.restart();
 			}
 			setStatus(Group.HumanPlayer, requestedGamePiece);
-		});
+		}
+
+		@Override
+		public boolean runsWhenDisabled() {
+			return true;
+		}
 	}
 
 	public static void periodic() {

@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 
+import org.littletonrobotics.junction.Logger;
+
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
@@ -103,6 +105,8 @@ public class TeleopSwerve extends CommandBase {
 			driveMaxPercent *= 0.3;
 			turnMaxPercent *= 0.2;
 		}
+
+		Logger.getInstance().recordOutput("TeleopSwerve/driveMaxPercent", driveMaxPercent);
 
 		translation = new Translation2d(
 			modifyAxis(driveSupplier.getAsDouble()),

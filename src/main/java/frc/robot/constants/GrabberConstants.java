@@ -7,6 +7,7 @@ public final class GrabberConstants {
 	public static final double cubeGrabSpeed = 0.4;
 	public static final double holdSpeed = 0.28;
 	public static final double releaseSpeed = 0.3;
+	public static final double cubeShootSpeed = 0.8;
 	public static final double releaseTime_s = 0.5;
 
 	public static final int smartCurrentLimit_A = 50;

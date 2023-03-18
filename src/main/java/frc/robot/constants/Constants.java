@@ -3,10 +3,10 @@ package frc.robot.constants;
 public final class Constants {
 	public static final double loopPeriod_s = org.littletonrobotics.junction.LoggedRobot.defaultPeriodSecs; // edu.wpi.first.wpilibj.TimedRobot.kDefaultPeriod
 
-	public static final RobotMode robotMode = RobotMode.ACTIVE;
+	public static final RobotMode robotMode = RobotMode.Active;
 
 	public enum RobotMode {
-		ACTIVE, REPLAY;
+		Active, Replay;
 	}
 
 	public static class OperatorConstants {

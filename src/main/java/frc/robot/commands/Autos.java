@@ -119,10 +119,12 @@ public final class Autos {
 		return swerveAnglesTo(swerve, new Rotation2d(0));
 	}
 
-	public static int pathCount = 0;
-
 	public static Command autoPath(Swerve swerve, PathPlannerTrajectory path) {
-		return new PathPlannerCommand(path, swerve, true, pathCount++ == 0);
+		return autoPath(swerve, path, false);
+	}
+
+	public static Command autoPath(Swerve swerve, PathPlannerTrajectory path, boolean firstPathEver) {
+		return new PathPlannerCommand(path, swerve, true, firstPathEver);
 	}
 
 	/*
@@ -140,22 +142,22 @@ public final class Autos {
 
 	public static Command coopCubeBalance(RobotContainer robo) {
 		var path = PathPlanner.loadPathGroup("coopCubeBalance",
-			new PathConstraints(2, maxAcceleration_mps2));
+			new PathConstraints(1, maxAcceleration_mps2));
 
 		return new SequentialCommandGroup(
 			initAndScore(robo, ScoringPosition.HighCube),
-			autoPath(robo.swerve, path.get(0)),
+			autoPath(robo.swerve, path.get(0), true),
 			balance(robo.swerve));
 	}
 
 	public static Command coopCubeMobilityBalance(RobotContainer robo) {
 		var path = PathPlanner.loadPathGroup("coopCubeMobilityBalance",
-			new PathConstraints(3, maxAcceleration_mps2),
-			new PathConstraints(2, maxAcceleration_mps2));
+			new PathConstraints(1.5, maxAcceleration_mps2),
+			new PathConstraints(1.5, maxAcceleration_mps2));
 
 		return new SequentialCommandGroup(
 			initAndScore(robo, ScoringPosition.HighCube),
-			autoPath(robo.swerve, path.get(0)),
+			autoPath(robo.swerve, path.get(0), true),
 			Commands.waitSeconds(3), // wait for charge station to stabilize first
 			autoPath(robo.swerve, path.get(1)),
 			balance(robo.swerve));
@@ -167,7 +169,7 @@ public final class Autos {
 
 		return new SequentialCommandGroup(
 			initAndScore(robo, ScoringPosition.HighCube),
-			autoPath(robo.swerve, path.get(0)));
+			autoPath(robo.swerve, path.get(0), true));
 	}
 
 	public static Command fwCube(RobotContainer robo) {
@@ -176,7 +178,7 @@ public final class Autos {
 
 		return new SequentialCommandGroup(
 			initAndScore(robo, ScoringPosition.HighCube),
-			autoPath(robo.swerve, path.get(0)));
+			autoPath(robo.swerve, path.get(0), true));
 	}
 
 	public static Command fwCubeBalance(RobotContainer robo) {
@@ -186,7 +188,7 @@ public final class Autos {
 
 		return new SequentialCommandGroup(
 			// initAndScore(robo, ScoringPosition.HighCube),
-			autoPath(robo.swerve, path.get(0)),
+			autoPath(robo.swerve, path.get(0), true),
 			autoPath(robo.swerve, path.get(1)),
 			balance(robo.swerve));
 	}
@@ -199,7 +201,7 @@ public final class Autos {
 
 		return new SequentialCommandGroup(
 			initAndScore(robo, ScoringPosition.HighCube),
-			autoPath(robo.swerve, path.get(0)),
+			autoPath(robo.swerve, path.get(0), true),
 			intakeGroundClose(robo.swerve, robo.elevator, robo.arm, robo.grabber),
 			allIn(robo.elevator, robo.arm),
 			autoPath(robo.swerve, path.get(1)),
@@ -215,7 +217,7 @@ public final class Autos {
 
 		return new SequentialCommandGroup(
 			initAndScore(robo, ScoringPosition.HighCube),
-			autoPath(robo.swerve, path.get(0)),
+			autoPath(robo.swerve, path.get(0), true),
 			intakeGroundClose(robo.swerve, robo.elevator, robo.arm, robo.grabber),
 			allIn(robo.elevator, robo.arm),
 			autoPath(robo.swerve, path.get(1)),
@@ -233,7 +235,7 @@ public final class Autos {
 
 		return new SequentialCommandGroup(
 			initAndScore(robo, ScoringPosition.HighCube),
-			autoPath(robo.swerve, path.get(0)),
+			autoPath(robo.swerve, path.get(0), true),
 			intakeGroundClose(robo.swerve, robo.elevator, robo.arm, robo.grabber),
 			allIn(robo.elevator, robo.arm),
 			autoPath(robo.swerve, path.get(1)),
@@ -248,7 +250,7 @@ public final class Autos {
 
 		return new SequentialCommandGroup(
 			initAndScore(robo, ScoringPosition.HighCube),
-			autoPath(robo.swerve, path.get(0)),
+			autoPath(robo.swerve, path.get(0), true),
 			intakeGroundClose(robo.swerve, robo.elevator, robo.arm, robo.grabber),
 			allIn(robo.elevator, robo.arm),
 			autoPath(robo.swerve, path.get(1)),

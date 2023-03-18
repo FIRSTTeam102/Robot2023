@@ -36,6 +36,8 @@ import frc.robot.commands.vision.GamePieceVision;
 import frc.robot.commands.vision.RetroreflectiveVision;
 
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.HttpCamera;
+import edu.wpi.first.cscore.HttpCamera.HttpCameraKind;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -50,6 +52,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import java.util.Map;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -196,8 +200,8 @@ public class RobotContainer {
 		// .whileTrue(arm.tempDisableLimits);
 
 		// human player request
-		operatorConsole.button(9).onTrue(Lights.requestGamePiece(Lights.Status.Cone));
-		operatorConsole.button(13).onTrue(Lights.requestGamePiece(Lights.Status.Cube));
+		operatorConsole.button(9).onTrue(new Lights.RequestGamePiece(Lights.Status.Cone));
+		operatorConsole.button(13).onTrue(new Lights.RequestGamePiece(Lights.Status.Cube));
 
 		/*
 		 * operator flight stick
@@ -216,7 +220,8 @@ public class RobotContainer {
 				.andThen(new ReleaseGrabber(grabber)));
 		operatorJoystick.button(4)
 			.onTrue(new StopGrabber(grabber));
-		// operatorJoystick.button(5)
+		operatorJoystick.button(6)
+			.onTrue(new ReleaseGrabber(grabber, GrabberConstants.cubeShootSpeed, GrabberConstants.releaseTime_s));
 		// .onTrue(new GrabGrabberUntilGrabbed(grabber));
 	}
 
@@ -256,16 +261,16 @@ public class RobotContainer {
 			DriverStation.reportError("Failed to get camera: " + e.toString(), e.getStackTrace());
 		}
 
-		// if (Robot.isReal()) {
-		// var limelightCamera = new HttpCamera("limelightStream", "http://limelight.local:5800/stream.mjpg",
-		// HttpCameraKind.kMJPGStreamer);
-		// Shuffleboard.getTab(ShuffleboardConstants.driveTab)
-		// .add("limelight", limelightCamera)
-		// .withProperties(Map.of("show crosshair", false, "show controls", false))
-		// .withWidget(BuiltInWidgets.kCameraStream)
-		// .withSize(7, 6)
-		// .withPosition(8, 0);
-		// }
+		if (Robot.isReal()) {
+			var limelightCamera = new HttpCamera("limelightStream", "http://limelight.local:5800/stream.mjpg",
+				HttpCameraKind.kMJPGStreamer);
+			Shuffleboard.getTab(ShuffleboardConstants.driveTab)
+				.add("limelight", limelightCamera)
+				.withProperties(Map.of("show crosshair", false, "show controls", false))
+				.withWidget(BuiltInWidgets.kCameraStream)
+				.withSize(7, 6)
+				.withPosition(8, 0);
+		}
 	}
 
 	/**

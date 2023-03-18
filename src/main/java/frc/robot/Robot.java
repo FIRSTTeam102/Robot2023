@@ -59,13 +59,13 @@ public class Robot extends LoggedRobot {
 		});
 
 		switch (robotMode) {
-			case REPLAY -> {
+			case Replay -> {
 				setUseTiming(false); // run as fast as possible
 				String logPath = LogFileUtil.findReplayLog();
 				Logger.getInstance().setReplaySource(new WPILOGReader(logPath));
 				Logger.getInstance().addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
 			}
-			case ACTIVE -> {
+			case Active -> {
 				logger.addDataReceiver(new WPILOGWriter("/media/sda1/logs/")); // todo: sd card? /home/lvuser/logs/
 				logger.addDataReceiver(new NT4Publisher()); // publish data to NetworkTables
 				if (isReal()) {
@@ -152,7 +152,6 @@ public class Robot extends LoggedRobot {
 		autonomousCommand = robotContainer.getAutonomousCommand();
 		if (autonomousCommand != null)
 			try {
-				Autos.pathCount = 0; // we presumably reset the position on the field so we can reset odometry
 				autonomousCommand.schedule();
 			} catch (Exception e) {
 				DriverStation.reportError("failedto schedule auto", e.getStackTrace());
