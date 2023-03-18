@@ -13,5 +13,5 @@ public final class GrabberConstants {
 	public static final int smartCurrentLimit_A = 50;
 	public static final int hardCurrentLimit_A = 60;
 
-	public static final double grabbedCurrent_A = 17;
+	public static final double grabbedCurrent_A = 21;
 }

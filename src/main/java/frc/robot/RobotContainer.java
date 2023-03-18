@@ -54,6 +54,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -88,7 +89,8 @@ public class RobotContainer {
 	public final Elevator elevator = new Elevator();
 	public final Grabber grabber = new Grabber();
 
-	private LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("auto routine");
+	// these are suppliers b/c pathplanner gets the alliance in the constructor, but it's unknown until init
+	private LoggedDashboardChooser<Supplier<Command>> autoChooser = new LoggedDashboardChooser<>("auto routine");
 	// private GenericEntry autoDelay;
 
 	/** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -99,20 +101,25 @@ public class RobotContainer {
 
 		// setup autos
 		// FW = field wall, LZ = loading zone barrier
-		autoChooser.addDefaultOption("nothing", new InstantCommand());
-		autoChooser.addOption("cube and nothing", Autos.initAndScore(this, ScoringPosition.HighCube));
+		autoChooser.addDefaultOption("nothing", () -> new InstantCommand());
+		autoChooser.addOption("cube and nothing", () -> Autos.initAndScore(this, ScoringPosition.HighCube));
 
-		autoChooser.addOption("lz cube", Autos.lzCube(this));
+		autoChooser.addOption("lz cube", () -> Autos.lzCube(this));
+		autoChooser.addOption("lz 2cube", () -> Autos.lz2Cube(this));
+		autoChooser.addOption("lz 2cube balance", () -> Autos.lz2CubeBalance(this));
 
-		autoChooser.addOption("fw cube", Autos.fwCube(this));
-		autoChooser.addOption("fw cube balance", Autos.fwCubeBalance(this));
+		autoChooser.addOption("fw cube", () -> Autos.fwCube(this));
+		autoChooser.addOption("fw cube balance", () -> Autos.fwCubeBalance(this));
+		autoChooser.addOption("fw 2cube", () -> Autos.fw2Cube(this));
+		autoChooser.addOption("fw 2cube balance", () -> Autos.fw2CubeBalance(this));
 
-		autoChooser.addOption("coop cube balance", Autos.coopCubeBalance(this));
-		autoChooser.addOption("coop cube mobility balance", Autos.coopCubeMobilityBalance(this));
+		autoChooser.addOption("coop cube balance", () -> Autos.coopCubeBalance(this));
+		autoChooser.addOption("coop cube mobility balance", () -> Autos.coopCubeMobilityBalance(this));
 
 		// for testing
 		autoChooser.addOption("[testing] drive characterization",
-			new FeedForwardCharacterization(swerve, true, swerve::runCharacterization, swerve::getCharacterizationVelocity));
+			() -> new FeedForwardCharacterization(swerve, true, swerve::runCharacterization,
+				swerve::getCharacterizationVelocity));
 
 		var driveTab = Shuffleboard.getTab(ShuffleboardConstants.driveTab);
 		driveTab.add("alerts", Alert.getAlertsSendable())
@@ -280,7 +287,7 @@ public class RobotContainer {
 	public Command getAutonomousCommand() {
 		// if (autoDelay.getDouble(0) > 0)
 		// return Commands.waitSeconds(autoDelay.getDouble(0)).andThen(autoChooser.get());
-		return autoChooser.get();
+		return autoChooser.get().get(); // 😭
 	}
 
 	Alert driverControllerAlert = new Alert("driver controller not connected properly", AlertType.Error);

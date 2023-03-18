@@ -142,7 +142,7 @@ public final class Autos {
 
 	public static Command coopCubeBalance(RobotContainer robo) {
 		var path = PathPlanner.loadPathGroup("coopCubeBalance",
-			new PathConstraints(1, maxAcceleration_mps2));
+			new PathConstraints(balanceMaxVelocity_mps, maxAcceleration_mps2));
 
 		return new SequentialCommandGroup(
 			initAndScore(robo, ScoringPosition.HighCube),
@@ -152,20 +152,19 @@ public final class Autos {
 
 	public static Command coopCubeMobilityBalance(RobotContainer robo) {
 		var path = PathPlanner.loadPathGroup("coopCubeMobilityBalance",
-			new PathConstraints(1.5, maxAcceleration_mps2),
-			new PathConstraints(1.5, maxAcceleration_mps2));
+			new PathConstraints(balanceMaxVelocity_mps, maxAcceleration_mps2));
 
 		return new SequentialCommandGroup(
 			initAndScore(robo, ScoringPosition.HighCube),
 			autoPath(robo.swerve, path.get(0), true),
-			Commands.waitSeconds(3), // wait for charge station to stabilize first
+			Commands.waitSeconds(1.2), // wait for charge station to stabilize first
 			autoPath(robo.swerve, path.get(1)),
 			balance(robo.swerve));
 	}
 
 	public static Command lzCube(RobotContainer robo) {
 		var path = PathPlanner.loadPathGroup("lzCube",
-			new PathConstraints(maxVelocity_mps, maxAcceleration_mps2));
+			new PathConstraints(slowerMaxVelocity_mps, maxAcceleration_mps2));
 
 		return new SequentialCommandGroup(
 			initAndScore(robo, ScoringPosition.HighCube),
@@ -174,7 +173,7 @@ public final class Autos {
 
 	public static Command fwCube(RobotContainer robo) {
 		var path = PathPlanner.loadPathGroup("fwCube",
-			new PathConstraints(maxVelocity_mps, maxAcceleration_mps2));
+			new PathConstraints(slowerMaxVelocity_mps, maxAcceleration_mps2));
 
 		return new SequentialCommandGroup(
 			initAndScore(robo, ScoringPosition.HighCube),
@@ -184,7 +183,7 @@ public final class Autos {
 	public static Command fwCubeBalance(RobotContainer robo) {
 		var path = PathPlanner.loadPathGroup("fwCubeBalance",
 			new PathConstraints(maxVelocity_mps, maxAcceleration_mps2),
-			new PathConstraints(2, maxAcceleration_mps2));
+			new PathConstraints(balanceMaxVelocity_mps, maxAcceleration_mps2));
 
 		return new SequentialCommandGroup(
 			// initAndScore(robo, ScoringPosition.HighCube),

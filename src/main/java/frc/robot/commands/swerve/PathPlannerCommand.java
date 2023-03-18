@@ -1,15 +1,14 @@
 package frc.robot.commands.swerve;
 
+import frc.robot.Robot;
 import frc.robot.subsystems.Swerve;
 
 import frc.robot.commands.Autos;
 
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
-
-import org.littletonrobotics.junction.Logger;
 
 /**
  * instructs the swerve subsystem to follow the specified trajectory 
@@ -37,21 +36,27 @@ public class PathPlannerCommand extends PPSwerveControllerCommand {
 	public PathPlannerCommand(PathPlannerTrajectory trajectory, Swerve swerve, boolean transformForAlliance,
 		boolean firstPathEver) {
 		super(
-			trajectory,
+			susTransformTrajectory(trajectory, transformForAlliance),
 			swerve::getPose,
 			swerve.kinematics,
 			Autos.ppXController,
 			Autos.ppYController,
 			Autos.ppRotationController,
 			swerve::setModuleStates,
-			transformForAlliance,
+			false, // transformForAlliance,
 			swerve);
 
 		this.swerve = swerve;
-		this.trajectory = transformForAlliance
-			? PathPlannerTrajectory.transformTrajectoryForAlliance(trajectory, DriverStation.getAlliance())
-			: trajectory;
+		// why can't it be a public 😭 i just want it in initialize
+		this.trajectory = susTransformTrajectory(trajectory, transformForAlliance);
 		this.resetOdometry = firstPathEver;
+	}
+
+	private static PathPlannerTrajectory susTransformTrajectory(PathPlannerTrajectory traj,
+		boolean transformForAlliance) {
+		return transformForAlliance
+			? PathPlannerTrajectory.transformTrajectoryForAlliance(traj, Robot.isBlue() ? Alliance.Blue : Alliance.Red)
+			: traj;
 	}
 
 	@Override
@@ -67,8 +72,6 @@ public class PathPlannerCommand extends PPSwerveControllerCommand {
 		Autos.ppXController.reset();
 		Autos.ppYController.reset();
 		Autos.ppRotationController.reset();
-
-		Logger.getInstance().recordOutput("Odometry/PathPlanner", trajectory);
 	}
 
 	@Override

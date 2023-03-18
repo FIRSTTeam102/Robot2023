@@ -59,6 +59,9 @@ public class Elevator extends SubsystemBase {
 	public Elevator() {
 		motor.setIdleMode(IdleMode.kBrake);
 
+		motor.setSmartCurrentLimit(50);
+		motor.setSecondaryCurrentLimit(65);
+
 		topSwitch.enableLimitSwitch(true);
 		bottomSwitch.enableLimitSwitch(true);
 

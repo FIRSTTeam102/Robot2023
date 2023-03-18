@@ -1,5 +1,6 @@
 package frc.robot.commands.scoring;
 
+import frc.robot.Robot;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.ScoringPosition;
 import frc.robot.subsystems.Arm;
@@ -30,6 +31,13 @@ public class SetScoringPosition extends ProxyCommand {
 		double elevatorTolerance_m, double armTolerance_m) {
 		super(() -> new SetElevatorArmPositionProxied(elevator, arm, elevatorPos_m, armPos_m,
 			elevatorTolerance_m, armTolerance_m));
+	}
+
+	@Override
+	public boolean isFinished() {
+		if (Robot.isSimulation())
+			return true; // temp: until we actually sim it, for now we want to test auto
+		return super.isFinished();
 	}
 
 	@Override

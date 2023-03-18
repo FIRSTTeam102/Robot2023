@@ -5,6 +5,8 @@ public final class AutoConstants {
 	// todo:?
 	public static final double maxVelocity_mps = 4.97;
 	public static final double maxAcceleration_mps2 = 3;
+	public static final double balanceMaxVelocity_mps = 1.5;
+	public static final double slowerMaxVelocity_mps = 3.5;
 
 	public static final double armTolerance_m = 0.1;
 	public static final double elevatorTolerance_m = 0.1;

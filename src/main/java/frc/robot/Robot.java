@@ -8,15 +8,20 @@ import frc.robot.util.ScoringMechanism2d;
 
 import frc.robot.commands.Autos;
 
+import edu.wpi.first.hal.AllianceStationID;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import com.pathplanner.lib.server.PathPlannerServer;
 
 import com.revrobotics.REVPhysicsSim;
@@ -45,6 +50,9 @@ public class Robot extends LoggedRobot {
 	 */
 	@Override
 	public void robotInit() {
+		if (Robot.isSimulation())
+			DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
+
 		var logger = Logger.getInstance();
 		logger.recordMetadata("RuntimeType", getRuntimeType().toString());
 		logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
@@ -75,6 +83,11 @@ public class Robot extends LoggedRobot {
 				}
 			}
 		}
+
+		PPSwerveControllerCommand.setLoggingCallbacks(
+			(PathPlannerTrajectory traj) -> Logger.getInstance().recordOutput("Odometry/PPTrajectory", traj),
+			(Pose2d pose) -> Logger.getInstance().recordOutput("Odometry/PPPose", pose),
+			null, null);
 
 		// disable LiveWindow telemetry in favor of AdvantageKit to reduce processing each tick
 		LiveWindow.disableAllTelemetry();
@@ -121,8 +134,8 @@ public class Robot extends LoggedRobot {
 	@Override
 	public void disabledInit() {
 		Lights.setControlMode(switch (DriverStation.getAlliance()) {
-			case Blue -> Lights.ControlMode.DisabledBlue;
-			default -> Lights.ControlMode.DisabledRed;
+			case Red -> Lights.ControlMode.DisabledRed;
+			default -> Lights.ControlMode.DisabledBlue;
 		});
 
 		// robotContainer.swerve.setGyroOffset_deg(0); // end of auto, clear PP offset or something
@@ -207,6 +220,6 @@ public class Robot extends LoggedRobot {
 	}
 
 	public static boolean isBlue() {
-		return DriverStation.getAlliance() == DriverStation.Alliance.Blue;
+		return DriverStation.getAlliance() != DriverStation.Alliance.Red;
 	}
 }

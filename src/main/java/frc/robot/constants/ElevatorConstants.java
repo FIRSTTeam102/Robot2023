@@ -23,7 +23,7 @@ public final class ElevatorConstants {
 	public static final double kIZone = 0.1;
 	public static final double kD = 0.0;
 
-	public static final double feedForward_V = 0.635;
+	public static final double feedForward_V = 0.63;
 
 	// /**
 	// * characterization values (feed forward)
@@ -40,7 +40,7 @@ public final class ElevatorConstants {
 		* (1 / gearRatio) /* rotation/rotation of main shaft */
 		* 0.2282; /* m/rotation */
 	public static final double conversionFactor_mps_per_rpm = conversionFactor_m_per_rotation / 60;
-	public static final double minHeight_m = 0;
+	public static final double minHeight_m = 0.02;
 	public static final double maxHeight_m = 1.22;
 	public static final double carriageMass_kg = Units
 		.lbsToKilograms(4.893 /* inner elevator */ + 9 /* carriage + arm */ + 6 /* grabber */);
