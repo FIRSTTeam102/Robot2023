@@ -6,6 +6,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
@@ -23,6 +24,8 @@ public class ChargeStationBalance extends CommandBase {
 
 	private Swerve swerve;
 
+	private Timer finishedTimer;
+
 	public ChargeStationBalance(Swerve swerve) {
 		this.swerve = swerve;
 		addRequirements(swerve);
@@ -34,7 +37,9 @@ public class ChargeStationBalance extends CommandBase {
 	}
 
 	@Override
-	public void initialize() {}
+	public void initialize() {
+		finishedTimer.reset();
+	}
 
 	@Override
 	public void execute() {
@@ -45,6 +50,13 @@ public class ChargeStationBalance extends CommandBase {
 		Logger.getInstance().recordOutput("Balance/outputVelocity_mps", outputVelocity_mps);
 
 		swerve.drive(new Translation2d(outputVelocity_mps, 0), 0, true);
+
+		if (driveController.atSetpoint())
+			finishedTimer.start();
+		else {
+			finishedTimer.stop();
+			finishedTimer.reset();
+		}
 	}
 
 	@Override
@@ -54,7 +66,7 @@ public class ChargeStationBalance extends CommandBase {
 
 	@Override
 	public boolean isFinished() {
-		return driveController.atSetpoint();
+		return finishedTimer.hasElapsed(0.5);
 	}
 
 	// // todo:, also don't pass borders as parameters

@@ -104,7 +104,7 @@ public class RobotContainer {
 		autoChooser.addDefaultOption("nothing", () -> new InstantCommand());
 		autoChooser.addOption("cube and nothing", () -> Autos.initAndScore(this, ScoringPosition.HighCube));
 
-		autoChooser.addOption("lz cube", () -> Autos.lzCube(this));
+		autoChooser.addOption("lz cube", () -> Autos.lzCube(this, true));
 		autoChooser.addOption("lz 2cube", () -> Autos.lz2Cube(this));
 		autoChooser.addOption("lz 2cube balance", () -> Autos.lz2CubeBalance(this));
 

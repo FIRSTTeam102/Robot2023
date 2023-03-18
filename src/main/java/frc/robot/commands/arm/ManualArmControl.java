@@ -42,6 +42,6 @@ public class ManualArmControl extends CommandBase {
 	public static double scaleInput(double input) {
 		return input == 0
 			? 0
-			: Math.copySign(.5 * Math.abs(input) + .2, input);
+			: Math.copySign(.6 * Math.abs(input) + .1, input);
 	}
 }

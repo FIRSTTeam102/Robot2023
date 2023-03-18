@@ -157,18 +157,19 @@ public final class Autos {
 		return new SequentialCommandGroup(
 			initAndScore(robo, ScoringPosition.HighCube),
 			autoPath(robo.swerve, path.get(0), true),
-			Commands.waitSeconds(1.2), // wait for charge station to stabilize first
+			Commands.waitSeconds(0.8), // wait for charge station to stabilize first
 			autoPath(robo.swerve, path.get(1)),
 			balance(robo.swerve));
 	}
 
-	public static Command lzCube(RobotContainer robo) {
+	public static Command lzCube(RobotContainer robo, boolean intakeAfter) {
 		var path = PathPlanner.loadPathGroup("lzCube",
 			new PathConstraints(slowerMaxVelocity_mps, maxAcceleration_mps2));
 
 		return new SequentialCommandGroup(
 			initAndScore(robo, ScoringPosition.HighCube),
 			autoPath(robo.swerve, path.get(0), true));
+		// intakeAfter ? intakeGroundClose(robo.swerve, robo.elevator, robo.arm, robo.grabber) : Commands.none());
 	}
 
 	public static Command fwCube(RobotContainer robo) {

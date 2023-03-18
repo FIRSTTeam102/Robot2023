@@ -11,7 +11,7 @@ public enum ScoringPosition {
 	HighCone(ElevatorConstants.maxHeight_m, 1.39, true),
 	DoubleSubstation(1.05, .382),
 	SingleSubstationCube(.58, 0),
-	AllIn(.19, .25);
+	AllIn(.19, .14);
 
 // @formatter:on
 	public final double elevatorHeight_m;

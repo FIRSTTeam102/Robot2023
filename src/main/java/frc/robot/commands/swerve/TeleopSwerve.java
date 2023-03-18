@@ -82,7 +82,7 @@ public class TeleopSwerve extends CommandBase {
 	private double driveMaxPercent = 1.0;
 	private double turnMaxPercent = 1.0;
 
-	private static final double normalMaxPercent = 0.8;
+	private static final double normalMaxPercent = 0.75;
 	private static final double maxArmDist_m = Arm.nutDistToArmDist(ArmConstants.maxNutDist_m)
 		- ArmConstants.dangerZone_m;
 
@@ -95,7 +95,7 @@ public class TeleopSwerve extends CommandBase {
 			driveMaxPercent = normalMaxPercent * (1 - (0.4 /* how much of the decrease to use */ * (
 			// bigger coefficient = more of a speed decrease the farther out it is
 			0.9 * (arm.getArmDist_m() / maxArmDist_m)
-				+ 0.4 * ((elevator.inputs.position_m - ArmConstants.dangerZone_m) / ElevatorConstants.maxHeight_m))));
+				+ 0.5 * ((elevator.inputs.position_m - ArmConstants.dangerZone_m) / ElevatorConstants.maxHeight_m))));
 			if (driveMaxPercent < 0.1) // bug?
 				driveMaxPercent = 0.1;
 			turnMaxPercent = driveMaxPercent * 0.9;
@@ -128,8 +128,8 @@ public class TeleopSwerve extends CommandBase {
 		swerve.stop();
 	}
 
-	private static final double cubicWeight = 0.4;
-	private static final double weightExponent = 3.5;
+	private static final double cubicWeight = 0.3;
+	private static final double weightExponent = 6.5;
 	private static final double minOutput = 0.1;
 
 	// custom input scaling
