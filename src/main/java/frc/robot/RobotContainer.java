@@ -30,6 +30,7 @@ import frc.robot.commands.grabber.StopGrabber;
 import frc.robot.commands.scoring.SetScoringPosition;
 import frc.robot.commands.swerve.ChargeStationBalance;
 import frc.robot.commands.swerve.TeleopSwerve;
+import frc.robot.commands.swerve.TeleopSwerve.ZeroYaw;
 import frc.robot.commands.swerve.XStance;
 import frc.robot.commands.vision.AprilTagVision;
 import frc.robot.commands.vision.GamePieceVision;
@@ -153,6 +154,8 @@ public class RobotContainer {
 
 		driverController.rightTrigger(OperatorConstants.boolTriggerThreshold)
 			.whileTrue(teleopSwerve.holdToggleFieldRelative());
+		driverController.rightBumper()
+			.whileTrue(teleopSwerve.holdRotateAroundPiece());
 
 		driverController.a().onTrue(teleopSwerve.toggleFieldRelative());
 		driverController.x().whileTrue(new XStance(swerve));

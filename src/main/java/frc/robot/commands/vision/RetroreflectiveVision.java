@@ -12,17 +12,17 @@ public class RetroreflectiveVision extends CommandBase {
 	private Routine routine;
 	private Vision vision;
 	private Swerve swerve;
-	private double robotTranslateVelocity_mps;
+	private double robotTranslate_mps;
 
 	public enum Routine {
 		BlueRedGridLeftRight
 	}
 
 	public RetroreflectiveVision(Routine routine, Vision vision, Swerve swerve) {
+		addRequirements(swerve);
 		this.routine = routine;
 		this.vision = vision;
 		this.swerve = swerve;
-		addRequirements(swerve);
 	}
 
 	@Override
@@ -41,11 +41,11 @@ public class RetroreflectiveVision extends CommandBase {
 		switch (routine) {
 			case BlueRedGridLeftRight:
 				if (-VisionConstants.crosshairTargetBoundTranslateX_rad > vision.inputs.crosshairToTargetErrorX_rad) {
-					robotTranslateVelocity_mps = VisionConstants.retroreflectiveTranslateKp
+					robotTranslate_mps = VisionConstants.retroreflectiveTranslateKp
 						* -vision.inputs.crosshairToTargetErrorX_rad
 						- VisionConstants.retroreflectiveTranslateKd;
 				} else if (vision.inputs.crosshairToTargetErrorX_rad > VisionConstants.crosshairTargetBoundTranslateX_rad) {
-					robotTranslateVelocity_mps = VisionConstants.retroreflectiveTranslateKp
+					robotTranslate_mps = VisionConstants.retroreflectiveTranslateKp
 						* vision.inputs.crosshairToTargetErrorX_rad
 						+ VisionConstants.retroreflectiveTranslateKd;
 				}
@@ -55,9 +55,10 @@ public class RetroreflectiveVision extends CommandBase {
 				return;
 		}
 
-		// Generate a translation to retroreflective
+		// Generate a continuously updated translation to retroreflective
 		System.out.println("Swerve --> BlueRedGridLeftRight");
-		swerve.drive(new Translation2d(robotTranslateVelocity_mps, 0), 0, false);
+		System.out.println(robotTranslate_mps);
+		swerve.drive(new Translation2d(0, robotTranslate_mps), 0, false);
 	}
 
 	// Stop swerve and set pipeline back to Apriltag

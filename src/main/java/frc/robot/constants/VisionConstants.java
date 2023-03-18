@@ -4,12 +4,12 @@ public final class VisionConstants {
 	/* AprilTagVision */
 	public static final double poseError_m = 1; // comparing visionPose to pose
 	public static final double botpose_fieldOffsetX_m = 0.18; // realife offset to pathplanner app
-	public static final double maxZDistanceAprilTag_m = 1.8934684 /* grid to charge station */
-		- 0.5334; /* limelight to front bumper */
+	public static final double botpose_fieldBlueCommunityGeoFenceX_m = 2.84; /* blue left to charge station distance */
+	public static final double botpose_fieldRedCommunityGeoFenceX_m = 13.68; /* red right to charge station distance */
 
 	/* RetroreflectiveVision */
-	public static final double retroreflectiveTranslateKp = 0.2;
-	public static final double retroreflectiveTranslateKd = 0.025;
+	public static final double retroreflectiveTranslateKp = 2.0;
+	public static final double retroreflectiveTranslateKd = 0.25;
 	public static final double crosshairTargetBoundTranslateX_rad = Math.toRadians(1.5);
 
 	/* ObjectDetectionVision */

@@ -18,7 +18,7 @@ public class ChargeStationBalance extends CommandBase {
 	private final double maxSpeed_mps = 0.5;
 
 	/** stops driving when within @fieldcal */
-	private final double maxAngle_rad = Units.degreesToRadians(5); // 3
+	private final double maxAngle_rad = Units.degreesToRadians(3.5); // 3
 
 	private final PIDController driveController = new PIDController(2.1, 0, 0.025);
 
@@ -66,7 +66,7 @@ public class ChargeStationBalance extends CommandBase {
 
 	@Override
 	public boolean isFinished() {
-		return finishedTimer.hasElapsed(0.5);
+		return finishedTimer.hasElapsed(1.2);
 	}
 
 	// // todo:, also don't pass borders as parameters

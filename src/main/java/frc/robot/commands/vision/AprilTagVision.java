@@ -49,9 +49,10 @@ public class AprilTagVision extends CommandBase {
 		// Sets pipeline to Apriltag
 		vision.setPipeline(Pipeline.AprilTag);
 
-		// If see an Apriltag and are within maxZDistanceAprilTag_m from the Apriltag, AprilTagVision will execute
+		// If see an Apriltag and are within the community, AprilTagVision will execute
 		regeneratePaths = vision.inputs.target == true
-			&& vision.inputs.botpose_fieldTranslationZ_m < VisionConstants.maxZDistanceAprilTag_m;
+			&& (vision.inputs.botpose_fieldTranslationX_m < VisionConstants.botpose_fieldBlueCommunityGeoFenceX_m
+				|| vision.inputs.botpose_fieldTranslationX_m > VisionConstants.botpose_fieldRedCommunityGeoFenceX_m);
 		cancelPPCommand();
 	}
 
@@ -189,7 +190,7 @@ public class AprilTagVision extends CommandBase {
 				return;
 		}
 
-		// Generate a path using from pose2d to apriltag
+		// Generate a one-time path using from pose2d to apriltag
 		PathPlannerTrajectory trajectory = PathPlanner.generatePath(
 			new PathConstraints(2.0, 1.0),
 			new PathPoint(swerve.getPose().getTranslation(), swerve.getPose().getRotation(), swerve.getPose().getRotation()),
@@ -223,7 +224,6 @@ public class AprilTagVision extends CommandBase {
 			// The command's initialize is not called before the first time that our isFinished is called
 			return false;
 		}
-
 		return false;
 	}
 

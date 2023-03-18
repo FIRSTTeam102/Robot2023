@@ -34,6 +34,12 @@ public class TeleopSwerve extends CommandBase {
 			() -> fieldRelative = !fieldRelative);
 	};
 
+	public CommandBase holdRotateAroundPiece() {
+		return Commands.startEnd(
+			() -> swerve.setCenterRotation(SwerveConstants.trackWidth_m + 0.1, 0),
+			() -> swerve.setCenterRotation(0, 0));
+	}
+
 	public class ZeroYaw extends InstantCommand {
 		public ZeroYaw() {
 			SmartDashboard.putBoolean("did zero yaw", false);

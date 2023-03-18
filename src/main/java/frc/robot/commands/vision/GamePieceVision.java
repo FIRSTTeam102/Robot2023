@@ -18,13 +18,14 @@ public class GamePieceVision extends CommandBase {
 	private Elevator elevator;
 	private Arm arm;
 	private Grabber grabber;
-	private double robotRotateVelocity_mps;
+	private double robotRotate_rps;
 
 	public enum Routine {
 		GamepieceGround
 	}
 
 	public GamePieceVision(Routine routine, Vision vision, Swerve swerve, Elevator elevator, Arm arm, Grabber grabber) {
+		addRequirements(swerve);
 		this.routine = routine;
 		this.vision = vision;
 		this.swerve = swerve;
@@ -49,10 +50,10 @@ public class GamePieceVision extends CommandBase {
 		switch (routine) {
 			case GamepieceGround:
 				if (-VisionConstants.crosshairGamePieceBoundRotateX_rad > vision.inputs.crosshairToTargetErrorX_rad) {
-					robotRotateVelocity_mps = VisionConstants.gamePieceRotateKp * -vision.inputs.crosshairToTargetErrorX_rad
+					robotRotate_rps = VisionConstants.gamePieceRotateKp * -vision.inputs.crosshairToTargetErrorX_rad
 						- VisionConstants.gamePieceRotateKd;
 				} else if (vision.inputs.crosshairToTargetErrorX_rad > VisionConstants.crosshairGamePieceBoundRotateX_rad) {
-					robotRotateVelocity_mps = VisionConstants.gamePieceRotateKp * vision.inputs.crosshairToTargetErrorX_rad
+					robotRotate_rps = VisionConstants.gamePieceRotateKp * vision.inputs.crosshairToTargetErrorX_rad
 						+ VisionConstants.gamePieceRotateKd;
 				}
 				break;
@@ -61,9 +62,9 @@ public class GamePieceVision extends CommandBase {
 				return;
 		}
 
-		// Generate a rotation to gamepiece
+		// Generate a continuously updated rotation to gamepiece
 		System.out.println("Swerve --> Gamepiece");
-		swerve.drive(new Translation2d(0, 0), robotRotateVelocity_mps, false);
+		swerve.drive(new Translation2d(0, 0), robotRotate_rps, false);
 	}
 
 	// Stop swerve and generate a algorithm to get gamepiece and set pipeline back to Apriltag

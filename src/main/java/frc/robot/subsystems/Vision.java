@@ -26,9 +26,9 @@ public class Vision extends SubsystemBase {
 		Logger.getInstance().processInputs(getName(), inputs);
 
 		Lights.setStatus(Lights.Group.LMAprilTag, switch ((int) inputs.targetAprilTag) {
-			case 1, 6 -> Lights.Status.Right; // right
-			case 2, 7 -> Lights.Status.Center; // center
-			case 3, 8 -> Lights.Status.Left; // left
+			case 1, 6 -> Lights.Status.Right; // right grid
+			case 2, 7 -> Lights.Status.Center; // center grid
+			case 3, 8 -> Lights.Status.Left; // left grid
 			case 4, 5 -> Lights.Status.LeftRight; // substation
 			default -> Lights.Status.None;
 		});
@@ -53,7 +53,7 @@ public class Vision extends SubsystemBase {
 
 	// Allows AprilTag commands to begin after pipeline switch time error
 	public boolean isPipelineReady() {
-		if (lastPipeline == inputs.pipeline || pipelineSwitchTimer.hasElapsed(0.9)) {
+		if (lastPipeline == inputs.pipeline || pipelineSwitchTimer.hasElapsed(0.8)) {
 			pipelineSwitchTimer.stop();
 			pipelineSwitchTimer.reset();
 			lastPipeline = inputs.pipeline;
