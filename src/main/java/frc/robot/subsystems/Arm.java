@@ -83,8 +83,8 @@ public class Arm extends SubsystemBase {
 
 		pidController.setReference(
 			MathUtil.clamp(armDistToNutDist(armLength_m),
-				Elevator.isInDangerZone() ? armDistToNutDist(dangerZone_m) : maxNutDist_m,
-				minNutDist_m + .3),
+				maxNutDist_m,
+				Elevator.isInDangerZone() ? armDistToNutDist(dangerZone_m) : minNutDist_m),
 			CANSparkMax.ControlType.kPosition);
 	}
 

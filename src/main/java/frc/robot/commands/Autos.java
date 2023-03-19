@@ -157,7 +157,7 @@ public final class Autos {
 		return new SequentialCommandGroup(
 			initAndScore(robo, ScoringPosition.HighCube),
 			autoPath(robo.swerve, path.get(0), true),
-			Commands.waitSeconds(0.8), // wait for charge station to stabilize first
+			Commands.waitSeconds(0.5), // wait for charge station to stabilize first
 			autoPath(robo.swerve, path.get(1)),
 			balance(robo.swerve));
 	}

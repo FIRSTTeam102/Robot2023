@@ -4,7 +4,7 @@ area_similarity:65
 aspect_max:20
 aspect_min:0
 black_level:0
-blue_balance:1950
+blue_balance:1525
 botfloorsnap:0
 botlength:1
 bottype:swerve
@@ -26,15 +26,15 @@ cross_a_y:0
 cross_b_a:0.002436
 cross_b_x:0.037500
 cross_b_y:0.004167
-desc:ObjectDetection
+desc:Gamepiece
 desired_contour_region:0
-detector_conf:0.75
+detector_conf:0.6
 detector_idfilters:
 dilation_steps:1
 direction_filter:0
 dual_close_sort_origin:0
 erosion_steps:0
-exposure:200
+exposure:500
 fiducial_decoder_strictness:strict
 fiducial_denoise:0.000000
 fiducial_idfilters:
@@ -54,7 +54,7 @@ image_source:0
 img_to_show:0
 intersection_filter:0
 invert_hue:0
-lcgain:20
+lcgain:40
 multigroup_max:8
 multigroup_min:1
 multigroup_rejector:1
@@ -62,7 +62,7 @@ pipeline_led_enabled:0
 pipeline_led_power:100
 pipeline_res:3
 pipeline_type:5
-red_balance:1200
+red_balance:1325
 roi_x:0
 roi_y:0
 rsf:0.000000

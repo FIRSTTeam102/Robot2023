@@ -29,7 +29,7 @@ public class Vision extends SubsystemBase {
 			case 1, 6 -> Lights.Status.Right; // right grid
 			case 2, 7 -> Lights.Status.Center; // center grid
 			case 3, 8 -> Lights.Status.Left; // left grid
-			case 4, 5 -> Lights.Status.LeftRight; // substation
+			case 4, 5 -> Lights.Status.LeftRight; // double substation
 			default -> Lights.Status.None;
 		});
 		Lights.setStatus(Lights.Group.LMRetroreflective, (inputs.pipeline == Pipeline.Retroreflective.value &&
@@ -38,8 +38,12 @@ public class Vision extends SubsystemBase {
 					: inputs.crosshairToTargetErrorX_rad > 0 ? Lights.Status.Right
 						: Lights.Status.All)
 				: Lights.Status.None);
-		Lights.setStatus(Lights.Group.Coral.value,
-			inputs.pipeline == Pipeline.GamePiece.value ? (int) inputs.targetObject : Lights.Status.None.value);
+		Lights.setStatus(Lights.Group.Coral, switch (inputs.targetObjectClass) {
+			case "cube" -> Lights.Status.Left;
+			case "cone" -> Lights.Status.Right;
+			case "merge" -> Lights.Status.LeftRight;
+			default -> Lights.Status.None;
+		});
 	}
 
 	// Creates set pipeline

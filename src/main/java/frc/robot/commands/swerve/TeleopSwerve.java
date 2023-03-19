@@ -7,10 +7,11 @@ import frc.robot.constants.SwerveConstants;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Swerve;
+import frc.robot.util.Alert;
+import frc.robot.util.Alert.AlertType;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -40,15 +41,17 @@ public class TeleopSwerve extends CommandBase {
 			() -> swerve.setCenterRotation(0, 0));
 	}
 
+	private Alert zeroedYaw = new Alert("never zeroed yaw", AlertType.Warning);
+
 	public class ZeroYaw extends InstantCommand {
 		public ZeroYaw() {
-			SmartDashboard.putBoolean("did zero yaw", false);
+			zeroedYaw.set(true);
 		}
 
 		@Override
 		public void initialize() {
 			swerve.zeroYaw();
-			SmartDashboard.putBoolean("did zero yaw", true);
+			zeroedYaw.set(false);
 		}
 
 		@Override

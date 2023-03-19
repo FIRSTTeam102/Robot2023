@@ -18,20 +18,20 @@ public class ChargeStationBalance extends CommandBase {
 	private final double maxSpeed_mps = 0.5;
 
 	/** stops driving when within @fieldcal */
-	private final double maxAngle_rad = Units.degreesToRadians(3.5); // 3
+	private final double finshedAngle_rad = Units.degreesToRadians(4); // 3
 
-	private final PIDController driveController = new PIDController(2.1, 0, 0.025);
+	private final PIDController driveController = new PIDController(1.5, 0, 0.05);
 
 	private Swerve swerve;
 
-	private Timer finishedTimer;
+	private Timer finishedTimer = new Timer();
 
 	public ChargeStationBalance(Swerve swerve) {
 		this.swerve = swerve;
 		addRequirements(swerve);
 
 		SmartDashboard.putData("balance drive pid", driveController);
-		driveController.setTolerance(maxAngle_rad);
+		driveController.setTolerance(finshedAngle_rad);
 		driveController.setSetpoint(0);
 		driveController.enableContinuousInput(-Math.PI, Math.PI);
 	}
@@ -49,24 +49,30 @@ public class ChargeStationBalance extends CommandBase {
 		var outputVelocity_mps = MathUtil.clamp(driveController.calculate(tilt_rad), -maxSpeed_mps, maxSpeed_mps);
 		Logger.getInstance().recordOutput("Balance/outputVelocity_mps", outputVelocity_mps);
 
-		swerve.drive(new Translation2d(outputVelocity_mps, 0), 0, true);
-
-		if (driveController.atSetpoint())
+		if (driveController.atSetpoint()) {
 			finishedTimer.start();
-		else {
+
+			swerve.stop();
+		} else {
 			finishedTimer.stop();
 			finishedTimer.reset();
+
+			swerve.drive(new Translation2d(outputVelocity_mps, 0), 0, true);
 		}
+
+		Logger.getInstance().recordOutput("Balance/finishedTimer_s", finishedTimer.get());
+		Logger.getInstance().recordOutput("Balance/atSetpoint", driveController.atSetpoint());
 	}
 
 	@Override
 	public void end(boolean interrupted) {
 		swerve.stop();
+		finishedTimer.stop();
 	}
 
 	@Override
 	public boolean isFinished() {
-		return finishedTimer.hasElapsed(1.2);
+		return finishedTimer.hasElapsed(0.6);
 	}
 
 	// // todo:, also don't pass borders as parameters

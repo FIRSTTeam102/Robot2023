@@ -268,7 +268,8 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 		// todo: estimate without using gyro?
 
 		// Every 0.02s, updating pose2d
-		if (vision.inputs.pipeline == Pipeline.AprilTag.value && vision.isPipelineReady() && vision.inputs.target == true
+		if (DriverStation.isTeleop() && // fixme: bad data messing up auto paths?
+			vision.inputs.pipeline == Pipeline.AprilTag.value && vision.isPipelineReady() && vision.inputs.target == true
 			&& (vision.inputs.botpose_fieldTranslationX_m < VisionConstants.botpose_fieldBlueCommunityGeoFenceX_m
 				|| vision.inputs.botpose_fieldTranslationX_m > VisionConstants.botpose_fieldRedCommunityGeoFenceX_m)) {
 			var visionPose = new Pose2d(vision.inputs.botpose_fieldTranslationX_m, vision.inputs.botpose_fieldTranslationY_m,

@@ -9,7 +9,7 @@ public final class AutoConstants {
 	public static final double slowerMaxVelocity_mps = 3.5;
 
 	public static final double armTolerance_m = 0.1;
-	public static final double elevatorTolerance_m = 0.1;
+	public static final double elevatorTolerance_m = 0.15;
 
 	/* auto path PID values */
 	public static final double autoDriveKp = 12.0;

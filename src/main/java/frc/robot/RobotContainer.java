@@ -30,7 +30,6 @@ import frc.robot.commands.grabber.StopGrabber;
 import frc.robot.commands.scoring.SetScoringPosition;
 import frc.robot.commands.swerve.ChargeStationBalance;
 import frc.robot.commands.swerve.TeleopSwerve;
-import frc.robot.commands.swerve.TeleopSwerve.ZeroYaw;
 import frc.robot.commands.swerve.XStance;
 import frc.robot.commands.vision.AprilTagVision;
 import frc.robot.commands.vision.GamePieceVision;
@@ -126,7 +125,7 @@ public class RobotContainer {
 		driveTab.add("alerts", Alert.getAlertsSendable())
 			.withSize(2, 4).withPosition(15, 0);
 		driveTab.add("auto routine", autoChooser.getSendableChooser())
-			.withSize(4, 1).withPosition(0, 6);
+			.withSize(4, 1).withPosition(15, 4);
 		// autoDelay = driveTab.add("auto delay", 0.0)
 		// .withSize(2, 1).withPosition(0, 7)
 		// .getEntry();
