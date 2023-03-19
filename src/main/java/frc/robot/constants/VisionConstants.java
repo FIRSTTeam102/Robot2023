@@ -8,12 +8,12 @@ public final class VisionConstants {
 	public static final double botpose_fieldRedCommunityGeoFenceX_m = 13.68; /* red right to charge station distance */
 
 	/* RetroreflectiveVision */
-	public static final double retroreflectiveTranslateKp = 2.0;
+	public static final double retroreflectiveTranslateKp = 1.0;
 	public static final double retroreflectiveTranslateKd = 0.25;
 	public static final double crosshairTargetBoundTranslateX_rad = Math.toRadians(1.5);
 
 	/* ObjectDetectionVision */
-	public static final double gamePieceRotateKp = 0;
-	public static final double gamePieceRotateKd = 0;
-	public static final double crosshairGamePieceBoundRotateX_rad = 0.035;
+	public static final double gamePieceRotateKp = 0.2;
+	public static final double gamePieceRotateKd = 0.3;
+	public static final double crosshairGamePieceBoundRotateX_rad = Math.toRadians(1.5);
 };
