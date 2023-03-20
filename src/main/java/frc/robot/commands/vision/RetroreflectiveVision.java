@@ -40,15 +40,16 @@ public class RetroreflectiveVision extends CommandBase {
 		// When we see a grid retroreflective, we will rotate to it
 		switch (routine) {
 			case BlueRedGridLeftRight:
-				if (-VisionConstants.crosshairTargetBoundTranslateX_rad > vision.inputs.crosshairToTargetErrorX_rad) {
+				if (vision.inputs.crosshairToTargetErrorX_rad < -VisionConstants.crosshairTargetBoundTranslateX_rad) {
 					robotTranslate_mps = VisionConstants.retroreflectiveTranslateKp
-						* -vision.inputs.crosshairToTargetErrorX_rad
+						* vision.inputs.crosshairToTargetErrorX_rad
 						- VisionConstants.retroreflectiveTranslateKd;
-				} else if (vision.inputs.crosshairToTargetErrorX_rad > VisionConstants.crosshairTargetBoundTranslateX_rad) {
+				} else if (VisionConstants.crosshairTargetBoundTranslateX_rad < vision.inputs.crosshairToTargetErrorX_rad) {
 					robotTranslate_mps = VisionConstants.retroreflectiveTranslateKp
 						* vision.inputs.crosshairToTargetErrorX_rad
 						+ VisionConstants.retroreflectiveTranslateKd;
 				}
+				robotTranslate_mps *= -1; // go opposite of error
 				break;
 
 			default:
@@ -71,8 +72,7 @@ public class RetroreflectiveVision extends CommandBase {
 	// Feedback loop for PD until we meet crosshairTargetBoundRotateX_rad
 	@Override
 	public boolean isFinished() {
-		// return ((-VisionConstants.crosshairTargetBoundTranslateX_rad < vision.inputs.crosshairToTargetErrorX_rad)
-		// && (vision.inputs.crosshairToTargetErrorX_rad < VisionConstants.crosshairTargetBoundTranslateX_rad));
-		return false;
+		return (vision.inputs.crosshairToTargetErrorX_rad < -VisionConstants.crosshairTargetBoundTranslateX_rad)
+			|| (VisionConstants.crosshairTargetBoundTranslateX_rad < vision.inputs.crosshairToTargetErrorX_rad);
 	}
 }

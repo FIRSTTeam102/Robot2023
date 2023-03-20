@@ -18,7 +18,7 @@ public class GamePieceVision extends CommandBase {
 	private Elevator elevator;
 	private Arm arm;
 	private Grabber grabber;
-	private double robotRotate_rps;
+	private double robotRotate_radps;
 
 	public enum Routine {
 		GamepieceGround
@@ -36,8 +36,8 @@ public class GamePieceVision extends CommandBase {
 
 	@Override
 	public void initialize() {
-		// Sets pipeline to GamePiece
 		vision.setPipeline(Pipeline.GamePiece);
+		robotRotate_radps = 0;
 	}
 
 	@Override
@@ -49,13 +49,14 @@ public class GamePieceVision extends CommandBase {
 		// When we see a ground gamepiece, we will rotate to it
 		switch (routine) {
 			case GamepieceGround:
-				if (-VisionConstants.crosshairGamePieceBoundRotateX_rad > vision.inputs.crosshairToTargetErrorX_rad) {
-					robotRotate_rps = VisionConstants.gamePieceRotateKp * -vision.inputs.crosshairToTargetErrorX_rad
+				if (vision.inputs.crosshairToTargetErrorX_rad < -VisionConstants.crosshairTargetBoundTranslateX_rad) {
+					robotRotate_radps = VisionConstants.gamePieceRotateKp * -vision.inputs.crosshairToTargetErrorX_rad
 						- VisionConstants.gamePieceRotateKd;
-				} else if (vision.inputs.crosshairToTargetErrorX_rad > VisionConstants.crosshairGamePieceBoundRotateX_rad) {
-					robotRotate_rps = VisionConstants.gamePieceRotateKp * vision.inputs.crosshairToTargetErrorX_rad
+				} else if (VisionConstants.crosshairTargetBoundTranslateX_rad < vision.inputs.crosshairToTargetErrorX_rad) {
+					robotRotate_radps = VisionConstants.gamePieceRotateKp * vision.inputs.crosshairToTargetErrorX_rad
 						+ VisionConstants.gamePieceRotateKd;
 				}
+				robotRotate_radps *= -1; // go opposite of error
 				break;
 
 			default:
@@ -64,24 +65,21 @@ public class GamePieceVision extends CommandBase {
 
 		// Generate a continuously updated rotation to gamepiece
 		System.out.println("Swerve --> Gamepiece");
-		swerve.drive(new Translation2d(0, 0), robotRotate_rps, false);
+		swerve.drive(new Translation2d(0, 0), robotRotate_radps, false);
 	}
 
 	// Stop swerve and generate a algorithm to get gamepiece and set pipeline back to Apriltag
 	@Override
 	public void end(boolean interrupted) {
 		swerve.stop();
-		// System.out.println("Arm --> GroundFar, Elevator --> Ground, Grabber --> GamepieceUntilGrabbed");
-		// Autos.intakeGroundFar(swerve, elevator, arm, grabber);
-		// System.out.println("Arm --> AllIn, Elevator --> AllIn");
-		// Autos.allIn(elevator, arm).schedule();
+		// System.out.println("Intakeground, Allin");
+		// Autos.intakeGround(swerve, elevator, arm, grabber).andThen(Autos.allIn(elevator, arm)).schedule();
 		vision.setPipeline(Pipeline.AprilTag);
 	}
 
-	// Feedback loop for PD until we meet crosshairTargetBoundRotateX_rad
 	@Override
 	public boolean isFinished() {
-		return ((-VisionConstants.crosshairGamePieceBoundRotateX_rad < vision.inputs.crosshairToTargetErrorX_rad)
-			&& (vision.inputs.crosshairToTargetErrorX_rad < VisionConstants.crosshairGamePieceBoundRotateX_rad));
+		return (vision.inputs.crosshairToTargetErrorX_rad < -VisionConstants.crosshairTargetBoundTranslateX_rad)
+			|| (VisionConstants.crosshairTargetBoundTranslateX_rad < vision.inputs.crosshairToTargetErrorX_rad);
 	}
 }

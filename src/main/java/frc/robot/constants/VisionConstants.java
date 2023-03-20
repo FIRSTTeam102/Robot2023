@@ -8,7 +8,7 @@ public final class VisionConstants {
 	public static final double botpose_fieldRedCommunityGeoFenceX_m = 13.68; /* red right to charge station distance */
 
 	/* RetroreflectiveVision */
-	public static final double retroreflectiveTranslateKp = 1.0;
+	public static final double retroreflectiveTranslateKp = 2.0;
 	public static final double retroreflectiveTranslateKd = 0.25;
 	public static final double crosshairTargetBoundTranslateX_rad = Math.toRadians(1.5);
 

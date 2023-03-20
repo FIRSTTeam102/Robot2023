@@ -68,29 +68,29 @@ public class AprilTagVision extends CommandBase {
 			case BlueRedGridDoublesubstationLeft:
 				if (vision.inputs.targetAprilTag == 5) {
 					System.out.println("Swerve --> BlueDoublesubstation5Left");
-					botpose_fieldGoToX_m = 0.70 + VisionConstants.botpose_fieldOffsetX_m;
-					botpose_fieldGoToY_m = 6.13;
+					botpose_fieldGoToX_m = 0.76 + VisionConstants.botpose_fieldOffsetX_m;
+					botpose_fieldGoToY_m = 6.21;
 				}
 				if (vision.inputs.targetAprilTag == 4) {
 					System.out.println("Swerve --> RedDoublesubstation4Left");
-					botpose_fieldGoToX_m = 15.84 - VisionConstants.botpose_fieldOffsetX_m;
+					botpose_fieldGoToX_m = 15.77 - VisionConstants.botpose_fieldOffsetX_m;
 					botpose_fieldGoToY_m = 7.33;
 				}
 
 				if (vision.inputs.targetAprilTag == 6) {
 					System.out.println("Swerve --> BlueGrid6Left");
 					botpose_fieldGoToX_m = 1.80 + VisionConstants.botpose_fieldOffsetX_m;
-					botpose_fieldGoToY_m = 3.87;
+					botpose_fieldGoToY_m = 3.86;
 				}
 				if (vision.inputs.targetAprilTag == 7) {
 					System.out.println("Swerve --> BlueGrid7Left");
 					botpose_fieldGoToX_m = 1.80 + VisionConstants.botpose_fieldOffsetX_m;
-					botpose_fieldGoToY_m = 2.19;
+					botpose_fieldGoToY_m = 2.16;
 				}
 				if (vision.inputs.targetAprilTag == 8) {
 					System.out.println("Swerve --> BlueGrid8Left");
 					botpose_fieldGoToX_m = 1.80 + VisionConstants.botpose_fieldOffsetX_m;
-					botpose_fieldGoToY_m = 0.51;
+					botpose_fieldGoToY_m = 0.50;
 				}
 				if (vision.inputs.targetAprilTag == 3) {
 					System.out.println("Swerve --> RedGrid3Left");
@@ -105,7 +105,7 @@ public class AprilTagVision extends CommandBase {
 				if (vision.inputs.targetAprilTag == 1) {
 					System.out.println("Swerve --> RedGrid1Left");
 					botpose_fieldGoToX_m = 14.73 - VisionConstants.botpose_fieldOffsetX_m;
-					botpose_fieldGoToY_m = 1.61;
+					botpose_fieldGoToY_m = 1.60;
 				}
 				break;
 
@@ -118,7 +118,7 @@ public class AprilTagVision extends CommandBase {
 				if (vision.inputs.targetAprilTag == 7) {
 					System.out.println("Swerve --> BlueGrid7Middle");
 					botpose_fieldGoToX_m = 1.80 + VisionConstants.botpose_fieldOffsetX_m;
-					botpose_fieldGoToY_m = 2.75;
+					botpose_fieldGoToY_m = 2.74;
 				}
 				if (vision.inputs.targetAprilTag == 8) {
 					System.out.println("Swerve --> BlueGrid8Middle");
@@ -128,12 +128,12 @@ public class AprilTagVision extends CommandBase {
 				if (vision.inputs.targetAprilTag == 3) {
 					System.out.println("Swerve --> RedGrid3Middle");
 					botpose_fieldGoToX_m = 14.73 - VisionConstants.botpose_fieldOffsetX_m;
-					botpose_fieldGoToY_m = 4.40;
+					botpose_fieldGoToY_m = 4.42;
 				}
 				if (vision.inputs.targetAprilTag == 2) {
 					System.out.println("Swerve --> RedGrid2Middle");
 					botpose_fieldGoToX_m = 14.73 - VisionConstants.botpose_fieldOffsetX_m;
-					botpose_fieldGoToY_m = 2.74;
+					botpose_fieldGoToY_m = 2.75;
 				}
 				if (vision.inputs.targetAprilTag == 1) {
 					System.out.println("Swerve --> RedGrid1Middle");
@@ -143,46 +143,49 @@ public class AprilTagVision extends CommandBase {
 				break;
 
 			case BlueRedGridDoublesubstationRight:
-				if (vision.inputs.targetAprilTag == 5) {
-					System.out.println("Swerve --> BlueDoublesubstation5Right");
-					botpose_fieldGoToX_m = 0.70 + VisionConstants.botpose_fieldOffsetX_m;
-					botpose_fieldGoToY_m = 7.47;
-				}
-				if (vision.inputs.targetAprilTag == 4) {
-					System.out.println("Swerve --> RedDoublesubstation4Right");
-					botpose_fieldGoToX_m = 15.84 - VisionConstants.botpose_fieldOffsetX_m;
-					botpose_fieldGoToY_m = 6.00;
-				}
+				switch ((int) vision.inputs.targetAprilTag) {
+					case 5 -> {
+						System.out.println("Swerve --> BlueDoublesubstation5Right");
+						botpose_fieldGoToX_m = 0.76 + VisionConstants.botpose_fieldOffsetX_m;
+						botpose_fieldGoToY_m = 7.33;
+					}
+					case 4 -> {
+						System.out.println("Swerve --> RedDoublesubstation4Right");
+						botpose_fieldGoToX_m = 15.77 - VisionConstants.botpose_fieldOffsetX_m;
+						botpose_fieldGoToY_m = 6.21;
+					}
 
-				if (vision.inputs.targetAprilTag == 6) {
-					System.out.println("Swerve --> BlueGrid6Right");
-					botpose_fieldGoToX_m = 1.80 + VisionConstants.botpose_fieldOffsetX_m;
-					botpose_fieldGoToY_m = 4.98;
-				}
-				if (vision.inputs.targetAprilTag == 7) {
-					System.out.println("Swerve --> BlueGrid7Right");
-					botpose_fieldGoToX_m = 1.80 + VisionConstants.botpose_fieldOffsetX_m;
-					botpose_fieldGoToY_m = 3.86;
-				}
-				if (vision.inputs.targetAprilTag == 8) {
-					System.out.println("Swerve --> BlueGrid8Right");
-					botpose_fieldGoToX_m = 1.80 + VisionConstants.botpose_fieldOffsetX_m;
-					botpose_fieldGoToY_m = 1.62;
-				}
-				if (vision.inputs.targetAprilTag == 3) {
-					System.out.println("Swerve --> RedGrid3Right");
-					botpose_fieldGoToX_m = 14.73 - VisionConstants.botpose_fieldOffsetX_m;
-					botpose_fieldGoToY_m = 3.85;
-				}
-				if (vision.inputs.targetAprilTag == 2) {
-					System.out.println("Swerve --> RedGrid2Right");
-					botpose_fieldGoToX_m = 14.73 - VisionConstants.botpose_fieldOffsetX_m;
-					botpose_fieldGoToY_m = 2.17;
-				}
-				if (vision.inputs.targetAprilTag == 1) {
-					System.out.println("Swerve --> RedGrid1Right");
-					botpose_fieldGoToX_m = 14.73 - VisionConstants.botpose_fieldOffsetX_m;
-					botpose_fieldGoToY_m = 0.49;
+					case 6 -> {
+						System.out.println("Swerve --> BlueGrid6Right");
+						botpose_fieldGoToX_m = 1.80 + VisionConstants.botpose_fieldOffsetX_m;
+						botpose_fieldGoToY_m = 4.98;
+					}
+					case 7 -> {
+						System.out.println("Swerve --> BlueGrid7Right");
+						botpose_fieldGoToX_m = 1.80 + VisionConstants.botpose_fieldOffsetX_m;
+						botpose_fieldGoToY_m = 3.30;
+					}
+					case 8 -> {
+						System.out.println("Swerve --> BlueGrid8Right");
+						botpose_fieldGoToX_m = 1.80 + VisionConstants.botpose_fieldOffsetX_m;
+						botpose_fieldGoToY_m = 1.61;
+					}
+
+					case 3 -> {
+						System.out.println("Swerve --> RedGrid3Right");
+						botpose_fieldGoToX_m = 14.73 - VisionConstants.botpose_fieldOffsetX_m;
+						botpose_fieldGoToY_m = 3.86;
+					}
+					case 2 -> {
+						System.out.println("Swerve --> RedGrid2Right");
+						botpose_fieldGoToX_m = 14.73 - VisionConstants.botpose_fieldOffsetX_m;
+						botpose_fieldGoToY_m = 2.16;
+					}
+					case 1 -> {
+						System.out.println("Swerve --> RedGrid1Right");
+						botpose_fieldGoToX_m = 14.73 - VisionConstants.botpose_fieldOffsetX_m;
+						botpose_fieldGoToY_m = 0.49;
+					}
 				}
 				break;
 
@@ -192,7 +195,7 @@ public class AprilTagVision extends CommandBase {
 
 		// Generate a one-time path using from pose2d to apriltag
 		PathPlannerTrajectory trajectory = PathPlanner.generatePath(
-			new PathConstraints(2.0, 1.0),
+			new PathConstraints(2.0, 0.5),
 			new PathPoint(swerve.getPose().getTranslation(), swerve.getPose().getRotation(), swerve.getPose().getRotation()),
 			new PathPoint(new Translation2d(botpose_fieldGoToX_m, botpose_fieldGoToY_m),
 				Rotation2d.fromDegrees(180), Rotation2d.fromDegrees(180)));
