@@ -139,6 +139,11 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 			new Pose2d(state.poseMeters.getTranslation(), state.holonomicRotation));
 	}
 
+	public void resetModuleOffsets() {
+		for (var mod : modules)
+			mod.io.setOffset(0);
+	}
+
 	/** @return gyro yaw including code offset */
 	public Rotation2d getYaw() {
 		return Rotation2d.fromDegrees(gyroInputs.yaw_deg + gyroOffset_deg);
@@ -233,7 +238,7 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 	public double getCharacterizationVelocity() {
 		double driveVelocityAverage = 0.0;
 		for (var module : modules)
-			driveVelocityAverage += module.getCharacterizationVelocity();
+			driveVelocityAverage += module.io.getCharacterizationVelocity_radps();
 		return driveVelocityAverage / modules.length;
 	}
 

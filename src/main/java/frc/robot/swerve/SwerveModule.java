@@ -15,7 +15,7 @@ import org.littletonrobotics.junction.Logger;
 public class SwerveModule implements AutoCloseable {
 	public int moduleNumber;
 	private Rotation2d lastAngle;
-	private final SwerveModuleIO io;
+	public final SwerveModuleIO io;
 	private final SwerveModuleIOInputsAutoLogged inputs = new SwerveModuleIOInputsAutoLogged();
 	private PIDController anglePIDController;
 
@@ -69,10 +69,6 @@ public class SwerveModule implements AutoCloseable {
 	public void runCharacterization(double voltage) {
 		setDesiredState(new SwerveModuleState(0.0, new Rotation2d(0.0)), true, true);
 		io.setDriveMotorPercentage(voltage / 12.0);
-	}
-
-	public double getCharacterizationVelocity() {
-		return io.getCharacterizationVelocity();
 	}
 
 	public SwerveModuleState getState() {

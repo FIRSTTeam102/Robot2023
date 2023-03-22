@@ -172,8 +172,13 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 	}
 
 	@Override
-	public double getCharacterizationVelocity() {
+	public double getCharacterizationVelocity_radps() {
 		return Conversions.falconToRadians(driveMotor.getSelectedSensorVelocity(), driveGearRatio);
+	}
+
+	@Override
+	public void setOffset(double offset_rad) {
+		angleOffset_rad = offset_rad;
 	}
 
 	@Override

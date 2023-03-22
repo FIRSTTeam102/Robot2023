@@ -22,24 +22,27 @@ public interface SwerveModuleIO extends AutoCloseable {
 		double angleTemperature_C = 0.0;
 	}
 
-	/** Updates the set of inputs. */
+	/** updates the set of inputs */
 	public default void updateInputs(SwerveModuleIOInputs inputs) {}
 
-	/** Run the drive motor at the specified percentage of full power. */
+	/** runs the drive motor at the specified percentage of full power */
 	public default void setDriveMotorPercentage(double percentage) {}
 
-	/** Run the drive motor at the specified velocity. */
+	/** runs the drive motor at the specified velocity */
 	public default void setDriveVelocity(double velocity) {}
 
-	/** Run the angle motor at the specified voltage. */
+	/** runs the angle motor at the specified voltage */
 	public default void setAngleVoltage(double voltage) {}
 
-	/** Enable or disable brake mode on the drive motor. */
+	/** enable or disable brake mode on the drive motor */
 	public default void setDriveBrakeMode(boolean enable) {}
 
-	public default double getCharacterizationVelocity() {
+	public default double getCharacterizationVelocity_radps() {
 		return 0.0;
 	}
+
+	/** set the offset (zero/forwards) of the angle position */
+	public default void setOffset(double offset_rad) {}
 
 	public default void close() throws Exception {}
 }

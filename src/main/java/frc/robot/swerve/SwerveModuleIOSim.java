@@ -92,7 +92,7 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 	}
 
 	@Override
-	public double getCharacterizationVelocity() {
+	public double getCharacterizationVelocity_radps() {
 		return driveWheelSim.getAngularVelocityRadPerSec();
 	}
 

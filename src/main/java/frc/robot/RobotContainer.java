@@ -28,6 +28,7 @@ import frc.robot.commands.grabber.GrabGrabber;
 import frc.robot.commands.grabber.ReleaseGrabber;
 import frc.robot.commands.grabber.StopGrabber;
 import frc.robot.commands.scoring.SetScoringPosition;
+import frc.robot.commands.swerve.AngleOffsetCalibration;
 import frc.robot.commands.swerve.ChargeStationBalance;
 import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.swerve.XStance;
@@ -98,6 +99,8 @@ public class RobotContainer {
 		DriverStation.silenceJoystickConnectionWarning(true);
 
 		configureBindings();
+
+		new AngleOffsetCalibration(swerve);
 
 		// setup autos
 		// FW = field wall, LZ = loading zone barrier
