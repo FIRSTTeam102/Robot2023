@@ -10,13 +10,11 @@ import frc.robot.subsystems.Swerve;
 import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
 
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-
-import org.littletonrobotics.junction.Logger;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -91,6 +89,10 @@ public class TeleopSwerve extends CommandBase {
 	private double driveMaxPercent = 1.0;
 	private double turnMaxPercent = 1.0;
 
+	// limits acceleration (mps2)
+	private SlewRateLimiter driveLimiter = new SlewRateLimiter(3);
+	private SlewRateLimiter strafeLimiter = new SlewRateLimiter(3);
+
 	private static final double normalMaxPercent = 0.75;
 	private static final double maxArmDist_m = Arm.nutDistToArmDist(ArmConstants.maxNutDist_m)
 		- ArmConstants.dangerZone_m;
@@ -115,11 +117,11 @@ public class TeleopSwerve extends CommandBase {
 			turnMaxPercent *= 0.2;
 		}
 
-		Logger.getInstance().recordOutput("TeleopSwerve/driveMaxPercent", driveMaxPercent);
+		// Logger.getInstance().recordOutput("TeleopSwerve/driveMaxPercent", driveMaxPercent);
 
 		translation = new Translation2d(
-			modifyAxis(driveSupplier.getAsDouble()),
-			modifyAxis(strafeSupplier.getAsDouble()))
+			driveLimiter.calculate(modifyAxis(driveSupplier.getAsDouble())),
+			strafeLimiter.calculate(modifyAxis(strafeSupplier.getAsDouble())))
 				.times(SwerveConstants.maxVelocity_mps * driveMaxPercent);
 
 		// Logger.getInstance().recordOutput("TeleopSwerve/translationX_mps", translation.getX());
@@ -152,10 +154,5 @@ public class TeleopSwerve extends CommandBase {
 			: Math.copySign(
 				(cubicWeight * Math.pow(absValue, weightExponent) + (1 - cubicWeight) * absValue + minOutput) / (1 + minOutput),
 				value);
-	}
-
-	@Override
-	public void initSendable(SendableBuilder builder) {
-		builder.addBooleanProperty("field oriented", () -> fieldRelative, null);
 	}
 }
