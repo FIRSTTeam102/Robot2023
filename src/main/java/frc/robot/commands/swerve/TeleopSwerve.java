@@ -86,12 +86,13 @@ public class TeleopSwerve extends CommandBase {
 
 	private double rotation;
 	private Translation2d translation;
-	private double driveMaxPercent = 1.0;
+	private double driveMax = 1.0;
 	private double turnMaxPercent = 1.0;
 
 	// limits acceleration (mps2)
-	private SlewRateLimiter driveLimiter = new SlewRateLimiter(3);
-	private SlewRateLimiter strafeLimiter = new SlewRateLimiter(3);
+	// todo: tune, see if stopping takes too long and maybe add an override
+	private SlewRateLimiter driveLimiter = new SlewRateLimiter(4, 3.5, 0);
+	private SlewRateLimiter strafeLimiter = new SlewRateLimiter(4, 3.5, 0);
 
 	private static final double normalMaxPercent = 0.75;
 	private static final double maxArmDist_m = Arm.nutDistToArmDist(ArmConstants.maxNutDist_m)
@@ -100,29 +101,28 @@ public class TeleopSwerve extends CommandBase {
 	@Override
 	public void execute() {
 		if (overrideSpeedSupplier.getAsBoolean()) {
-			driveMaxPercent = 1.0;
+			driveMax = 1.0;
 			turnMaxPercent = 0.9;
 		} else {
-			driveMaxPercent = normalMaxPercent * (1 - (0.4 /* how much of the decrease to use */ * (
+			driveMax = normalMaxPercent * (1 - (0.4 /* how much of the decrease to use */ * (
 			// bigger coefficient = more of a speed decrease the farther out it is
 			0.9 * (arm.getArmDist_m() / maxArmDist_m)
 				+ 0.5 * ((elevator.inputs.position_m - ArmConstants.dangerZone_m) / ElevatorConstants.maxHeight_m))));
-			if (driveMaxPercent < 0.1) // bug?
-				driveMaxPercent = 0.1;
-			turnMaxPercent = driveMaxPercent * 0.9;
+			if (driveMax < 0.1) // bug?
+				driveMax = 0.1;
+			turnMaxPercent = driveMax * 0.9;
 		}
 
 		if (preciseModeSupplier.getAsBoolean()) {
-			driveMaxPercent *= 0.3;
+			driveMax *= 0.3;
 			turnMaxPercent *= 0.2;
 		}
 
-		// Logger.getInstance().recordOutput("TeleopSwerve/driveMaxPercent", driveMaxPercent);
+		driveMax *= SwerveConstants.maxVelocity_mps; // turn percent into velocity
 
 		translation = new Translation2d(
-			driveLimiter.calculate(modifyAxis(driveSupplier.getAsDouble())),
-			strafeLimiter.calculate(modifyAxis(strafeSupplier.getAsDouble())))
-				.times(SwerveConstants.maxVelocity_mps * driveMaxPercent);
+			driveLimiter.calculate(driveMax * modifyAxis(driveSupplier.getAsDouble())),
+			strafeLimiter.calculate(driveMax * modifyAxis(strafeSupplier.getAsDouble())));
 
 		// Logger.getInstance().recordOutput("TeleopSwerve/translationX_mps", translation.getX());
 		// Logger.getInstance().recordOutput("TeleopSwerve/translationY_mps", translation.getY());
