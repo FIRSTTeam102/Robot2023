@@ -41,7 +41,7 @@ public class SetScoringPosition extends CommandBase {
 		Elevator, Arm, None;
 	}
 
-	Mech nextSet;
+	private Mech nextSet;
 
 	@Override
 	public void initialize() {
@@ -102,7 +102,7 @@ public class SetScoringPosition extends CommandBase {
 			|| (armTolerance_m > 0 && Math.abs(arm.getArmDist_m() - armTarget_m) < armTolerance_m))
 			return false;
 
-		// normally just end
-		return true;
+		// normally only end after last mech set
+		return nextSet == Mech.None;
 	}
 }
