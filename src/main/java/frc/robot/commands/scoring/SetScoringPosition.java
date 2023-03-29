@@ -62,7 +62,7 @@ public class SetScoringPosition extends CommandBase {
 	@Override
 	public void execute() {
 		switch (nextSet) {
-			case Elevator -> {
+			case Arm -> {
 				if (elevator.inputs.position_m < ElevatorConstants.dangerZone_m)
 					return; // until we get above
 
@@ -72,7 +72,7 @@ public class SetScoringPosition extends CommandBase {
 				}
 			}
 
-			case Arm -> {
+			case Elevator -> {
 				if (armTarget_m > arm.getArmDist_m()
 					? arm.getArmDist_m() > 0.6 * armTarget_m // arm going out
 					: arm.getArmDist_m() < armTarget_m + 0.15 // arm going in, offset for when going to 0
