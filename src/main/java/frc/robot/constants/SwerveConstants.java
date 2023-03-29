@@ -79,7 +79,7 @@ public final class SwerveConstants {
 	public static final double angleKd = 0.05;
 	public static final double angleKf = 0.0;
 	/* sim angle motor PID values */
-	public static final double simAngleKp = 18.0;
+	public static final double simAngleKp = 8.0;
 	public static final double simAngleKi = 0.0;
 	public static final double simAngleKd = 0.0;
 	public static final double simAngleKf = 0.0;

@@ -104,8 +104,8 @@ public class RobotContainer {
 
 		// setup autos
 		// FW = field wall, LZ = loading zone barrier
-		autoChooser.addDefaultOption("nothing", () -> new InstantCommand());
-		autoChooser.addOption("cube and nothing", () -> Autos.initAndScore(this, ScoringPosition.HighCube));
+		autoChooser.addOption("nothing", () -> new InstantCommand());
+		autoChooser.addDefaultOption("cube and nothing", () -> Autos.initAndScore(this, ScoringPosition.HighCube));
 
 		autoChooser.addOption("lz cube", () -> Autos.lzCube(this, true));
 		autoChooser.addOption("lz 2cube", () -> Autos.lz2Cube(this));

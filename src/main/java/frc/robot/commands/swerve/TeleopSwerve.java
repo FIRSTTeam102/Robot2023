@@ -90,7 +90,7 @@ public class TeleopSwerve extends CommandBase {
 	private double turnMaxPercent = 1.0;
 
 	// todo: tune, see if stopping takes too long and maybe add an override
-	private static final double accelerationLimit_mps2 = 9;
+	private static final double accelerationLimit_mps2 = 10;
 	private SlewRateLimiter driveLimiter = new SlewRateLimiter(accelerationLimit_mps2);
 	private SlewRateLimiter strafeLimiter = new SlewRateLimiter(accelerationLimit_mps2);
 

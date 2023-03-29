@@ -6,7 +6,6 @@ import frc.robot.RobotContainer;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.GrabberConstants;
 import frc.robot.constants.ScoringPosition;
-import frc.robot.constants.SwerveConstants;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Grabber;
@@ -58,12 +57,12 @@ public final class Autos {
 
 	public static Command goForward(Swerve swerve) {
 		return Commands.startEnd(
-			() -> swerve.drive(new Translation2d(SwerveConstants.maxVelocity_mps * 0.2, 0), 0, true),
+			() -> swerve.drive(new Translation2d(0.5, 0), 0, true),
 			() -> swerve.stop(), swerve);
 	}
 
 	public static Command intakeGround(Swerve swerve, Elevator elevator, Arm arm, Grabber grabber) {
-		return deadlineSeconds(3, Commands.sequence(
+		return deadlineSeconds(2, Commands.sequence(
 			new SetScoringPosition(elevator, arm, ScoringPosition.Ground),
 			Commands.deadline(new GrabGrabberUntilGrabbed(grabber, GrabberConstants.cubeGrabSpeed), goForward(swerve))));
 	}
