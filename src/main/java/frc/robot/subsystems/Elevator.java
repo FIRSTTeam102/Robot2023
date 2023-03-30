@@ -69,7 +69,7 @@ public class Elevator extends SubsystemBase {
 		pidController.setD(kD);
 		pidController.setI(kI);
 		pidController.setIZone(kIZone);
-		pidController.setOutputRange(minOuput, mMaxOutput);
+		pidController.setOutputRange(minOuput, maxOutput);
 
 		encoder.setPositionConversionFactor(conversionFactor_m_per_rotation);
 		encoder.setVelocityConversionFactor(conversionFactor_mps_per_rpm);

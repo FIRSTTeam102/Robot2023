@@ -1,6 +1,8 @@
 package frc.robot.commands.scoring;
 
 import frc.robot.Robot;
+import frc.robot.constants.ArmConstants;
+import frc.robot.constants.AutoConstants;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.ScoringPosition;
 import frc.robot.subsystems.Arm;
@@ -66,13 +68,17 @@ public class SetScoringPosition extends CommandBase {
 				if (elevator.inputs.position_m < ElevatorConstants.dangerZone_m)
 					return; // until we get above
 
-				if (elevator.inputs.position_m > 0.9 * elevatorTarget_m) {
+				if (elevatorTolerated(AutoConstants.elevatorTolerance_m)) {
 					arm.setPosition(armTarget_m);
 					nextSet = Mech.None;
 				}
 			}
 
 			case Elevator -> {
+				if (elevatorTarget_m < ElevatorConstants.dangerZone_m && arm.getArmDist_m() < ArmConstants.dangerZone_m)
+					break; // until we get out
+
+				// todo: use tolerances
 				if (armTarget_m > arm.getArmDist_m()
 					? arm.getArmDist_m() > 0.6 * armTarget_m // arm going out
 					: arm.getArmDist_m() < armTarget_m + 0.15 // arm going in, offset for when going to 0
@@ -98,11 +104,19 @@ public class SetScoringPosition extends CommandBase {
 			return true;
 
 		// keep running until we're at both positions (auto)
-		if ((elevatorTolerance_m > 0 && Math.abs(elevator.inputs.position_m - elevatorTarget_m) < elevatorTolerance_m)
-			|| (armTolerance_m > 0 && Math.abs(arm.getArmDist_m() - armTarget_m) < armTolerance_m))
+		if ((elevatorTolerance_m > 0 && elevatorTolerated(elevatorTolerance_m))
+			|| (armTolerance_m > 0 && armTolerated(armTolerance_m)))
 			return false;
 
 		// normally only end after last mech set
 		return nextSet == Mech.None;
+	}
+
+	boolean elevatorTolerated(double tolerance_m) {
+		return Math.abs(elevator.inputs.position_m - elevatorTarget_m) < tolerance_m;
+	}
+
+	boolean armTolerated(double tolerance_m) {
+		return Math.abs(arm.getArmDist_m() - armTarget_m) < tolerance_m;
 	}
 }

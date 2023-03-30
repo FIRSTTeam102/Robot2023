@@ -4,7 +4,6 @@ import edu.wpi.first.math.util.Units;
 
 public final class ElevatorConstants {
 	public static final double dangerZone_m = .11;
-	public static final double gridSafeZone_m = .7;
 
 	public static final double coneMoveDownHeight_m = -0.15;
 
@@ -14,8 +13,8 @@ public final class ElevatorConstants {
 	/* speeds */
 	public static final double percentSpeed = 0.6;
 
-	public static final double minOuput = -.5;
-	public static final double mMaxOutput = .5;
+	public static final double maxOutput = .7;
+	public static final double minOuput = -maxOutput;
 
 	/* pid stuff */
 	public static final double kP = 1;
