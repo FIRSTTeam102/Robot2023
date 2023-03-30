@@ -10,10 +10,10 @@ public final class VisionConstants {
 	/* RetroreflectiveVision */
 	public static final double retroreflectiveTranslateKp = 2.0;
 	public static final double retroreflectiveTranslateKd = 0.25;
-	public static final double crosshairTargetBoundTranslateX_rad = Math.toRadians(1.5);
+	public static final double crosshairFieldBoundTranslateX_rad = Math.toRadians(1.5);
 
 	/* ObjectDetectionVision */
-	public static final double gamePieceRotateKp = 0.2;
+	public static final double gamePieceRotateKp = 0.8;
 	public static final double gamePieceRotateKd = 0.3;
 	public static final double crosshairGamePieceBoundRotateX_rad = Math.toRadians(1.5);
 };

@@ -1,7 +1,7 @@
 package frc.robot.commands.vision;
 
 import frc.robot.constants.VisionConstants;
-import frc.robot.io.VisionIO.Pipeline;
+import frc.robot.io.VisionIO.FieldVisionPipeline;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
 
@@ -28,7 +28,8 @@ public class RetroreflectiveVision extends CommandBase {
 	@Override
 	public void initialize() {
 		// Sets pipeline to Retroreflective
-		vision.setPipeline(Pipeline.Retroreflective);
+		vision.setFieldVisionPipeline(FieldVisionPipeline.Retroreflective);
+		robotTranslate_mps = 0;
 	}
 
 	@Override
@@ -37,42 +38,41 @@ public class RetroreflectiveVision extends CommandBase {
 		if (!vision.isPipelineReady())
 			return;
 
-		// When we see a grid retroreflective, we will rotate to it
+		// When we see a grid Retroreflective, we will rotate to it
 		switch (routine) {
 			case BlueRedGridLeftRight:
-				if (vision.inputs.crosshairToTargetErrorX_rad < -VisionConstants.crosshairTargetBoundTranslateX_rad) {
+				if (vision.inputs.fieldVisionCrosshairToTargetErrorX_rad < -VisionConstants.crosshairFieldBoundTranslateX_rad) {
 					robotTranslate_mps = VisionConstants.retroreflectiveTranslateKp
-						* vision.inputs.crosshairToTargetErrorX_rad
+						* vision.inputs.fieldVisionCrosshairToTargetErrorX_rad
 						- VisionConstants.retroreflectiveTranslateKd;
-				} else if (VisionConstants.crosshairTargetBoundTranslateX_rad < vision.inputs.crosshairToTargetErrorX_rad) {
+				} else if (VisionConstants.crosshairFieldBoundTranslateX_rad < vision.inputs.fieldVisionCrosshairToTargetErrorX_rad) {
 					robotTranslate_mps = VisionConstants.retroreflectiveTranslateKp
-						* vision.inputs.crosshairToTargetErrorX_rad
+						* vision.inputs.fieldVisionCrosshairToTargetErrorX_rad
 						+ VisionConstants.retroreflectiveTranslateKd;
 				}
-				robotTranslate_mps *= -1; // go opposite of error
+				robotTranslate_mps *= -1; // Translate opposite of error
 				break;
 
 			default:
 				return;
 		}
 
-		// Generate a continuously updated translation to retroreflective
+		// Generate a continuously updated translation to Retroreflective
 		System.out.println("Swerve --> BlueRedGridLeftRight");
-		System.out.println(robotTranslate_mps);
 		swerve.drive(new Translation2d(0, robotTranslate_mps), 0, false);
 	}
 
-	// Stop swerve and set pipeline back to Apriltag
+	// Stop swerve and set pipeline back to AprilTag
 	@Override
 	public void end(boolean interrupted) {
 		swerve.stop();
-		vision.setPipeline(Pipeline.AprilTag);
+		vision.setFieldVisionPipeline(FieldVisionPipeline.AprilTag);
 	}
 
-	// Feedback loop for PD until we meet crosshairTargetBoundRotateX_rad
+	// Feedback loop for PD until we meet fieldVisionCrosshairTargetBoundRotateX_rad
 	@Override
 	public boolean isFinished() {
-		return (vision.inputs.crosshairToTargetErrorX_rad < -VisionConstants.crosshairTargetBoundTranslateX_rad)
-			|| (VisionConstants.crosshairTargetBoundTranslateX_rad < vision.inputs.crosshairToTargetErrorX_rad);
+		return (vision.inputs.fieldVisionCrosshairToTargetErrorX_rad < -VisionConstants.crosshairFieldBoundTranslateX_rad)
+			&& (VisionConstants.crosshairFieldBoundTranslateX_rad < vision.inputs.fieldVisionCrosshairToTargetErrorX_rad);
 	}
 }
