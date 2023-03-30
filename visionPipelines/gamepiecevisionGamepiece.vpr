@@ -21,8 +21,8 @@ crop_x_min:-1
 crop_y_max:1.000000
 crop_y_min:-1.000000
 cross_a_a:1
-cross_a_x:0
-cross_a_y:0
+cross_a_x:-0.191406
+cross_a_y:0.204167
 cross_b_a:0.002436
 cross_b_x:0.037500
 cross_b_y:0.004167
@@ -34,12 +34,14 @@ dilation_steps:1
 direction_filter:0
 dual_close_sort_origin:0
 erosion_steps:0
-exposure:500
+exposure:300
 fiducial_decoder_strictness:strict
 fiducial_denoise:0.000000
 fiducial_idfilters:
 fiducial_locfilters:
+fiducial_method:sqpnp
 fiducial_qualitythreshold:0.000000
+fiducial_refine:1
 fiducial_resdiv:3
 fiducial_size:203.2
 fiducial_skip3d:0
@@ -54,7 +56,7 @@ image_source:0
 img_to_show:0
 intersection_filter:0
 invert_hue:0
-lcgain:40
+lcgain:30
 multigroup_max:8
 multigroup_min:1
 multigroup_rejector:1

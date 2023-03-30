@@ -6,7 +6,7 @@ import frc.robot.Robot;
 import frc.robot.constants.VisionConstants;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOInputsAutoLogged;
-import frc.robot.io.VisionIO.Pipeline;
+import frc.robot.io.VisionIO.FieldVisionPipeline;
 import frc.robot.swerve.SwerveModule;
 import frc.robot.swerve.SwerveModuleIOReal;
 import frc.robot.swerve.SwerveModuleIOSim;
@@ -274,13 +274,15 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 
 		// Every 0.02s, updating pose2d
 		if (DriverStation.isTeleop() && // fixme: bad data messing up auto paths?
-			vision.inputs.pipeline == Pipeline.AprilTag.value && vision.isPipelineReady() && vision.inputs.target == true
-			&& (vision.inputs.botpose_fieldTranslationX_m < VisionConstants.botpose_fieldBlueCommunityGeoFenceX_m
-				|| vision.inputs.botpose_fieldTranslationX_m > VisionConstants.botpose_fieldRedCommunityGeoFenceX_m)) {
-			var visionPose = new Pose2d(vision.inputs.botpose_fieldTranslationX_m, vision.inputs.botpose_fieldTranslationY_m,
-				new Rotation2d(vision.inputs.botpose_fieldRotationZ_rad));
+			vision.inputs.fieldVisionPipeline == FieldVisionPipeline.AprilTag.value && vision.isPipelineReady()
+			&& vision.inputs.fieldVisionTarget == true
+			&& (vision.inputs.fieldVisionBotpose_FieldspaceTranslationX_m < VisionConstants.botpose_fieldBlueCommunityGeoFenceX_m
+				|| vision.inputs.fieldVisionBotpose_FieldspaceTranslationX_m > VisionConstants.botpose_fieldRedCommunityGeoFenceX_m)) {
+			var visionPose = new Pose2d(vision.inputs.fieldVisionBotpose_FieldspaceTranslationX_m,
+				vision.inputs.fieldVisionBotpose_FieldspaceTranslationY_m,
+				new Rotation2d(vision.inputs.fieldVisionBotpose_FieldspaceRotationZ_rad));
 			Logger.getInstance().recordOutput("Odometry/VisionPose", visionPose);
-			poseEstimator.addVisionMeasurement(visionPose, timer.get() - vision.inputs.botpose_latency_s);
+			poseEstimator.addVisionMeasurement(visionPose, timer.get() - vision.inputs.fieldVisionBotpose_Latency_s);
 		}
 
 		Logger.getInstance().recordOutput("Odometry/Robot", pose);

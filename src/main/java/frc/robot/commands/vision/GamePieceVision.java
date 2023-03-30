@@ -1,7 +1,7 @@
 package frc.robot.commands.vision;
 
 import frc.robot.constants.VisionConstants;
-import frc.robot.io.VisionIO.Pipeline;
+import frc.robot.io.VisionIO.GamePieceVisionPipeline;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Grabber;
@@ -19,9 +19,10 @@ public class GamePieceVision extends CommandBase {
 	private Arm arm;
 	private Grabber grabber;
 	private double robotRotate_radps;
+	private double gamePieceVisionCrosshairToTargetErrorLOSCorrectionX_rad;
 
 	public enum Routine {
-		GamepieceGround
+		GamePieceGround
 	}
 
 	public GamePieceVision(Routine routine, Vision vision, Swerve swerve, Elevator elevator, Arm arm, Grabber grabber) {
@@ -36,7 +37,7 @@ public class GamePieceVision extends CommandBase {
 
 	@Override
 	public void initialize() {
-		vision.setPipeline(Pipeline.GamePiece);
+		vision.setGamePieceVisionPipeline(GamePieceVisionPipeline.GamePiece);
 		robotRotate_radps = 0;
 	}
 
@@ -46,40 +47,48 @@ public class GamePieceVision extends CommandBase {
 		if (!vision.isPipelineReady())
 			return;
 
-		// When we see a ground gamepiece, we will rotate to it
+		gamePieceVisionCrosshairToTargetErrorLOSCorrectionX_rad = (3.98 / 12.16)
+			- (6.23 / 12.16) * vision.inputs.gamePieceVisionCrosshairToTargetErrorY_rad;
+
+		// When we see a ground GamePiece, we will rotate to it
 		switch (routine) {
-			case GamepieceGround:
-				if (vision.inputs.crosshairToTargetErrorX_rad < -VisionConstants.crosshairTargetBoundTranslateX_rad) {
-					robotRotate_radps = VisionConstants.gamePieceRotateKp * -vision.inputs.crosshairToTargetErrorX_rad
+			case GamePieceGround:
+				if (vision.inputs.gamePieceVisionCrosshairToTargetErrorX_rad < -gamePieceVisionCrosshairToTargetErrorLOSCorrectionX_rad) {
+					robotRotate_radps = VisionConstants.gamePieceRotateKp
+						* vision.inputs.gamePieceVisionCrosshairToTargetErrorX_rad
 						- VisionConstants.gamePieceRotateKd;
-				} else if (VisionConstants.crosshairTargetBoundTranslateX_rad < vision.inputs.crosshairToTargetErrorX_rad) {
-					robotRotate_radps = VisionConstants.gamePieceRotateKp * vision.inputs.crosshairToTargetErrorX_rad
+				} else if (gamePieceVisionCrosshairToTargetErrorLOSCorrectionX_rad < vision.inputs.gamePieceVisionCrosshairToTargetErrorX_rad) {
+					robotRotate_radps = VisionConstants.gamePieceRotateKp
+						* vision.inputs.gamePieceVisionCrosshairToTargetErrorX_rad
 						+ VisionConstants.gamePieceRotateKd;
 				}
-				robotRotate_radps *= -1; // go opposite of error
+				robotRotate_radps *= -1; // Rotate opposite of error
 				break;
 
 			default:
 				return;
 		}
 
-		// Generate a continuously updated rotation to gamepiece
-		System.out.println("Swerve --> Gamepiece");
+		// Generate a continuously updated rotation to GamePiece
+		System.out.println("Swerve --> GamePiece");
+		System.out.println(vision.inputs.gamePieceVisionCrosshairToTargetErrorX_rad);
+		System.out.println(robotRotate_radps);
 		swerve.drive(new Translation2d(0, 0), robotRotate_radps, false);
 	}
 
-	// Stop swerve and generate a algorithm to get gamepiece and set pipeline back to Apriltag
+	// Stop swerve and generate a algorithm to get GamePiece and set pipeline back to GamePiece
 	@Override
 	public void end(boolean interrupted) {
 		swerve.stop();
 		// System.out.println("Intakeground, Allin");
 		// Autos.intakeGround(swerve, elevator, arm, grabber).andThen(Autos.allIn(elevator, arm)).schedule();
-		vision.setPipeline(Pipeline.AprilTag);
+		vision.setGamePieceVisionPipeline(GamePieceVisionPipeline.GamePiece);
 	}
 
+	// Feedback loop for PD until we meet gamePieceVisionCrosshairTargetBoundRotateX_rad
 	@Override
 	public boolean isFinished() {
-		return (vision.inputs.crosshairToTargetErrorX_rad < -VisionConstants.crosshairTargetBoundTranslateX_rad)
-			|| (VisionConstants.crosshairTargetBoundTranslateX_rad < vision.inputs.crosshairToTargetErrorX_rad);
+		return (gamePieceVisionCrosshairToTargetErrorLOSCorrectionX_rad < -VisionConstants.crosshairGamePieceBoundRotateX_rad)
+			&& (VisionConstants.crosshairGamePieceBoundRotateX_rad < gamePieceVisionCrosshairToTargetErrorLOSCorrectionX_rad);
 	}
 }
