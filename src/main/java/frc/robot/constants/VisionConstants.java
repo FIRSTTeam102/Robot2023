@@ -13,7 +13,7 @@ public final class VisionConstants {
 	public static final double crosshairFieldBoundTranslateX_rad = Math.toRadians(1.5);
 
 	/* ObjectDetectionVision */
-	public static final double gamePieceRotateKp = 0.8;
-	public static final double gamePieceRotateKd = 0.3;
+	public static final double gamePieceRotateKp = 1.25;
+	public static final double gamePieceRotateKd = 0.34;
 	public static final double crosshairGamePieceBoundRotateX_rad = Math.toRadians(1.5);
 };

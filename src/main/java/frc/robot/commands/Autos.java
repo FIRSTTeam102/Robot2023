@@ -55,16 +55,23 @@ public final class Autos {
 		return new SetScoringPosition(elevator, arm, ScoringPosition.AllIn, 0.2, 0.2);
 	}
 
-	public static Command goForward(Swerve swerve) {
+	public static Command goForward(Swerve swerve, double speed_mps) {
 		return Commands.startEnd(
-			() -> swerve.drive(new Translation2d(0.5, 0), 0, true),
+			() -> swerve.drive(new Translation2d(speed_mps, 0), 0, false),
 			() -> swerve.stop(), swerve);
 	}
 
 	public static Command intakeGround(Swerve swerve, Elevator elevator, Arm arm, Grabber grabber) {
 		return deadlineSeconds(2, Commands.sequence(
-			new SetScoringPosition(elevator, arm, ScoringPosition.Ground),
-			Commands.deadline(new GrabGrabberUntilGrabbed(grabber, GrabberConstants.cubeGrabSpeed), goForward(swerve))));
+			new SetScoringPosition(elevator, arm, ScoringPosition.Ground, elevatorTolerance_m, 0.2),
+			Commands.deadline(new GrabGrabberUntilGrabbed(grabber, GrabberConstants.cubeGrabSpeed), goForward(swerve, 1.3))));
+	}
+
+	public static Command intakeGroundUntimed(Swerve swerve, Elevator elevator, Arm arm, Grabber grabber) {
+		return Commands.sequence(
+			new SetScoringPosition(elevator, arm, ScoringPosition.Ground, elevatorTolerance_m, 0.2),
+			Commands.deadline(new GrabGrabberUntilGrabbed(grabber, GrabberConstants.cubeGrabSpeed), goForward(swerve, 1.3)),
+			new SetScoringPosition(elevator, arm, ScoringPosition.AllIn));
 	}
 
 	public static Command score(Elevator elevator, Arm arm, Grabber grabber, ScoringPosition pos) {

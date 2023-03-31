@@ -51,7 +51,7 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 			grabbedCounter++;
 		else
 			grabbedCounter = 0;
-		return grabbedCounter > 6;
+		return grabbedCounter > 10;
 	}
 
 	private int overCurrentCounter = 0;

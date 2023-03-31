@@ -205,7 +205,9 @@ public class RobotContainer {
 			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.SingleSubstationCube));
 
 		operatorConsole.button(5) // aim at game piece
-			.whileTrue(new GamePieceVision(GamePieceVision.Routine.GamePieceGround, vision, swerve, elevator, arm, grabber));
+			.whileTrue(new GamePieceVision(GamePieceVision.Routine.GamePieceGround, vision, swerve));
+		operatorConsole.button(6) // autograb
+			.whileTrue(Autos.intakeGroundUntimed(swerve, elevator, arm, grabber));
 
 		operatorConsole.button(14)
 			.whileTrue(Commands.run(elevator::killMotor, elevator));

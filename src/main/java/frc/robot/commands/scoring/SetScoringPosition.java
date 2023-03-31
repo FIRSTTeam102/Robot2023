@@ -78,11 +78,7 @@ public class SetScoringPosition extends CommandBase {
 				if (elevatorTarget_m < ElevatorConstants.dangerZone_m && arm.getArmDist_m() < ArmConstants.dangerZone_m)
 					break; // until we get out
 
-				// todo: use tolerances
-				if (armTarget_m > arm.getArmDist_m()
-					? arm.getArmDist_m() > 0.6 * armTarget_m // arm going out
-					: arm.getArmDist_m() < armTarget_m + 0.15 // arm going in, offset for when going to 0
-				) {
+				if (armTolerated(Elevator.isInDangerZone() ? 0.07 : AutoConstants.armTolerance_m)) {
 					elevator.setPosition(elevatorTarget_m);
 					nextSet = Mech.None;
 				}
@@ -104,8 +100,8 @@ public class SetScoringPosition extends CommandBase {
 			return true;
 
 		// keep running until we're at both positions (auto)
-		if ((elevatorTolerance_m > 0 && elevatorTolerated(elevatorTolerance_m))
-			|| (armTolerance_m > 0 && armTolerated(armTolerance_m)))
+		if ((elevatorTolerance_m > 0 && !elevatorTolerated(elevatorTolerance_m))
+			|| (armTolerance_m > 0 && !armTolerated(armTolerance_m)))
 			return false;
 
 		// normally only end after last mech set
