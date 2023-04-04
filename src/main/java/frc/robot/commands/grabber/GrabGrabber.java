@@ -16,6 +16,9 @@ public class GrabGrabber extends CommandBase {
 
 	@Override
 	public void initialize() {
+		// if (grabber.isHasGrabbed())
+		// grabber.hold();
+		// else
 		grabber.move(speed);
 	}
 

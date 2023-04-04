@@ -9,6 +9,6 @@ public class GrabGrabberUntilGrabbed extends GrabGrabber {
 
 	@Override
 	public boolean isFinished() {
-		return grabber.hasGrabbed();
+		return grabber.isHasGrabbed();
 	}
 }

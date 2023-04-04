@@ -1,0 +1,3 @@
+* text=auto
+
+visionPipelines/*.txt text eol=lf

@@ -40,7 +40,7 @@ public final class ElevatorConstants {
 		* 0.2282; /* m/rotation */
 	public static final double conversionFactor_mps_per_rpm = conversionFactor_m_per_rotation / 60;
 	public static final double minHeight_m = 0.02;
-	public static final double maxHeight_m = 1.22;
+	public static final double maxHeight_m = 1.24;
 	public static final double carriageMass_kg = Units
 		.lbsToKilograms(4.893 /* inner elevator */ + 9 /* carriage + arm */ + 6 /* grabber */);
 	public static final double drumRadius_m = Units.inchesToMeters(0.5);

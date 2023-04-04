@@ -131,6 +131,8 @@ public class TeleopSwerve extends CommandBase {
 			* SwerveConstants.maxAngularVelocity_radps
 			* turnMaxPercent;
 
+		// Logger.getInstance().recordOutput("TeleopSwerve/rotation_radps", rotation);
+
 		swerve.drive(translation, rotation, fieldRelative);
 	}
 

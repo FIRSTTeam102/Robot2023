@@ -71,6 +71,8 @@ public class Elevator extends SubsystemBase {
 		pidController.setIZone(kIZone);
 		pidController.setOutputRange(minOuput, maxOutput);
 
+		motor.setClosedLoopRampRate(0.1);
+
 		encoder.setPositionConversionFactor(conversionFactor_m_per_rotation);
 		encoder.setVelocityConversionFactor(conversionFactor_mps_per_rpm);
 

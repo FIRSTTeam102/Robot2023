@@ -14,11 +14,15 @@ import com.revrobotics.CANSparkMax;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
+import lombok.Getter;
+
 public class Grabber extends SubsystemBase implements AutoCloseable {
-	private CANSparkMax motor = new CANSparkMax(motorId, CANSparkMax.MotorType.kBrushed);
+	// +in, -out
+	private CANSparkMax motor = new CANSparkMax(motorId, CANSparkMax.MotorType.kBrushless);
 
 	public Grabber() {
-		motor.setInverted(false);
+		motor.setInverted(true);
+		motor.enableVoltageCompensation(12);
 
 		motor.setSmartCurrentLimit(smartCurrentLimit_A);
 		motor.setSecondaryCurrentLimit(hardCurrentLimit_A);
@@ -45,14 +49,8 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 	}
 
 	private int grabbedCounter = 0;
-
-	public boolean hasGrabbed() {
-		if (inputs.current_A > grabbedCurrent_A)
-			grabbedCounter++;
-		else
-			grabbedCounter = 0;
-		return grabbedCounter > 10;
-	}
+	@Getter
+	private boolean hasGrabbed = false;
 
 	private int overCurrentCounter = 0;
 
@@ -62,6 +60,18 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 		Logger.getInstance().processInputs(getName(), inputs);
 
 		ScoringMechanism2d.setGrabber(inputs.percentOutput);
+
+		if (inputs.percentOutput > 0) { // grabbing
+			if (inputs.current_A > grabbedCurrent_A)
+				grabbedCounter++;
+			else
+				grabbedCounter = 0;
+			hasGrabbed = grabbedCounter > 8;
+		} else {
+			grabbedCounter = 0;
+			hasGrabbed = false;
+		}
+		Logger.getInstance().recordOutput("Grabber/hasGrabbed", hasGrabbed);
 
 		if (inputs.current_A > smartCurrentLimit_A) {
 			overCurrentCounter++;
@@ -84,7 +94,7 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 	public static class GrabberIOInputs {
 		public double percentOutput = 0.0;
 		public double current_A = 0.0;
-		// public double temperature_C = 0.0;
+		public double temperature_C = 0.0;
 	}
 
 	public GrabberIOInputsAutoLogged inputs = new GrabberIOInputsAutoLogged();
@@ -92,7 +102,7 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 	private void updateInputs(GrabberIOInputs inputs) {
 		inputs.percentOutput = Robot.isReal() ? motor.getAppliedOutput() : motor.get();
 		inputs.current_A = motor.getOutputCurrent();
-		// inputs.temperature_C = motor.getMotorTemperature();
+		inputs.temperature_C = motor.getMotorTemperature();
 	}
 
 	@Override
