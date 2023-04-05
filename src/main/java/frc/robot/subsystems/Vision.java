@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import frc.robot.io.VisionIO;
 import frc.robot.io.VisionIO.FieldVisionPipeline;
+import frc.robot.io.VisionIO.GamePieceString;
 import frc.robot.io.VisionIO.GamePieceVisionPipeline;
 import frc.robot.io.VisionIOInputsAutoLogged;
 
@@ -43,9 +44,9 @@ public class Vision extends SubsystemBase {
 							: Lights.Status.All)
 					: Lights.Status.None);
 		Lights.setStatus(Lights.Group.Coral, switch (inputs.gamePieceVisionTargetObjectClass) {
-			case "cube" -> Lights.Status.Left;
-			case "cone" -> Lights.Status.Right;
-			case "merge" -> Lights.Status.LeftRight;
+			case GamePieceString.Cube -> Lights.Status.Left;
+			case GamePieceString.Cone -> Lights.Status.Right;
+			case GamePieceString.Merge -> Lights.Status.LeftRight;
 			default -> Lights.Status.None;
 		});
 	}

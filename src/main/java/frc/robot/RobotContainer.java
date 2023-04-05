@@ -1,7 +1,6 @@
 package frc.robot;
 
 import frc.robot.constants.Constants;
-import frc.robot.constants.Constants.CameraConstants;
 import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.constants.Constants.ShuffleboardConstants;
 import frc.robot.constants.ElevatorConstants;
@@ -36,13 +35,11 @@ import frc.robot.commands.vision.AprilTagVision;
 import frc.robot.commands.vision.GamePieceVision;
 import frc.robot.commands.vision.RetroreflectiveVision;
 
-import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.HttpCamera;
 import edu.wpi.first.cscore.HttpCamera.HttpCameraKind;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.SendableCameraWrapper;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -207,7 +204,7 @@ public class RobotContainer {
 		operatorConsole.button(5) // aim at game piece
 			.whileTrue(new GamePieceVision(GamePieceVision.Routine.GamePieceGround, vision, swerve));
 		operatorConsole.button(6) // autograb
-			.whileTrue(Autos.intakeGroundUntimed(swerve, elevator, arm, grabber));
+			.whileTrue(Autos.intakeGroundUntimed(swerve, elevator, arm, grabber, vision));
 
 		operatorConsole.button(14)
 			.whileTrue(Commands.run(elevator::killMotor, elevator));
@@ -235,56 +232,54 @@ public class RobotContainer {
 		operatorJoystick.button(4)
 			.onTrue(new StopGrabber(grabber));
 		operatorJoystick.button(6)
-			.onTrue(new ReleaseGrabber(grabber, GrabberConstants.cubeShootSpeed, GrabberConstants.releaseTime_s));
+			.whileTrue(Commands.startEnd(() -> grabber.move(-GrabberConstants.cubeShootSpeed), grabber::stop, grabber));
 		// .onTrue(new GrabGrabberUntilGrabbed(grabber));
 	}
 
-	@SuppressWarnings("unused")
+	// @SuppressWarnings("unused")
 	private void configureCameras() {
 		if (!Robot.isReal())
 			return;
 
 		// camera
-		try {
-			var camera = CameraServer.startAutomaticCapture("arm", 0);
-			camera.setConnectVerbose(0);
-			// camera.setFPS(CameraConstants.fps);
-			// camera.setResolution(CameraConstants.width, CameraConstants.height);
-			// camera.setPixelFormat(PixelFormat.kGray);
-			if (CameraConstants.exposure >= 0)
-				camera.setExposureManual(CameraConstants.exposure);
-			else
-				camera.setExposureAuto();
-			// camera.setBrightness(0);
+		// try {
+		// var camera = CameraServer.startAutomaticCapture("arm", 0);
+		// camera.setConnectVerbose(0);
+		// // camera.setFPS(CameraConstants.fps);
+		// // camera.setResolution(CameraConstants.width, CameraConstants.height);
+		// // camera.setPixelFormat(PixelFormat.kGray);
+		// if (CameraConstants.exposure >= 0)
+		// camera.setExposureManual(CameraConstants.exposure);
+		// else
+		// camera.setExposureAuto();
+		// // camera.setBrightness(0);
 
-			// camera server is evil
-			// var cameraServer = CameraServer.addSwitchedCamera("camera");
-			// var cameraServer = CameraServer.startAutomaticCapture(camera);
-			// var cameraServer = (MjpegServer) CameraServer.getServer();
-			// cameraServer.setFPS(CameraConstants.fps);
-			// cameraServer.setResolution(CameraConstants.width, CameraConstants.height);
-			// cameraServer.setCompression(CameraConstants.compression);
+		// // camera server is evil
+		// // var cameraServer = CameraServer.addSwitchedCamera("camera");
+		// // var cameraServer = CameraServer.startAutomaticCapture(camera);
+		// // var cameraServer = (MjpegServer) CameraServer.getServer();
+		// // cameraServer.setFPS(CameraConstants.fps);
+		// // cameraServer.setResolution(CameraConstants.width, CameraConstants.height);
+		// // cameraServer.setCompression(CameraConstants.compression);
 
-			Shuffleboard.getTab(ShuffleboardConstants.driveTab)
-				.add("camera", SendableCameraWrapper.wrap(camera))
-				// .addCamera("camera", "arm", cameraServ
-				.withWidget(BuiltInWidgets.kCameraStream)
-				.withSize(8, 6)
-				.withPosition(0, 0);
-		} catch (edu.wpi.first.cscore.VideoException e) {
-			DriverStation.reportError("Failed to get camera: " + e.toString(), e.getStackTrace());
-		}
+		// Shuffleboard.getTab(ShuffleboardConstants.driveTab)
+		// .add("camera", SendableCameraWrapper.wrap(camera))
+		// // .addCamera("camera", "arm", cameraServ
+		// .withWidget(BuiltInWidgets.kCameraStream)
+		// .withSize(8, 6)
+		// .withPosition(0, 0);
+		// } catch (edu.wpi.first.cscore.VideoException e) {
+		// DriverStation.reportError("Failed to get camera: " + e.toString(), e.getStackTrace());
+		// }
 
-		if (Robot.isReal()) {
-			var limelightCamera = new HttpCamera("limelightStream", "http://limelight.local:5800/stream.mjpg",
-				HttpCameraKind.kMJPGStreamer);
-			Shuffleboard.getTab(ShuffleboardConstants.driveTab)
-				.add("limelight", limelightCamera)
-				.withProperties(Map.of("show crosshair", false, "show controls", false))
-				.withWidget(BuiltInWidgets.kCameraStream)
-				.withSize(7, 6)
-				.withPosition(8, 0);
-		}
+		var limelightCamera = new HttpCamera("limelight-gpv-stream", "http://10.1.2.12:5800",
+			HttpCameraKind.kMJPGStreamer);
+		Shuffleboard.getTab(ShuffleboardConstants.driveTab)
+			.add("limelight", limelightCamera)
+			.withProperties(Map.of("show crosshair", false, "show controls", false))
+			.withWidget(BuiltInWidgets.kCameraStream)
+			.withSize(15, 6)
+			.withPosition(0, 0);
 	}
 
 	/**

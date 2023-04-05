@@ -1,5 +1,7 @@
 package frc.robot.constants;
 
+import frc.robot.subsystems.Arm;
+
 // @formatter:off
 public enum ScoringPosition {
 	// @fieldcal
@@ -7,11 +9,12 @@ public enum ScoringPosition {
 	GroundFar(0, .82),
 	MidCube(.702, .777),
 	MidCone(.9652, .951, true),
-	HighCube(1, 1.213),
+	HighCube(1.04, 1.213),
 	HighCone(ElevatorConstants.maxHeight_m, 1.39, true),
-	DoubleSubstation(1.02, .4),
+	DoubleSubstation(1.035, .3),
 	SingleSubstationCube(.58, 0),
-	AllIn(.21, .14);
+	AllIn(.21, Arm.nutDistToArmDist(ArmConstants.minNutDist_m)),
+	AllInBumper(.14, Arm.nutDistToArmDist(ArmConstants.minNutDist_m));
 
 // @formatter:on
 	public final double elevatorHeight_m;

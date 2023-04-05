@@ -148,4 +148,11 @@ public class VisionIO {
 	public void setGamePieceVisionPipeline(GamePieceVisionPipeline pipeline) {
 		pipelineEntryGamePieceVision.setNumber(pipeline.value);
 	}
+
+	/** labels from {@see /visionPipelines/gamepiecevisionOfficialDetector.txt} */
+	public static final class GamePieceString {
+		public static final String Cone = "cone";
+		public static final String Cube = "cube";
+		public static final String Merge = "merge";
+	}
 }

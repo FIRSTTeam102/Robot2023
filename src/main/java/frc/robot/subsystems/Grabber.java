@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import static frc.robot.constants.GrabberConstants.*;
 
 import frc.robot.Robot;
+import frc.robot.constants.GrabberConstants;
 import frc.robot.util.BuildManager;
 import frc.robot.util.ScoringMechanism2d;
 
@@ -13,8 +14,6 @@ import com.revrobotics.CANSparkMax;
 
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
-
-import lombok.Getter;
 
 public class Grabber extends SubsystemBase implements AutoCloseable {
 	// +in, -out
@@ -49,8 +48,10 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 	}
 
 	private int grabbedCounter = 0;
-	@Getter
-	private boolean hasGrabbed = false;
+
+	public boolean hasGrabbed(int ticks) {
+		return grabbedCounter > ticks;
+	};
 
 	private int overCurrentCounter = 0;
 
@@ -66,12 +67,10 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 				grabbedCounter++;
 			else
 				grabbedCounter = 0;
-			hasGrabbed = grabbedCounter > 8;
 		} else {
 			grabbedCounter = 0;
-			hasGrabbed = false;
 		}
-		Logger.getInstance().recordOutput("Grabber/hasGrabbed", hasGrabbed);
+		Logger.getInstance().recordOutput("Grabber/hasGrabbed", hasGrabbed(GrabberConstants.grabbedTicks));
 
 		if (inputs.current_A > smartCurrentLimit_A) {
 			overCurrentCounter++;

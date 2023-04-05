@@ -1,5 +1,6 @@
 package frc.robot.commands.grabber;
 
+import frc.robot.constants.GrabberConstants;
 import frc.robot.subsystems.Grabber;
 
 public class GrabGrabberUntilGrabbed extends GrabGrabber {
@@ -9,6 +10,6 @@ public class GrabGrabberUntilGrabbed extends GrabGrabber {
 
 	@Override
 	public boolean isFinished() {
-		return grabber.isHasGrabbed();
+		return grabber.hasGrabbed(GrabberConstants.grabbedTicks);
 	}
 }

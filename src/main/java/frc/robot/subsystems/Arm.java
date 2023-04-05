@@ -39,7 +39,7 @@ public class Arm extends SubsystemBase {
 	// private SparkMaxLimitSwitch backLimitSwitch = motor.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);
 
 	@Getter
-	private double targetPosition_m = 0;
+	private double targetNutPosition_m = 0;
 
 	@Getter
 	private double armDist_m = 0;
@@ -79,13 +79,11 @@ public class Arm extends SubsystemBase {
 	}
 
 	public void setPosition(double armLength_m) {
-		targetPosition_m = armLength_m;
+		targetNutPosition_m = MathUtil.clamp(armDistToNutDist(armLength_m),
+			maxNutDist_m,
+			Elevator.isInDangerZone() ? armDistToNutDist(dangerZone_m) : minNutDist_m);
 
-		pidController.setReference(
-			MathUtil.clamp(armDistToNutDist(armLength_m),
-				maxNutDist_m,
-				Elevator.isInDangerZone() ? armDistToNutDist(dangerZone_m) : minNutDist_m),
-			CANSparkMax.ControlType.kPosition);
+		pidController.setReference(targetNutPosition_m, CANSparkMax.ControlType.kPosition);
 	}
 
 	public void setSpeed(double speed) {
@@ -97,7 +95,7 @@ public class Arm extends SubsystemBase {
 	}
 
 	public boolean withinTargetPosition() {
-		return Math.abs(armDist_m - targetPosition_m) < AutoConstants.armTolerance_m;
+		return Math.abs(armDist_m - targetNutPosition_m) < AutoConstants.armTolerance_m;
 	}
 
 	boolean hasDoneLimitReset = false;
@@ -111,7 +109,7 @@ public class Arm extends SubsystemBase {
 		Logger.getInstance().recordOutput("Arm/armDist_m", armDist_m);
 		ScoringMechanism2d.arm.setLength(armDist_m);
 
-		Logger.getInstance().recordOutput("Arm/targetArmDist_m", targetPosition_m);
+		Logger.getInstance().recordOutput("Arm/targetNutPosition_m", targetNutPosition_m);
 
 		// if (inputs.backLimitSwitch)
 		// encoder.setPosition(maxNutDist_m - minNutDist_m);

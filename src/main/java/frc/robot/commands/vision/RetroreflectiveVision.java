@@ -13,6 +13,7 @@ public class RetroreflectiveVision extends CommandBase {
 	private Vision vision;
 	private Swerve swerve;
 	private double robotTranslate_mps;
+	private boolean isFinished = false;
 
 	public enum Routine {
 		BlueRedGridLeftRight
@@ -30,6 +31,7 @@ public class RetroreflectiveVision extends CommandBase {
 		// Sets pipeline to Retroreflective
 		vision.setFieldVisionPipeline(FieldVisionPipeline.Retroreflective);
 		robotTranslate_mps = 0;
+		isFinished = false;
 	}
 
 	@Override
@@ -37,6 +39,9 @@ public class RetroreflectiveVision extends CommandBase {
 		// If isPipelineReady true, begin execute
 		if (!vision.isPipelineReady())
 			return;
+
+		isFinished = (vision.inputs.fieldVisionCrosshairToTargetErrorX_rad < VisionConstants.crosshairFieldBoundTranslateX_rad)
+			&& (-VisionConstants.crosshairFieldBoundTranslateX_rad < vision.inputs.fieldVisionCrosshairToTargetErrorX_rad);
 
 		// When we see a grid Retroreflective, we will rotate to it
 		switch (routine) {
@@ -59,12 +64,14 @@ public class RetroreflectiveVision extends CommandBase {
 
 		// Generate a continuously updated translation to Retroreflective
 		System.out.println("Swerve --> BlueRedGridLeftRight");
-		swerve.drive(new Translation2d(0, robotTranslate_mps), 0, false);
+		if (!isFinished)
+			swerve.drive(new Translation2d(0, robotTranslate_mps), 0, false);
 	}
 
 	// Stop swerve and set pipeline back to AprilTag
 	@Override
 	public void end(boolean interrupted) {
+		isFinished = false;
 		swerve.stop();
 		vision.setFieldVisionPipeline(FieldVisionPipeline.AprilTag);
 	}
@@ -72,7 +79,6 @@ public class RetroreflectiveVision extends CommandBase {
 	// Feedback loop for PD until we meet fieldVisionCrosshairTargetBoundRotateX_rad
 	@Override
 	public boolean isFinished() {
-		return (vision.inputs.fieldVisionCrosshairToTargetErrorX_rad < -VisionConstants.crosshairFieldBoundTranslateX_rad)
-			&& (VisionConstants.crosshairFieldBoundTranslateX_rad < vision.inputs.fieldVisionCrosshairToTargetErrorX_rad);
+		return vision.isPipelineReady() && isFinished;
 	}
 }
