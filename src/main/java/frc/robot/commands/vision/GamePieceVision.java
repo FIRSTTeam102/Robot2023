@@ -65,6 +65,7 @@ public class GamePieceVision extends CommandBase {
 		}
 
 		// Generate a continuously updated rotation to GamePiece
+		System.out.println("Swerve --> GamePiece");
 		swerve.drive(new Translation2d(0, 0), robotRotate_radps, false);
 	}
 
@@ -75,7 +76,7 @@ public class GamePieceVision extends CommandBase {
 		vision.setGamePieceVisionPipeline(GamePieceVisionPipeline.GamePiece);
 	}
 
-	// Feedback loop for PD until we meet gamePieceVisionCrosshairTargetBoundRotateX_rad
+	// Feedback loop for PD until we meet gamePieceVisionCrosshairToTargetErrorX_rad
 	@Override
 	public boolean isFinished() {
 		return isAligned;

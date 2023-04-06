@@ -17,9 +17,9 @@ crop_x_max:1.000000
 crop_x_min:-1.000000
 crop_y_max:1.000000
 crop_y_min:-1.000000
-cross_a_a:0.003740
-cross_a_x:0.234093
-cross_a_y:-0.192346
+cross_a_a:0.003694
+cross_a_x:0.150000
+cross_a_y:-0.087500
 cross_b_a:0.002436
 cross_b_x:0.037500
 cross_b_y:0.004167
@@ -36,7 +36,9 @@ fiducial_decoder_strictness:strict
 fiducial_denoise:0.000000
 fiducial_idfilters:
 fiducial_locfilters:
+fiducial_method:sqpnp
 fiducial_qualitythreshold:0.000000
+fiducial_refine:1
 fiducial_resdiv:1
 fiducial_size:200.000000
 fiducial_skip3d:1

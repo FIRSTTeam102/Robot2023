@@ -8,12 +8,14 @@ import frc.robot.subsystems.Vision;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
+import org.littletonrobotics.junction.Logger;
+
 public class RetroreflectiveVision extends CommandBase {
 	private Routine routine;
 	private Vision vision;
 	private Swerve swerve;
 	private double robotTranslate_mps;
-	private boolean isFinished = false;
+	private boolean isAligned;
 
 	public enum Routine {
 		BlueRedGridLeftRight
@@ -31,7 +33,7 @@ public class RetroreflectiveVision extends CommandBase {
 		// Sets pipeline to Retroreflective
 		vision.setFieldVisionPipeline(FieldVisionPipeline.Retroreflective);
 		robotTranslate_mps = 0;
-		isFinished = false;
+		isAligned = false;
 	}
 
 	@Override
@@ -40,8 +42,9 @@ public class RetroreflectiveVision extends CommandBase {
 		if (!vision.isPipelineReady())
 			return;
 
-		isFinished = (vision.inputs.fieldVisionCrosshairToTargetErrorX_rad < VisionConstants.crosshairFieldBoundTranslateX_rad)
-			&& (-VisionConstants.crosshairFieldBoundTranslateX_rad < vision.inputs.fieldVisionCrosshairToTargetErrorX_rad);
+		isAligned = (vision.inputs.fieldVisionCrosshairToTargetErrorX_rad < VisionConstants.crosshairFieldBoundTranslateX_rad)
+			&& (vision.inputs.fieldVisionCrosshairToTargetErrorX_rad > -VisionConstants.crosshairFieldBoundTranslateX_rad);
+		Logger.getInstance().recordOutput("FieldVision/isAligned", isAligned);
 
 		// When we see a grid Retroreflective, we will rotate to it
 		switch (routine) {
@@ -76,9 +79,9 @@ public class RetroreflectiveVision extends CommandBase {
 		vision.setFieldVisionPipeline(FieldVisionPipeline.AprilTag);
 	}
 
-	// Feedback loop for PD until we meet fieldVisionCrosshairTargetBoundRotateX_rad
+	// Feedback loop for PD until we meet fieldVisionCrosshairToTargetErrorX_rad
 	@Override
 	public boolean isFinished() {
-		return vision.isPipelineReady() && isFinished;
+		return isAligned;
 	}
 }
