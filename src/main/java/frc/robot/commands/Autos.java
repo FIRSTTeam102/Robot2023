@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import static frc.robot.constants.AutoConstants.*;
 
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.GrabberConstants;
@@ -13,6 +14,7 @@ import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
 
 import frc.robot.commands.elevator.MoveElevatorBy;
+import frc.robot.commands.elevator.SetElevatorPosition;
 import frc.robot.commands.grabber.GrabConeOrCubeUntilGrabbed;
 import frc.robot.commands.grabber.GrabGrabber;
 import frc.robot.commands.grabber.GrabGrabberUntilGrabbed;
@@ -22,6 +24,7 @@ import frc.robot.commands.swerve.ChargeStationBalance;
 import frc.robot.commands.swerve.PathPlannerCommand;
 import frc.robot.commands.swerve.XStance;
 import frc.robot.commands.vision.GamePieceVision;
+import frc.robot.commands.vision.RetroreflectiveVision;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -31,6 +34,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 import com.pathplanner.lib.PathConstraints;
@@ -38,10 +42,6 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
 public final class Autos {
-	// public static CommandBase exampleAuto(ExampleSubsystem subsystem) {
-	// return Commands.sequence(subsystem.exampleMethodCommand(), new ExampleCommand(subsystem));
-	// }
-
 	// used by pathplanner
 	public static final PIDController ppXController = new PIDController(autoDriveKp, autoDriveKi, autoDriveKd);
 	public static final PIDController ppYController = new PIDController(autoDriveKp, autoDriveKi, autoDriveKd);
@@ -59,7 +59,7 @@ public final class Autos {
 	}
 
 	public static Command allInBumper(Elevator elevator, Arm arm) {
-		return new SetScoringPosition(elevator, arm, ScoringPosition.AllInBumper, 0.4, 0.2);
+		return new SetScoringPosition(elevator, arm, ScoringPosition.AllInBumper, 0.5, 0.2);
 	}
 
 	public static Command goForward(Swerve swerve, double speed_mps) {
@@ -68,14 +68,20 @@ public final class Autos {
 			() -> swerve.stop(), swerve);
 	}
 
-	public static Command align(Swerve swerve, Vision vision) {
+	public static Command gamePieceAlign(Swerve swerve, Vision vision) {
 		return deadlineSeconds(1, new GamePieceVision(GamePieceVision.Routine.GamePieceGround, vision, swerve));
 	}
 
-	public static Command intakeGround(Swerve swerve, Elevator elevator, Arm arm, Grabber grabber) {
-		return deadlineSeconds(2, Commands.sequence(
+	/** will not cross the center line */
+	public static Command intakeGroundForAuto(Swerve swerve, Elevator elevator, Arm arm, Grabber grabber) {
+		return deadlineSeconds(3.5, Commands.sequence(
 			new SetScoringPosition(elevator, arm, ScoringPosition.Ground, elevatorTolerance_m, 0.2),
-			Commands.deadline(new GrabGrabberUntilGrabbed(grabber, GrabberConstants.cubeGrabSpeed), goForward(swerve, 1.3))));
+			Commands.race(
+				Commands.waitUntil(() -> Robot.isBlue() // kill driving if we're crossing the center line
+					? swerve.getPose().getX() > 7.6
+					: swerve.getPose().getX() < 8.9),
+				new GrabGrabberUntilGrabbed(grabber, GrabberConstants.cubeGrabSpeed),
+				goForward(swerve, 1.3))));
 	}
 
 	public static Command intakeGroundUntimed(Swerve swerve, Elevator elevator, Arm arm, Grabber grabber, Vision vision) {
@@ -85,10 +91,16 @@ public final class Autos {
 			new SetScoringPosition(elevator, arm, ScoringPosition.AllIn));
 	}
 
+	/** if we don't have a game piece then don't go back */
+	public static Command stopIfNoPiece(Grabber grabber) {
+		return Commands.waitUntil(() -> grabber.hasGrabbed(GrabberConstants.grabbedTicks));
+	}
+
 	public static Command score(Elevator elevator, Arm arm, Grabber grabber, ScoringPosition pos) {
 		var sequence = new SequentialCommandGroup(
 			new SetScoringPosition(elevator, arm, pos, elevatorTolerance_m, armTolerance_m));
-		if (pos.moveDown)
+		if (pos.isCone)
+			// todo: vision alignment
 			sequence.addCommands(new MoveElevatorBy(elevator, ElevatorConstants.coneMoveDownHeight_m));
 		sequence.addCommands(new ReleaseGrabber(grabber), Commands.waitSeconds(0.1));
 		return sequence;
@@ -157,6 +169,7 @@ public final class Autos {
 			new PathConstraints(balanceMaxVelocity_mps + 0.4, maxAcceleration_mps2));
 
 		return new SequentialCommandGroup(
+			Commands.runOnce(() -> robo.swerve.autoAprilTag = false),
 			initAndScore(robo, ScoringPosition.HighCube),
 			autoPath(robo.swerve, path.get(0), true),
 			Commands.waitSeconds(0.25), // wait for charge station to stabilize first
@@ -179,6 +192,7 @@ public final class Autos {
 			new PathConstraints(slowerMaxVelocity_mps, maxAcceleration_mps2));
 
 		return new SequentialCommandGroup(
+			new ProxyCommand(() -> Commands.print("IS BLUEEEEEEEEEEEEEEEEEEEEEE???????" + Robot.isBlue())),
 			initAndScore(robo, ScoringPosition.HighCube),
 			autoPath(robo.swerve, path.get(0), true));
 	}
@@ -202,9 +216,10 @@ public final class Autos {
 
 		return new SequentialCommandGroup(
 			initAndScore(robo, ScoringPosition.HighCube),
+			Commands.print("ready to go"),
 			autoPath(robo.swerve, path.get(0), true),
-			align(robo.swerve, robo.vision),
-			intakeGround(robo.swerve, robo.elevator, robo.arm, robo.grabber),
+			gamePieceAlign(robo.swerve, robo.vision),
+			intakeGroundForAuto(robo.swerve, robo.elevator, robo.arm, robo.grabber),
 			allIn(robo.elevator, robo.arm),
 			autoPath(robo.swerve, path.get(1)),
 			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCube),
@@ -220,7 +235,7 @@ public final class Autos {
 		return new SequentialCommandGroup(
 			initAndScore(robo, ScoringPosition.HighCube),
 			autoPath(robo.swerve, path.get(0), true),
-			intakeGround(robo.swerve, robo.elevator, robo.arm, robo.grabber),
+			intakeGroundForAuto(robo.swerve, robo.elevator, robo.arm, robo.grabber),
 			allIn(robo.elevator, robo.arm),
 			autoPath(robo.swerve, path.get(1)),
 			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCube),
@@ -238,7 +253,8 @@ public final class Autos {
 		return new SequentialCommandGroup(
 			initAndScore(robo, ScoringPosition.HighCube),
 			autoPath(robo.swerve, path.get(0), true),
-			intakeGround(robo.swerve, robo.elevator, robo.arm, robo.grabber),
+			gamePieceAlign(robo.swerve, robo.vision),
+			intakeGroundForAuto(robo.swerve, robo.elevator, robo.arm, robo.grabber),
 			allIn(robo.elevator, robo.arm),
 			autoPath(robo.swerve, path.get(1)),
 			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCube),
@@ -253,12 +269,27 @@ public final class Autos {
 		return new SequentialCommandGroup(
 			initAndScore(robo, ScoringPosition.HighCube),
 			autoPath(robo.swerve, path.get(0), true),
-			intakeGround(robo.swerve, robo.elevator, robo.arm, robo.grabber),
+			intakeGroundForAuto(robo.swerve, robo.elevator, robo.arm, robo.grabber),
 			allIn(robo.elevator, robo.arm),
 			autoPath(robo.swerve, path.get(1)),
 			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCube),
 			allIn(robo.elevator, robo.arm),
 			autoPath(robo.swerve, path.get(2)),
 			balance(robo.swerve));
+	}
+
+	public static Command lzCubePickupCone(RobotContainer robo) {
+		var path = PathPlanner.loadPathGroup("lzCubePickupCone",
+			new PathConstraints(3, maxAcceleration_mps2));
+
+		return new SequentialCommandGroup(
+			initAndScore(robo, ScoringPosition.HighCube),
+			autoPath(robo.swerve, path.get(0), true),
+			intakeGroundForAuto(robo.swerve, robo.elevator, robo.arm, robo.grabber),
+			stopIfNoPiece(robo.grabber),
+			allIn(robo.elevator, robo.arm),
+			autoPath(robo.swerve, path.get(1)),
+			new RetroreflectiveVision(RetroreflectiveVision.Routine.BlueRedGridLeftRight, robo.vision, robo.swerve),
+			new SetElevatorPosition(robo.elevator, ScoringPosition.HighCone.elevatorHeight_m));
 	}
 }

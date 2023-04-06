@@ -15,9 +15,6 @@ public class Vision extends SubsystemBase {
 	private VisionIO io = new VisionIO();
 	public VisionIOInputsAutoLogged inputs = new VisionIOInputsAutoLogged();
 
-	Timer fieldVisionPipelineSwitchTimer = new Timer();
-	Timer gamePieceVisionPipelineSwitchTimer = new Timer();
-
 	public Vision() {
 		setFieldVisionPipeline(FieldVisionPipeline.AprilTag);
 		setGamePieceVisionPipeline(GamePieceVisionPipeline.GamePiece);
@@ -37,7 +34,7 @@ public class Vision extends SubsystemBase {
 			default -> Lights.Status.None;
 		});
 		Lights.setStatus(Lights.Group.LMRetroreflective,
-			(inputs.fieldVisionPipeline == FieldVisionPipeline.Retroreflective.value &&
+			(inputs.fieldVisionPipeline == FieldVisionPipeline.RetroReflective.value &&
 				inputs.fieldVisionTarget)
 					? (inputs.fieldVisionCrosshairToTargetErrorX_rad < 0 ? Lights.Status.Left
 						: inputs.fieldVisionCrosshairToTargetErrorX_rad > 0 ? Lights.Status.Right
@@ -58,16 +55,17 @@ public class Vision extends SubsystemBase {
 		io.setFieldVisionPipeline(pipeline);
 	}
 
-	long lastFieldVisionPipeline = 0;
-
 	// Creates setGamePieceVisionPipeline
 	public void setGamePieceVisionPipeline(GamePieceVisionPipeline pipeline) {
-		gamePieceVisionPipelineSwitchTimer.reset();
-		gamePieceVisionPipelineSwitchTimer.start();
+		// gamePieceVisionPipelineSwitchTimer.reset();
+		// gamePieceVisionPipelineSwitchTimer.start();
 		io.setGamePieceVisionPipeline(pipeline);
 	}
 
-	long lastGamePieceVisionPipeline = 0;
+	Timer fieldVisionPipelineSwitchTimer = new Timer();
+	// Timer gamePieceVisionPipelineSwitchTimer = new Timer();
+	long lastFieldVisionPipeline = 0;
+	// long lastGamePieceVisionPipeline = 0;
 
 	// Allows AprilTag commands to begin after pipeline switch time error
 	public boolean isPipelineReady() {

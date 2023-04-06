@@ -3,7 +3,7 @@ area_min:0.0006250000000000001
 area_similarity:15
 aspect_max:20
 aspect_min:0
-black_level:10
+black_level:15
 blue_balance:2000
 botfloorsnap:0
 calibration_type:0
@@ -72,8 +72,8 @@ rsu:0.000000
 rsyaw:0.000000
 sat_max:255
 sat_min:65
-send_corners:0
-send_raw_contours:0
+send_corners:1
+send_raw_contours:1
 solve3d:0
 solve3d_algo:0
 solve3d_bindtarget:1
@@ -87,7 +87,7 @@ solve3d_zoffset:0
 tsf:0.000000
 tss:0.000000
 tsu:0.000000
-val_max:190
+val_max:254
 val_min:90
 x_outlier_miqr:0.4
 y_max:1.000000

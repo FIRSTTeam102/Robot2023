@@ -66,6 +66,8 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 
 	private Vision vision;
 
+	public boolean autoAprilTag = true;
+
 	public Swerve(GyroIO gyroIO, Vision vision) {
 		modules = new SwerveModule[moduleConstants.length];
 		int moduleNumber = 0;
@@ -273,7 +275,8 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 		// todo: estimate without using gyro?
 
 		// Every 0.02s, updating pose2d
-		if (vision.inputs.fieldVisionPipeline == FieldVisionPipeline.AprilTag.value && vision.isPipelineReady()
+		if ((autoAprilTag || !DriverStation.isAutonomous())
+			&& vision.inputs.fieldVisionPipeline == FieldVisionPipeline.AprilTag.value && vision.isPipelineReady()
 			&& vision.inputs.fieldVisionTarget == true
 			&& (vision.inputs.fieldVisionBotpose_FieldspaceTranslationX_m < VisionConstants.botpose_fieldBlueCommunityGeoFenceX_m
 				|| vision.inputs.fieldVisionBotpose_FieldspaceTranslationX_m > VisionConstants.botpose_fieldRedCommunityGeoFenceX_m)) {

@@ -8,8 +8,6 @@ import frc.robot.subsystems.Vision;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-import org.littletonrobotics.junction.Logger;
-
 public class GrabConeOrCubeUntilGrabbed extends CommandBase {
 	Grabber grabber;
 	Vision vision;
@@ -31,8 +29,6 @@ public class GrabConeOrCubeUntilGrabbed extends CommandBase {
 	public void execute() {
 		if (lastPiece.equals("") || !vision.inputs.gamePieceVisionTargetObjectClass.equals(""))
 			lastPiece = vision.inputs.gamePieceVisionTargetObjectClass;
-		Logger.getInstance().recordOutput("Vision/lastPiece", lastPiece);
-		Logger.getInstance().recordOutput("Vision/true", lastPiece.equals(GamePieceString.Cone));
 
 		grabber.move(lastPiece.equals(GamePieceString.Cone)
 			? coneGrabSpeed

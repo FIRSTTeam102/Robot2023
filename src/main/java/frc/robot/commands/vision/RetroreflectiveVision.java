@@ -31,7 +31,7 @@ public class RetroreflectiveVision extends CommandBase {
 	@Override
 	public void initialize() {
 		// Sets pipeline to Retroreflective
-		vision.setFieldVisionPipeline(FieldVisionPipeline.Retroreflective);
+		vision.setFieldVisionPipeline(FieldVisionPipeline.RetroReflective);
 		robotTranslate_mps = 0;
 		isAligned = false;
 	}
@@ -42,7 +42,8 @@ public class RetroreflectiveVision extends CommandBase {
 		if (!vision.isPipelineReady())
 			return;
 
-		isAligned = (vision.inputs.fieldVisionCrosshairToTargetErrorX_rad < VisionConstants.crosshairFieldBoundTranslateX_rad)
+		isAligned = vision.inputs.fieldVisionTarget &&
+			(vision.inputs.fieldVisionCrosshairToTargetErrorX_rad < VisionConstants.crosshairFieldBoundTranslateX_rad)
 			&& (vision.inputs.fieldVisionCrosshairToTargetErrorX_rad > -VisionConstants.crosshairFieldBoundTranslateX_rad);
 		Logger.getInstance().recordOutput("FieldVision/isAligned", isAligned);
 
@@ -67,14 +68,13 @@ public class RetroreflectiveVision extends CommandBase {
 
 		// Generate a continuously updated translation to Retroreflective
 		System.out.println("Swerve --> BlueRedGridLeftRight");
-		if (!isFinished)
-			swerve.drive(new Translation2d(0, robotTranslate_mps), 0, false);
+		swerve.drive(new Translation2d(0, robotTranslate_mps), 0, false);
 	}
 
 	// Stop swerve and set pipeline back to AprilTag
 	@Override
 	public void end(boolean interrupted) {
-		isFinished = false;
+		isAligned = false;
 		swerve.stop();
 		vision.setFieldVisionPipeline(FieldVisionPipeline.AprilTag);
 	}

@@ -35,11 +35,10 @@ import frc.robot.commands.vision.AprilTagVision;
 import frc.robot.commands.vision.GamePieceVision;
 import frc.robot.commands.vision.RetroreflectiveVision;
 
-import edu.wpi.first.cscore.HttpCamera;
-import edu.wpi.first.cscore.HttpCamera.HttpCameraKind;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.SendableCameraWrapper;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -106,12 +105,13 @@ public class RobotContainer {
 
 		autoChooser.addOption("lz cube", () -> Autos.lzCube(this, true));
 		autoChooser.addOption("lz 2cube", () -> Autos.lz2Cube(this));
-		autoChooser.addOption("lz 2cube balance", () -> Autos.lz2CubeBalance(this));
+		autoChooser.addOption("lz cube pickup cone", () -> Autos.lzCubePickupCone(this));
+		// autoChooser.addOption("lz 2cube balance", () -> Autos.lz2CubeBalance(this));
 
 		autoChooser.addOption("fw cube", () -> Autos.fwCube(this));
 		autoChooser.addOption("fw cube balance", () -> Autos.fwCubeBalance(this));
 		autoChooser.addOption("fw 2cube", () -> Autos.fw2Cube(this));
-		autoChooser.addOption("fw 2cube balance", () -> Autos.fw2CubeBalance(this));
+		// autoChooser.addOption("fw 2cube balance", () -> Autos.fw2CubeBalance(this));
 
 		autoChooser.addOption("coop cube balance", () -> Autos.coopCubeBalance(this));
 		autoChooser.addOption("coop cube mobility balance", () -> Autos.coopCubeMobilityBalance(this));
@@ -122,10 +122,10 @@ public class RobotContainer {
 				swerve::getCharacterizationVelocity));
 
 		var driveTab = Shuffleboard.getTab(ShuffleboardConstants.driveTab);
-		driveTab.add("alerts", Alert.getAlertsSendable())
-			.withSize(2, 4).withPosition(15, 0);
 		driveTab.add("auto routine", autoChooser.getSendableChooser())
-			.withSize(4, 1).withPosition(15, 4);
+			.withSize(4, 1).withPosition(0, 6);
+		driveTab.add("alerts", Alert.getAlertsSendable())
+			.withSize(2, 4).withPosition(17, 0);
 		// autoDelay = driveTab.add("auto delay", 0.0)
 		// .withSize(2, 1).withPosition(0, 7)
 		// .getEntry();
@@ -272,14 +272,22 @@ public class RobotContainer {
 		// DriverStation.reportError("Failed to get camera: " + e.toString(), e.getStackTrace());
 		// }
 
-		var limelightCamera = new HttpCamera("limelight-gpv-stream", "http://10.1.2.12:5800",
-			HttpCameraKind.kMJPGStreamer);
+		// var limelightCamera = new HttpCamera("limelight-gpv-stream", "http://10.1.2.12:5800",
+		// HttpCameraKind.kMJPGStreamer);
+
 		Shuffleboard.getTab(ShuffleboardConstants.driveTab)
-			.add("limelight", limelightCamera)
+			.add("gpv", SendableCameraWrapper.wrap("limelight-gpv-stream", "http://10.1.2.12:5800/stream.mjpg"))
 			.withProperties(Map.of("show crosshair", false, "show controls", false))
 			.withWidget(BuiltInWidgets.kCameraStream)
-			.withSize(15, 6)
+			.withSize(11, 5)
 			.withPosition(0, 0);
+
+		Shuffleboard.getTab(ShuffleboardConstants.driveTab)
+			.add("fv", SendableCameraWrapper.wrap("limelight-fv-stream", "http://10.1.2.11:5800/stream.mjpg"))
+			.withProperties(Map.of("show crosshair", false, "show controls", false))
+			.withWidget(BuiltInWidgets.kCameraStream)
+			.withSize(5, 5)
+			.withPosition(11, 0);
 	}
 
 	/**

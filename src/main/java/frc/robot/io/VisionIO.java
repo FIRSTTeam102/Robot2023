@@ -121,7 +121,7 @@ public class VisionIO {
 
 	/* fieldvision */
 	public enum FieldVisionPipeline {
-		AprilTag(0), Retroreflective(1);
+		AprilTag(0), RetroReflective(1);
 
 		public final int value;
 

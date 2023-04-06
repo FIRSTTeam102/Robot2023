@@ -30,6 +30,7 @@ public class GamePieceVision extends CommandBase {
 
 	@Override
 	public void initialize() {
+		// Sets pipeline to GamePiece
 		vision.setGamePieceVisionPipeline(GamePieceVisionPipeline.GamePiece);
 		robotRotate_radps = 0;
 		isAligned = false;
