@@ -3,7 +3,7 @@ package frc.robot.constants;
 public final class VisionConstants {
 	/* AprilTagVision */
 	public static final double poseError_m = 1; // comparing visionPose to pose
-	public static final double botpose_fieldOffsetX_m = 0.18; // realife offset to pathplanner app
+	public static final double botpose_fieldOffsetX_m = 0.025; // realife offset to pathplanner app
 	public static final double botpose_fieldBlueCommunityGeoFenceX_m = 2.84; /* blue left to charge station distance */
 	public static final double botpose_fieldRedCommunityGeoFenceX_m = 13.68; /* red right to charge station distance */
 

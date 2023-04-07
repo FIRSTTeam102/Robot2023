@@ -1,5 +1,7 @@
 package frc.robot.constants;
 
+import edu.wpi.first.math.util.Units;
+
 public final class AutoConstants {
 	/* pathplanner */
 	// todo:?
@@ -14,6 +16,9 @@ public final class AutoConstants {
 	/* rotates the robot to give the gamepiece limelight a better view */
 	public static final double leftGamepieceAngle_rad = Math.toRadians(0);
 	public static final double rightGamepieceAngle_rad = Math.toRadians(-5);
+
+	/** distance from center of robot to centerline */
+	public static final double centerClearance_m = SwerveConstants.wheelBase_m + Units.inchesToMeters(16.5);
 
 	/* auto path PID values */
 	public static final double autoDriveKp = 12.0;

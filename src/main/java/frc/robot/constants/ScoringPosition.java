@@ -13,7 +13,7 @@ public enum ScoringPosition {
 	HighCone(ElevatorConstants.maxHeight_m, 1.39, true),
 	DoubleSubstation(1.075, .37),
 	SingleSubstationCube(.58, 0),
-	AllIn(.21, Arm.nutDistToArmDist(ArmConstants.minNutDist_m)),
+	AllIn(.23, Arm.nutDistToArmDist(ArmConstants.minNutDist_m)),
 	AllInHigher(.25, Arm.nutDistToArmDist(ArmConstants.minNutDist_m)),
 	AllInBumper(.18, Arm.nutDistToArmDist(ArmConstants.minNutDist_m));
 

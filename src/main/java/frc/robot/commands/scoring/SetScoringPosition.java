@@ -65,7 +65,8 @@ public class SetScoringPosition extends CommandBase {
 	public void execute() {
 		switch (nextSet) {
 			case Arm -> {
-				if (elevator.inputs.position_m < ElevatorConstants.dangerZone_m)
+				if (elevator.inputs.position_m < ElevatorConstants.dangerZone_m
+					|| (armTarget_m == ScoringPosition.AllIn.armExtension_m && elevator.inputs.position_m < .16))
 					return; // until we get above
 
 				if (elevatorTolerated(AutoConstants.elevatorTolerance_m)) {

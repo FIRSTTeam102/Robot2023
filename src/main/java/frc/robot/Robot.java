@@ -11,7 +11,6 @@ import frc.robot.commands.Autos;
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -74,7 +73,7 @@ public class Robot extends LoggedRobot {
 				Logger.getInstance().addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
 			}
 			case Active -> {
-				logger.addDataReceiver(new WPILOGWriter("/media/sda1/logs/")); // todo: sd card? /home/lvuser/logs/
+				// logger.addDataReceiver(new WPILOGWriter("/media/sda1/logs/")); // todo: sd card? /home/lvuser/logs/
 				logger.addDataReceiver(new NT4Publisher()); // publish data to NetworkTables
 				if (isReal()) {
 					LoggedPowerDistribution.getInstance(); // enable power distribution logging
@@ -95,11 +94,11 @@ public class Robot extends LoggedRobot {
 		logger.start();
 
 		// forward limelight when connected over USB
-		if (Robot.isReal()) {
-			for (int port = 5800; port <= 5805; port++) {
-				PortForwarder.add(port, "limelight.local", port);
-			}
-		}
+		// if (Robot.isReal()) {
+		// for (int port = 5800; port <= 5805; port++) {
+		// PortForwarder.add(port, "limelight.local", port);
+		// }
+		// }
 
 		/*
 		 * Instantiate our RobotContainer. This will perform all our button bindings,

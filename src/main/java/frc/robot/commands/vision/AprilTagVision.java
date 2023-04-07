@@ -50,9 +50,8 @@ public class AprilTagVision extends CommandBase {
 		vision.setFieldVisionPipeline(FieldVisionPipeline.AprilTag);
 
 		// If see an AprilTag and are within the community, AprilTagVision will execute
-		regeneratePaths = vision.inputs.fieldVisionTarget == true
-			&& (vision.inputs.fieldVisionBotpose_FieldspaceTranslationX_m < VisionConstants.botpose_fieldBlueCommunityGeoFenceX_m
-				|| vision.inputs.fieldVisionBotpose_FieldspaceTranslationX_m > VisionConstants.botpose_fieldRedCommunityGeoFenceX_m);
+		regeneratePaths = (vision.inputs.fieldVisionBotpose_FieldspaceTranslationX_m < VisionConstants.botpose_fieldBlueCommunityGeoFenceX_m
+			|| vision.inputs.fieldVisionBotpose_FieldspaceTranslationX_m > VisionConstants.botpose_fieldRedCommunityGeoFenceX_m);
 		cancelPPCommand();
 	}
 
@@ -212,7 +211,7 @@ public class AprilTagVision extends CommandBase {
 			default -> 0; // hopefully never
 		});
 		PathPlannerTrajectory trajectory = PathPlanner.generatePath(
-			new PathConstraints(2.0, 0.5),
+			new PathConstraints(3, 2),
 			new PathPoint(swerve.getPose().getTranslation(), swerve.getPose().getRotation(), swerve.getPose().getRotation()),
 			new PathPoint(new Translation2d(botpose_fieldGoToX_m, botpose_fieldGoToY_m), rotation, rotation));
 

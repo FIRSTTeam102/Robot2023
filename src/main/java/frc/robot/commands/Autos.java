@@ -5,6 +5,7 @@ import static frc.robot.constants.AutoConstants.*;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.constants.ElevatorConstants;
+import frc.robot.constants.FieldConstants;
 import frc.robot.constants.GrabberConstants;
 import frc.robot.constants.ScoringPosition;
 import frc.robot.subsystems.Arm;
@@ -78,9 +79,13 @@ public final class Autos {
 		// return Commands.sequence(
 		// deadlineSeconds(1,
 		// new ProxyCommand(() -> new TurnToAngle(Robot.isBlue() ? blueStartAngle_rad : redStartAngle_rad, swerve))),
-		return deadlineSeconds(4, Commands.sequence(
-			new GamePieceVision(GamePieceVision.Routine.GamePieceGround, vision, swerve),
-			new GamePieceVision(GamePieceVision.Routine.GamePieceGround, vision, swerve)));
+		return Commands.sequence(Commands.race(
+			Commands.waitSeconds(1.5),
+			Commands.waitUntil(() -> !vision.inputs.gamePieceVisionTarget), // if we lost the target, just go on
+			Commands.sequence(
+				new GamePieceVision(GamePieceVision.Routine.GamePieceGround, vision, swerve),
+				new GamePieceVision(GamePieceVision.Routine.GamePieceGround, vision, swerve))),
+			Commands.waitSeconds(0.5));
 	}
 
 	public static Command intakeGroundForAuto(Swerve swerve, Elevator elevator, Arm arm, Grabber grabber,
@@ -95,14 +100,16 @@ public final class Autos {
 			new SetScoringPosition(elevator, arm, ScoringPosition.Ground, elevatorTolerance_m, 0.2),
 			Commands.race(
 				Commands.waitUntil(() -> Robot.isBlue() // kill driving if we're crossing the center line
-					? swerve.getPose().getX() > 7.6
-					: swerve.getPose().getX() < 8.9),
+					? swerve.getPose().getX() > ((FieldConstants.fieldLengthX_m / 2) - centerClearance_m)
+					: swerve.getPose().getX() < ((FieldConstants.fieldLengthX_m / 2) + centerClearance_m)),
 				new GrabGrabberUntilGrabbed(grabber, grabSpeed),
 				goForward(swerve, 1.3))));
 	}
 
 	public static Command intakeGroundUntimed(Swerve swerve, Elevator elevator, Arm arm, Grabber grabber, Vision vision) {
 		return Commands.sequence(
+			new SetElevatorPosition(elevator, ScoringPosition.AllInBumper.elevatorHeight_m),
+			Commands.waitUntil(() -> elevator.withinTargetPosition()),
 			new SetScoringPosition(elevator, arm, ScoringPosition.Ground, elevatorTolerance_m, 0.2),
 			Commands.deadline(new GrabConeOrCubeUntilGrabbed(grabber, vision), goForward(swerve, 1.3)),
 			new SetScoringPosition(elevator, arm, ScoringPosition.AllIn));
