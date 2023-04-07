@@ -8,13 +8,14 @@ public enum ScoringPosition {
 	Ground(0, .525),
 	GroundFar(0, .82),
 	MidCube(.702, .777),
-	MidCone(.9652, .951, true),
+	MidCone(.99, .951, true),
 	HighCube(1.04, 1.213),
 	HighCone(ElevatorConstants.maxHeight_m, 1.39, true),
-	DoubleSubstation(1.055, .33),
+	DoubleSubstation(1.075, .37),
 	SingleSubstationCube(.58, 0),
 	AllIn(.21, Arm.nutDistToArmDist(ArmConstants.minNutDist_m)),
-	AllInBumper(.14, Arm.nutDistToArmDist(ArmConstants.minNutDist_m));
+	AllInHigher(.25, Arm.nutDistToArmDist(ArmConstants.minNutDist_m)),
+	AllInBumper(.18, Arm.nutDistToArmDist(ArmConstants.minNutDist_m));
 
 // @formatter:on
 	public final double elevatorHeight_m;

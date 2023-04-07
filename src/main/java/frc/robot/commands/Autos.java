@@ -13,6 +13,7 @@ import frc.robot.subsystems.Grabber;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
 
+import frc.robot.commands.arm.SetArmPosition;
 import frc.robot.commands.elevator.MoveElevatorBy;
 import frc.robot.commands.elevator.SetElevatorPosition;
 import frc.robot.commands.grabber.GrabConeOrCubeUntilGrabbed;
@@ -34,7 +35,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 import com.pathplanner.lib.PathConstraints;
@@ -48,6 +48,7 @@ public final class Autos {
 	public static final PIDController ppRotationController = new PIDController(autoAngleKp, autoAngleKi, autoAngleKd); // rad
 	static {
 		ppRotationController.enableContinuousInput(-Math.PI, Math.PI);
+		ppRotationController.setTolerance(0.01, 0.01);
 	}
 
 	public static Command deadlineSeconds(double time_s, Command... commands) {
@@ -55,7 +56,11 @@ public final class Autos {
 	}
 
 	public static Command allIn(Elevator elevator, Arm arm) {
-		return new SetScoringPosition(elevator, arm, ScoringPosition.AllIn, 0.2, 0.2);
+		return new SetScoringPosition(elevator, arm, ScoringPosition.AllIn, 0.4, 0.2);
+	}
+
+	public static Command allInHigher(Elevator elevator, Arm arm) {
+		return new SetScoringPosition(elevator, arm, ScoringPosition.AllInHigher, 0.4, 0.2);
 	}
 
 	public static Command allInBumper(Elevator elevator, Arm arm) {
@@ -68,19 +73,31 @@ public final class Autos {
 			() -> swerve.stop(), swerve);
 	}
 
-	public static Command gamePieceAlign(Swerve swerve, Vision vision) {
-		return deadlineSeconds(1, new GamePieceVision(GamePieceVision.Routine.GamePieceGround, vision, swerve));
+	public static Command gamePieceAlign(Swerve swerve, Vision vision, double blueStartAngle_rad,
+		double redStartAngle_rad) {
+		// return Commands.sequence(
+		// deadlineSeconds(1,
+		// new ProxyCommand(() -> new TurnToAngle(Robot.isBlue() ? blueStartAngle_rad : redStartAngle_rad, swerve))),
+		return deadlineSeconds(4, Commands.sequence(
+			new GamePieceVision(GamePieceVision.Routine.GamePieceGround, vision, swerve),
+			new GamePieceVision(GamePieceVision.Routine.GamePieceGround, vision, swerve)));
+	}
+
+	public static Command intakeGroundForAuto(Swerve swerve, Elevator elevator, Arm arm, Grabber grabber,
+		double deadline_s) {
+		return intakeGroundForAuto(swerve, elevator, arm, grabber, deadline_s, GrabberConstants.cubeGrabSpeed);
 	}
 
 	/** will not cross the center line */
-	public static Command intakeGroundForAuto(Swerve swerve, Elevator elevator, Arm arm, Grabber grabber) {
-		return deadlineSeconds(3.5, Commands.sequence(
+	public static Command intakeGroundForAuto(Swerve swerve, Elevator elevator, Arm arm, Grabber grabber,
+		double deadline_s, double grabSpeed) {
+		return deadlineSeconds(deadline_s, Commands.sequence(
 			new SetScoringPosition(elevator, arm, ScoringPosition.Ground, elevatorTolerance_m, 0.2),
 			Commands.race(
 				Commands.waitUntil(() -> Robot.isBlue() // kill driving if we're crossing the center line
 					? swerve.getPose().getX() > 7.6
 					: swerve.getPose().getX() < 8.9),
-				new GrabGrabberUntilGrabbed(grabber, GrabberConstants.cubeGrabSpeed),
+				new GrabGrabberUntilGrabbed(grabber, grabSpeed),
 				goForward(swerve, 1.3))));
 	}
 
@@ -140,18 +157,22 @@ public final class Autos {
 		return new PathPlannerCommand(path, swerve, true, firstPathEver);
 	}
 
+	public static Command initAndScore(RobotContainer robo, ScoringPosition position) {
+		return Commands.sequence(
+			deadlineSeconds(5, Commands.sequence(
+				swerveAnglesTo0(robo.swerve),
+				grabTimed(robo.grabber),
+				score(robo.elevator, robo.arm, robo.grabber, position),
+				allInBumper(robo.elevator, robo.arm))),
+			// make sure they get set anyways, though there should be enough time
+			new SetArmPosition(robo.arm, ScoringPosition.AllInBumper.armExtension_m),
+			new SetElevatorPosition(robo.elevator, ScoringPosition.AllInBumper.elevatorHeight_m));
+	}
+
 	/*
 	 * routines
 	 * for naming: start location (lz, fw, coop) then one-word description for each part (cube, cone, balance, ...)
 	 */
-
-	public static Command initAndScore(RobotContainer robo, ScoringPosition position) {
-		return new SequentialCommandGroup(
-			swerveAnglesTo0(robo.swerve),
-			grabTimed(robo.grabber),
-			score(robo.elevator, robo.arm, robo.grabber, position),
-			allInBumper(robo.elevator, robo.arm));
-	}
 
 	public static Command coopCubeBalance(RobotContainer robo) {
 		var path = PathPlanner.loadPathGroup("coopCubeBalance",
@@ -177,7 +198,7 @@ public final class Autos {
 			balance(robo.swerve));
 	}
 
-	public static Command lzCube(RobotContainer robo, boolean intakeAfter) {
+	public static Command lzCube(RobotContainer robo) {
 		var path = PathPlanner.loadPathGroup("lzCube",
 			new PathConstraints(slowerMaxVelocity_mps, maxAcceleration_mps2));
 
@@ -192,104 +213,135 @@ public final class Autos {
 			new PathConstraints(slowerMaxVelocity_mps, maxAcceleration_mps2));
 
 		return new SequentialCommandGroup(
-			new ProxyCommand(() -> Commands.print("IS BLUEEEEEEEEEEEEEEEEEEEEEE???????" + Robot.isBlue())),
 			initAndScore(robo, ScoringPosition.HighCube),
 			autoPath(robo.swerve, path.get(0), true));
 	}
 
-	public static Command fwCubeBalance(RobotContainer robo) {
-		var path = PathPlanner.loadPathGroup("fwCubeBalance",
-			new PathConstraints(maxVelocity_mps, maxAcceleration_mps2),
-			new PathConstraints(balanceMaxVelocity_mps, maxAcceleration_mps2));
-
-		return new SequentialCommandGroup(
-			// initAndScore(robo, ScoringPosition.HighCube),
-			autoPath(robo.swerve, path.get(0), true),
-			autoPath(robo.swerve, path.get(1)),
-			balance(robo.swerve));
-	}
-
 	/** 2 pice auto by field wall */
-	public static Command fw2Cube(RobotContainer robo) {
-		var path = PathPlanner.loadPathGroup("fw2Cube",
+	public static Command fwCube2(RobotContainer robo) {
+		var path = PathPlanner.loadPathGroup("fwCube2",
 			new PathConstraints(maxVelocity_mps, maxAcceleration_mps2));
 
 		return new SequentialCommandGroup(
 			initAndScore(robo, ScoringPosition.HighCube),
-			Commands.print("ready to go"),
 			autoPath(robo.swerve, path.get(0), true),
-			gamePieceAlign(robo.swerve, robo.vision),
-			intakeGroundForAuto(robo.swerve, robo.elevator, robo.arm, robo.grabber),
+			gamePieceAlign(robo.swerve, robo.vision, leftGamepieceAngle_rad, rightGamepieceAngle_rad),
+			intakeGroundForAuto(robo.swerve, robo.elevator, robo.arm, robo.grabber, 3),
+			stopIfNoPiece(robo.grabber),
 			allIn(robo.elevator, robo.arm),
 			autoPath(robo.swerve, path.get(1)),
-			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCube),
+			// score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCube),
+			new ReleaseGrabber(robo.grabber),
 			allIn(robo.elevator, robo.arm));
-	}
-
-	/** 2 piece auto w/ charge station by field wall */
-	@Deprecated
-	public static Command fw2CubeBalance(RobotContainer robo) {
-		var path = PathPlanner.loadPathGroup("fw2CubeBalance",
-			new PathConstraints(maxVelocity_mps, maxAcceleration_mps2));
-
-		return new SequentialCommandGroup(
-			initAndScore(robo, ScoringPosition.HighCube),
-			autoPath(robo.swerve, path.get(0), true),
-			intakeGroundForAuto(robo.swerve, robo.elevator, robo.arm, robo.grabber),
-			allIn(robo.elevator, robo.arm),
-			autoPath(robo.swerve, path.get(1)),
-			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCube),
-			allIn(robo.elevator, robo.arm),
-			autoPath(robo.swerve, path.get(2)),
-			balance(robo.swerve));
 	}
 
 	/** two piece by the loading zone wall */
-	@Deprecated
-	public static Command lz2Cube(RobotContainer robo) {
-		var path = PathPlanner.loadPathGroup("lz2Cube",
+	public static Command lzCube2(RobotContainer robo) {
+		var path = PathPlanner.loadPathGroup("lzCube2",
 			new PathConstraints(maxVelocity_mps, maxAcceleration_mps2));
 
 		return new SequentialCommandGroup(
 			initAndScore(robo, ScoringPosition.HighCube),
 			autoPath(robo.swerve, path.get(0), true),
-			gamePieceAlign(robo.swerve, robo.vision),
-			intakeGroundForAuto(robo.swerve, robo.elevator, robo.arm, robo.grabber),
+			gamePieceAlign(robo.swerve, robo.vision, rightGamepieceAngle_rad, leftGamepieceAngle_rad),
+			intakeGroundForAuto(robo.swerve, robo.elevator, robo.arm, robo.grabber, 3.5),
+			stopIfNoPiece(robo.grabber),
 			allIn(robo.elevator, robo.arm),
 			autoPath(robo.swerve, path.get(1)),
-			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCube),
-			allIn(robo.elevator, robo.arm));
+			new ReleaseGrabber(robo.grabber));
 	}
 
-	@Deprecated
-	public static Command lz2CubeBalance(RobotContainer robo) {
-		var path = PathPlanner.loadPathGroup("lz2CubeBalance",
-			new PathConstraints(maxVelocity_mps, maxAcceleration_mps2));
-
-		return new SequentialCommandGroup(
-			initAndScore(robo, ScoringPosition.HighCube),
-			autoPath(robo.swerve, path.get(0), true),
-			intakeGroundForAuto(robo.swerve, robo.elevator, robo.arm, robo.grabber),
-			allIn(robo.elevator, robo.arm),
-			autoPath(robo.swerve, path.get(1)),
-			score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCube),
-			allIn(robo.elevator, robo.arm),
-			autoPath(robo.swerve, path.get(2)),
-			balance(robo.swerve));
-	}
-
-	public static Command lzCubePickupCone(RobotContainer robo) {
-		var path = PathPlanner.loadPathGroup("lzCubePickupCone",
+	public static Command lzCubeAimCone(RobotContainer robo) {
+		var path = PathPlanner.loadPathGroup("lzCubeAimCone",
 			new PathConstraints(3, maxAcceleration_mps2));
 
 		return new SequentialCommandGroup(
 			initAndScore(robo, ScoringPosition.HighCube),
 			autoPath(robo.swerve, path.get(0), true),
-			intakeGroundForAuto(robo.swerve, robo.elevator, robo.arm, robo.grabber),
+			gamePieceAlign(robo.swerve, robo.vision, rightGamepieceAngle_rad, leftGamepieceAngle_rad),
+			intakeGroundForAuto(robo.swerve, robo.elevator, robo.arm, robo.grabber, 3.5, GrabberConstants.coneGrabSpeed),
 			stopIfNoPiece(robo.grabber),
 			allIn(robo.elevator, robo.arm),
 			autoPath(robo.swerve, path.get(1)),
 			new RetroreflectiveVision(RetroreflectiveVision.Routine.BlueRedGridLeftRight, robo.vision, robo.swerve),
 			new SetElevatorPosition(robo.elevator, ScoringPosition.HighCone.elevatorHeight_m));
 	}
+
+	public static Command lzCubePickupCone(RobotContainer robo) {
+		var path = PathPlanner.loadPathGroup("lzCubePickupCone",
+			new PathConstraints(3, 2),
+			new PathConstraints(2, 1));
+
+		return new SequentialCommandGroup(
+			initAndScore(robo, ScoringPosition.HighCube),
+			autoPath(robo.swerve, path.get(0), true),
+			gamePieceAlign(robo.swerve, robo.vision, rightGamepieceAngle_rad, leftGamepieceAngle_rad),
+			intakeGroundForAuto(robo.swerve, robo.elevator, robo.arm, robo.grabber, 3.5, GrabberConstants.coneGrabSpeed),
+			stopIfNoPiece(robo.grabber),
+			allInHigher(robo.elevator, robo.arm),
+			autoPath(robo.swerve, path.get(1)));
+	}
+
+	public static Command fwCubePickupCone(RobotContainer robo) {
+		var path = PathPlanner.loadPathGroup("fwCubePickupCone",
+			new PathConstraints(2, 2),
+			new PathConstraints(2, 1));
+
+		return new SequentialCommandGroup(
+			initAndScore(robo, ScoringPosition.HighCube),
+			autoPath(robo.swerve, path.get(0), true),
+			gamePieceAlign(robo.swerve, robo.vision, leftGamepieceAngle_rad, rightGamepieceAngle_rad),
+			intakeGroundForAuto(robo.swerve, robo.elevator, robo.arm, robo.grabber, 3.5, GrabberConstants.coneGrabSpeed),
+			stopIfNoPiece(robo.grabber),
+			allInHigher(robo.elevator, robo.arm),
+			autoPath(robo.swerve, path.get(1)));
+	}
+
+	// public static Command fwCubeBalance(RobotContainer robo) {
+	// var path = PathPlanner.loadPathGroup("fwCubeBalance",
+	// new PathConstraints(maxVelocity_mps, maxAcceleration_mps2),
+	// new PathConstraints(balanceMaxVelocity_mps, maxAcceleration_mps2));
+
+	// return new SequentialCommandGroup(
+	// // initAndScore(robo, ScoringPosition.HighCube),
+	// autoPath(robo.swerve, path.get(0), true),
+	// autoPath(robo.swerve, path.get(1)),
+	// balance(robo.swerve));
+	// }
+
+	// /** 2 piece auto w/ charge station by field wall */
+	// @Deprecated
+	// public static Command fw2CubeBalance(RobotContainer robo) {
+	// var path = PathPlanner.loadPathGroup("fw2CubeBalance",
+	// new PathConstraints(maxVelocity_mps, maxAcceleration_mps2));
+
+	// return new SequentialCommandGroup(
+	// initAndScore(robo, ScoringPosition.HighCube),
+	// autoPath(robo.swerve, path.get(0), true),
+	// intakeGroundForAuto(robo.swerve, robo.elevator, robo.arm, robo.grabber, 2),
+	// allIn(robo.elevator, robo.arm),
+	// autoPath(robo.swerve, path.get(1)),
+	// score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCube),
+	// allIn(robo.elevator, robo.arm),
+	// autoPath(robo.swerve, path.get(2)),
+	// balance(robo.swerve));
+	// }
+
+	// @Deprecated
+	// public static Command lz2CubeBalance(RobotContainer robo) {
+	// var path = PathPlanner.loadPathGroup("lz2CubeBalance",
+	// new PathConstraints(maxVelocity_mps, maxAcceleration_mps2));
+
+	// return new SequentialCommandGroup(
+	// initAndScore(robo, ScoringPosition.HighCube),
+	// autoPath(robo.swerve, path.get(0), true),
+	// intakeGroundForAuto(robo.swerve, robo.elevator, robo.arm, robo.grabber, 2),
+	// stopIfNoPiece(robo.grabber),
+	// allIn(robo.elevator, robo.arm),
+	// autoPath(robo.swerve, path.get(1)),
+	// score(robo.elevator, robo.arm, robo.grabber, ScoringPosition.MidCube),
+	// allIn(robo.elevator, robo.arm),
+	// autoPath(robo.swerve, path.get(2)),
+	// balance(robo.swerve));
+	// }
 }

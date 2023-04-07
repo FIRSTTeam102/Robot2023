@@ -108,6 +108,14 @@ public class SetScoringPosition extends CommandBase {
 		return nextSet == Mech.None;
 	}
 
+	@Override
+	public void end(boolean interrupted) {
+		// set anyway when going back down (for auto)
+		if (interrupted && nextSet == Mech.Elevator && arm.getArmDist_m() <= ArmConstants.dangerZone_m) {
+			elevator.setPosition(elevatorTarget_m);
+		}
+	}
+
 	boolean elevatorTolerated(double tolerance_m) {
 		return Math.abs(elevator.inputs.position_m - elevatorTarget_m) < tolerance_m;
 	}

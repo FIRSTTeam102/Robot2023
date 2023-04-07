@@ -11,6 +11,10 @@ public final class AutoConstants {
 	public static final double armTolerance_m = 0.1;
 	public static final double elevatorTolerance_m = 0.15;
 
+	/* rotates the robot to give the gamepiece limelight a better view */
+	public static final double leftGamepieceAngle_rad = Math.toRadians(0);
+	public static final double rightGamepieceAngle_rad = Math.toRadians(-5);
+
 	/* auto path PID values */
 	public static final double autoDriveKp = 12.0;
 	public static final double autoDriveKi = 0; // 0.02?

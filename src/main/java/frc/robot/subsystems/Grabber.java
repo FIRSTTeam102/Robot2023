@@ -82,7 +82,7 @@ public class Grabber extends SubsystemBase implements AutoCloseable {
 			Lights.setStatus(Lights.Group.Grabber, Lights.Status.Center);
 		} else
 			Lights.setStatus(Lights.Group.Grabber,
-				inputs.current_A > grabbedCurrent_A ? Lights.Status.All : Lights.Status.None);
+				hasGrabbed(grabbedTicks) ? Lights.Status.All : Lights.Status.None);
 
 	}
 

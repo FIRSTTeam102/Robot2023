@@ -103,14 +103,16 @@ public class RobotContainer {
 		autoChooser.addOption("nothing", () -> new InstantCommand());
 		autoChooser.addDefaultOption("cube and nothing", () -> Autos.initAndScore(this, ScoringPosition.HighCube));
 
-		autoChooser.addOption("lz cube", () -> Autos.lzCube(this, true));
-		autoChooser.addOption("lz 2cube", () -> Autos.lz2Cube(this));
+		autoChooser.addOption("lz cube", () -> Autos.lzCube(this));
+		autoChooser.addOption("lz cube 2", () -> Autos.lzCube2(this));
+		autoChooser.addOption("lz cube aim cone", () -> Autos.lzCubeAimCone(this));
 		autoChooser.addOption("lz cube pickup cone", () -> Autos.lzCubePickupCone(this));
 		// autoChooser.addOption("lz 2cube balance", () -> Autos.lz2CubeBalance(this));
 
 		autoChooser.addOption("fw cube", () -> Autos.fwCube(this));
-		autoChooser.addOption("fw cube balance", () -> Autos.fwCubeBalance(this));
-		autoChooser.addOption("fw 2cube", () -> Autos.fw2Cube(this));
+		// autoChooser.addOption("fw cube balance", () -> Autos.fwCubeBalance(this));
+		autoChooser.addOption("fw cube 2", () -> Autos.fwCube2(this));
+		autoChooser.addOption("fw cube pickup cone", () -> Autos.fwCubePickupCone(this));
 		// autoChooser.addOption("fw 2cube balance", () -> Autos.fw2CubeBalance(this));
 
 		autoChooser.addOption("coop cube balance", () -> Autos.coopCubeBalance(this));
@@ -123,9 +125,9 @@ public class RobotContainer {
 
 		var driveTab = Shuffleboard.getTab(ShuffleboardConstants.driveTab);
 		driveTab.add("auto routine", autoChooser.getSendableChooser())
-			.withSize(4, 1).withPosition(0, 6);
+			.withSize(4, 1).withPosition(0, 5);
 		driveTab.add("alerts", Alert.getAlertsSendable())
-			.withSize(2, 4).withPosition(17, 0);
+			.withSize(5, 4).withPosition(4, 5);
 		// autoDelay = driveTab.add("auto delay", 0.0)
 		// .withSize(2, 1).withPosition(0, 7)
 		// .getEntry();

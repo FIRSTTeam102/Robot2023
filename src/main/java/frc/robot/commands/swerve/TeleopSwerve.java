@@ -12,6 +12,7 @@ import frc.robot.util.Alert.AlertType;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -35,7 +36,7 @@ public class TeleopSwerve extends CommandBase {
 
 	public CommandBase holdRotateAroundPiece() {
 		return Commands.startEnd(
-			() -> swerve.setCenterRotation(SwerveConstants.trackWidth_m + 0.1, 0),
+			() -> swerve.setCenterRotation(SwerveConstants.trackWidth_m + Units.inchesToMeters(13), 0),
 			() -> swerve.setCenterRotation(0, 0));
 	}
 
