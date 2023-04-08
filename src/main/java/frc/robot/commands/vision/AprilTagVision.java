@@ -69,12 +69,12 @@ public class AprilTagVision extends CommandBase {
 					case 5 -> {
 						System.out.println("Swerve --> BlueDoublesubstation5Left");
 						botpose_fieldGoToX_m = 0.76 + VisionConstants.botpose_fieldOffsetX_m;
-						botpose_fieldGoToY_m = 6.02;
+						botpose_fieldGoToY_m = 7.5; // flipped
 					}
 					case 4 -> {
 						System.out.println("Swerve --> RedDoublesubstation4Left");
 						botpose_fieldGoToX_m = 15.77 - VisionConstants.botpose_fieldOffsetX_m;
-						botpose_fieldGoToY_m = 7.5;
+						botpose_fieldGoToY_m = 6.02; // flipped
 					}
 
 					case 6 -> {
@@ -157,12 +157,12 @@ public class AprilTagVision extends CommandBase {
 					case 5 -> {
 						System.out.println("Swerve --> BlueDoublesubstation5Right");
 						botpose_fieldGoToX_m = 0.76 + VisionConstants.botpose_fieldOffsetX_m;
-						botpose_fieldGoToY_m = 7.5;
+						botpose_fieldGoToY_m = 6.02; // flipped
 					}
 					case 4 -> {
 						System.out.println("Swerve --> RedDoublesubstation4Right");
 						botpose_fieldGoToX_m = 15.77 - VisionConstants.botpose_fieldOffsetX_m;
-						botpose_fieldGoToY_m = 6.02;
+						botpose_fieldGoToY_m = 7.5; // flipped
 					}
 
 					case 6 -> {

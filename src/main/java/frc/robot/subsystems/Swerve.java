@@ -253,6 +253,8 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 		return states;
 	}
 
+	private double visionSeenCount = 0;
+
 	@Override
 	public void periodic() {
 		gyroIO.updateInputs(gyroInputs);
@@ -280,12 +282,20 @@ public class Swerve extends SubsystemBase implements AutoCloseable {
 			&& vision.inputs.fieldVisionTarget == true
 			&& (vision.inputs.fieldVisionBotpose_FieldspaceTranslationX_m < VisionConstants.botpose_fieldBlueCommunityGeoFenceX_m
 				|| vision.inputs.fieldVisionBotpose_FieldspaceTranslationX_m > VisionConstants.botpose_fieldRedCommunityGeoFenceX_m)) {
-			var visionPose = new Pose2d(vision.inputs.fieldVisionBotpose_FieldspaceTranslationX_m,
-				vision.inputs.fieldVisionBotpose_FieldspaceTranslationY_m,
-				new Rotation2d(vision.inputs.fieldVisionBotpose_FieldspaceRotationZ_rad));
-			Logger.getInstance().recordOutput("Odometry/VisionPose", visionPose);
-			poseEstimator.addVisionMeasurement(visionPose, timer.get() - vision.inputs.fieldVisionBotpose_Latency_s);
-		}
+			visionSeenCount++;
+			if (visionSeenCount > 2) { // fixme: temporary
+				var visionPose = new Pose2d(vision.inputs.fieldVisionBotpose_FieldspaceTranslationX_m,
+					vision.inputs.fieldVisionBotpose_FieldspaceTranslationY_m,
+					new Rotation2d(vision.inputs.fieldVisionBotpose_FieldspaceRotationZ_rad));
+				Logger.getInstance().recordOutput("Odometry/VisionPose", visionPose);
+				// var distance = Math.hypot(
+				// Math.abs(translationX - vision.inputs.fieldVisionBotpose_FieldspaceTranslationX_m),
+				// Math.abs(translationY - vision.inputs.fieldVisionBotpose_FieldspaceTranslationY_m));
+				poseEstimator.addVisionMeasurement(visionPose, timer.get() - vision.inputs.fieldVisionBotpose_Latency_s);
+				// VecBuilder.fill(distance / 2, distance / 2, 100));
+			}
+		} else
+			visionSeenCount = 0;
 
 		Logger.getInstance().recordOutput("Odometry/Robot", pose);
 		// Logger.getInstance().recordOutput("3DField", new Pose3d(pose));

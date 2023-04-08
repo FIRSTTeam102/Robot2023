@@ -165,7 +165,17 @@ public class RobotContainer {
 		driverController.y().onTrue(zeroYaw);
 		new Trigger(RobotController::getUserButton).onTrue(zeroYaw);
 
-		driverController.povUp().whileTrue(new ChargeStationBalance(swerve));
+		driverController.start().whileTrue(new ChargeStationBalance(swerve)); // right menu
+
+		driverController.pov(90) // left grid or left double substation
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.BlueRedGridDoublesubstationLeft, vision, swerve));
+		driverController.pov(0) // middle grid
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.BlueRedGridMiddle, vision, swerve));
+		driverController.pov(270) // right grid or right double substation
+			.whileTrue(new AprilTagVision(AprilTagVision.Routine.BlueRedGridDoublesubstationRight, vision, swerve));
+
+		driverController.pov(180)
+			.whileTrue(new RetroreflectiveVision(RetroreflectiveVision.Routine.BlueRedGridLeftRight, vision, swerve));
 
 		/*
 		 * operator console
@@ -176,11 +186,11 @@ public class RobotContainer {
 		 */
 
 		// swerve to grid or double substation. swerve/arm/elevator game piece (green)
-		operatorConsole.button(1) // left grid or left double substation
+		operatorConsole.button(3) // left grid or left double substation
 			.whileTrue(new AprilTagVision(AprilTagVision.Routine.BlueRedGridDoublesubstationLeft, vision, swerve));
 		operatorConsole.button(2) // middle grid
 			.whileTrue(new AprilTagVision(AprilTagVision.Routine.BlueRedGridMiddle, vision, swerve));
-		operatorConsole.button(3) // right grid or right double substation
+		operatorConsole.button(1) // right grid or right double substation
 			.whileTrue(new AprilTagVision(AprilTagVision.Routine.BlueRedGridDoublesubstationRight, vision, swerve));
 
 		// swerve or/and arm/elevator to grid or double substation (blue + orange)

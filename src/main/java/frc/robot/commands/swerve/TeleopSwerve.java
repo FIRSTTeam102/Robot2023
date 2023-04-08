@@ -34,10 +34,18 @@ public class TeleopSwerve extends CommandBase {
 			() -> fieldRelative = !fieldRelative);
 	};
 
+	private boolean invertRotation = false;
+
 	public CommandBase holdRotateAroundPiece() {
 		return Commands.startEnd(
-			() -> swerve.setCenterRotation(SwerveConstants.trackWidth_m + Units.inchesToMeters(13), 0),
-			() -> swerve.setCenterRotation(0, 0));
+			() -> {
+				invertRotation = true;
+				swerve.setCenterRotation(SwerveConstants.trackWidth_m + Units.inchesToMeters(13), 0);
+			},
+			() -> {
+				invertRotation = false;
+				swerve.setCenterRotation(0, 0);
+			});
 	}
 
 	private Alert zeroedYaw = new Alert("never zeroed yaw", AlertType.Warning);
@@ -83,6 +91,11 @@ public class TeleopSwerve extends CommandBase {
 		this.swerve = swerve;
 		this.arm = arm;
 		this.elevator = elevator;
+	}
+
+	@Override
+	public void initialize() {
+		invertRotation = false;
 	}
 
 	private double rotation;
@@ -131,6 +144,9 @@ public class TeleopSwerve extends CommandBase {
 		rotation = modifyAxis(turnSupplier.getAsDouble())
 			* SwerveConstants.maxAngularVelocity_radps
 			* turnMaxPercent;
+
+		if (invertRotation) // todo: why is this necessary?
+			rotation *= -1;
 
 		// Logger.getInstance().recordOutput("TeleopSwerve/rotation_radps", rotation);
 

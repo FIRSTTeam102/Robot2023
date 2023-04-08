@@ -111,7 +111,11 @@ public final class Autos {
 			new SetElevatorPosition(elevator, ScoringPosition.AllInBumper.elevatorHeight_m),
 			Commands.waitUntil(() -> elevator.withinTargetPosition()),
 			new SetScoringPosition(elevator, arm, ScoringPosition.Ground, elevatorTolerance_m, 0.2),
-			Commands.deadline(new GrabConeOrCubeUntilGrabbed(grabber, vision), goForward(swerve, 1.3)),
+			Commands.deadline(
+				new GrabConeOrCubeUntilGrabbed(grabber, vision),
+				Commands.sequence(
+					Commands.waitUntil(() -> grabber.inputs.percentOutput >= 0.9 * GrabberConstants.cubeGrabSpeed),
+					goForward(swerve, 1.3))),
 			new SetScoringPosition(elevator, arm, ScoringPosition.AllIn));
 	}
 
