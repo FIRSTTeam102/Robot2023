@@ -88,6 +88,10 @@ public final class Autos {
 			Commands.waitSeconds(0.5));
 	}
 
+	public static Command waitForElevator(Elevator elevator) {
+		return Commands.waitUntil(() -> elevator.withinTargetPosition());
+	}
+
 	public static Command intakeGroundForAuto(Swerve swerve, Elevator elevator, Arm arm, Grabber grabber,
 		double deadline_s) {
 		return intakeGroundForAuto(swerve, elevator, arm, grabber, deadline_s, GrabberConstants.cubeGrabSpeed);
@@ -97,19 +101,23 @@ public final class Autos {
 	public static Command intakeGroundForAuto(Swerve swerve, Elevator elevator, Arm arm, Grabber grabber,
 		double deadline_s, double grabSpeed) {
 		return deadlineSeconds(deadline_s, Commands.sequence(
+			new SetElevatorPosition(elevator, ScoringPosition.AllIn.elevatorHeight_m),
+			waitForElevator(elevator),
 			new SetScoringPosition(elevator, arm, ScoringPosition.Ground, elevatorTolerance_m, 0.2),
+			Commands.runOnce(() -> swerve.autoAprilTag = false), // it shouldn't be seeing any tags rn, just to be safe
 			Commands.race(
 				Commands.waitUntil(() -> Robot.isBlue() // kill driving if we're crossing the center line
 					? swerve.getPose().getX() > ((FieldConstants.fieldLengthX_m / 2) - centerClearance_m)
 					: swerve.getPose().getX() < ((FieldConstants.fieldLengthX_m / 2) + centerClearance_m)),
-				new GrabGrabberUntilGrabbed(grabber, grabSpeed),
-				goForward(swerve, 1.3))));
+				new GrabGrabberUntilGrabbed(grabber, grabSpeed, 12),
+				goForward(swerve, 1.3)),
+			Commands.runOnce(() -> swerve.autoAprilTag = true)));
 	}
 
 	public static Command intakeGroundUntimed(Swerve swerve, Elevator elevator, Arm arm, Grabber grabber, Vision vision) {
 		return Commands.sequence(
 			new SetElevatorPosition(elevator, ScoringPosition.AllInBumper.elevatorHeight_m),
-			Commands.waitUntil(() -> elevator.withinTargetPosition()),
+			waitForElevator(elevator),
 			new SetScoringPosition(elevator, arm, ScoringPosition.Ground, elevatorTolerance_m, 0.2),
 			Commands.deadline(
 				new GrabConeOrCubeUntilGrabbed(grabber, vision),
@@ -281,30 +289,32 @@ public final class Autos {
 	public static Command lzCubePickupCone(RobotContainer robo) {
 		var path = PathPlanner.loadPathGroup("lzCubePickupCone",
 			new PathConstraints(3, 2),
-			new PathConstraints(2, 1));
+			new PathConstraints(1.5, 0.75));
 
 		return new SequentialCommandGroup(
 			initAndScore(robo, ScoringPosition.HighCube),
 			autoPath(robo.swerve, path.get(0), true),
 			gamePieceAlign(robo.swerve, robo.vision, rightGamepieceAngle_rad, leftGamepieceAngle_rad),
-			intakeGroundForAuto(robo.swerve, robo.elevator, robo.arm, robo.grabber, 3.5, GrabberConstants.coneGrabSpeed),
+			intakeGroundForAuto(robo.swerve, robo.elevator, robo.arm, robo.grabber, 4, GrabberConstants.coneGrabSpeed),
 			stopIfNoPiece(robo.grabber),
 			allInHigher(robo.elevator, robo.arm),
+			new GrabGrabber(robo.grabber, GrabberConstants.coneGrabSpeed),
 			autoPath(robo.swerve, path.get(1)));
 	}
 
 	public static Command fwCubePickupCone(RobotContainer robo) {
 		var path = PathPlanner.loadPathGroup("fwCubePickupCone",
 			new PathConstraints(2, 2),
-			new PathConstraints(2, 1));
+			new PathConstraints(1.5, 0.75));
 
 		return new SequentialCommandGroup(
 			initAndScore(robo, ScoringPosition.HighCube),
 			autoPath(robo.swerve, path.get(0), true),
 			gamePieceAlign(robo.swerve, robo.vision, leftGamepieceAngle_rad, rightGamepieceAngle_rad),
-			intakeGroundForAuto(robo.swerve, robo.elevator, robo.arm, robo.grabber, 3.5, GrabberConstants.coneGrabSpeed),
+			intakeGroundForAuto(robo.swerve, robo.elevator, robo.arm, robo.grabber, 4, GrabberConstants.coneGrabSpeed),
 			stopIfNoPiece(robo.grabber),
 			allInHigher(robo.elevator, robo.arm),
+			new GrabGrabber(robo.grabber, GrabberConstants.coneGrabSpeed),
 			autoPath(robo.swerve, path.get(1)));
 	}
 
