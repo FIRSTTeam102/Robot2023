@@ -21,7 +21,9 @@ import frc.robot.util.Alert.AlertType;
 import frc.robot.commands.Autos;
 import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.arm.ManualArmControl;
+import frc.robot.commands.arm.MoveArm;
 import frc.robot.commands.elevator.ManualElevatorControl;
+import frc.robot.commands.elevator.MoveElevator;
 import frc.robot.commands.elevator.MoveElevatorBy;
 import frc.robot.commands.grabber.GrabGrabber;
 import frc.robot.commands.grabber.ReleaseGrabber;
@@ -35,12 +37,15 @@ import frc.robot.commands.vision.AprilTagVision;
 import frc.robot.commands.vision.GamePieceVision;
 import frc.robot.commands.vision.RetroreflectiveVision;
 
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.SendableCameraWrapper;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
@@ -52,6 +57,8 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import java.util.Map;
 import java.util.function.Supplier;
+
+import lombok.Getter;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -90,11 +97,18 @@ public class RobotContainer {
 	private LoggedDashboardChooser<Supplier<Command>> autoChooser = new LoggedDashboardChooser<>("auto routine");
 	// private GenericEntry autoDelay;
 
+	@Getter
+	private boolean lastDemoMode = true;
+	public GenericEntry demoModeDash;
+	private GenericEntry demoSpeedDash;
+
+	double getDemoSpeed() {
+		return demoSpeedDash.getDouble(0);
+	}
+
 	/** The container for the robot. Contains subsystems, OI devices, and commands. */
 	public RobotContainer() {
 		DriverStation.silenceJoystickConnectionWarning(true);
-
-		configureBindings();
 
 		new AngleOffsetCalibration(swerve);
 
@@ -132,6 +146,40 @@ public class RobotContainer {
 		// .withSize(2, 1).withPosition(0, 7)
 		// .getEntry();
 		configureCameras();
+
+		demoModeDash = driveTab.add("demo mode", lastDemoMode)
+			.withWidget(BuiltInWidgets.kToggleSwitch)
+			.withPosition(9, 5)
+			.withSize(2, 1)
+			.getEntry();
+		demoSpeedDash = driveTab.addPersistent("swerve speed", 0.5)
+			.withWidget(BuiltInWidgets.kNumberSlider)
+			.withProperties(Map.of("min", 0.0, "max", 1.0, "block increment", 0.1))
+			.withPosition(11, 5)
+			.withSize(4, 2)
+			.getEntry();
+
+		clearButtons();
+		if (demoModeDash.getBoolean(lastDemoMode))
+			configureDemoButtons();
+		else
+			configureBindings();
+	}
+
+	public void updateDemoMode() {
+		if (lastDemoMode != demoModeDash.getBoolean(lastDemoMode)) {
+			lastDemoMode = demoModeDash.getBoolean(lastDemoMode);
+			clearButtons();
+			if (lastDemoMode)
+				configureDemoButtons();
+			else
+				configureBindings();
+		}
+	}
+
+	public void clearButtons() {
+		CommandScheduler.getInstance().cancelAll();
+		CommandScheduler.getInstance().getActiveButtonLoop().clear();
 	}
 
 	/**
@@ -142,8 +190,10 @@ public class RobotContainer {
 	 * {@link CommandXboxController Xbox} controllers or
 	 * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
 	 */
-	private void configureBindings() {
-		/* driver */
+	public void configureBindings() {
+		/*
+		 * driver
+		 */
 		var teleopSwerve = new TeleopSwerve(
 			() -> -driverController.getLeftY(),
 			() -> -driverController.getLeftX(),
@@ -248,10 +298,80 @@ public class RobotContainer {
 		// .onTrue(new GrabGrabberUntilGrabbed(grabber));
 	}
 
+	public void configureDemoButtons() {
+		/*
+		 * driver
+		 */
+		var teleopSwerve = new TeleopSwerve(
+			() -> -driverController.getLeftY() * getDemoSpeed(),
+			() -> -driverController.getLeftX() * getDemoSpeed(),
+			() -> -driverController.getRightX() * getDemoSpeed(),
+			() -> false, // override speed
+			() -> driverController.getLeftTriggerAxis() > OperatorConstants.boolTriggerThreshold, // preceise mode
+			swerve, arm, elevator);
+		swerve.setDefaultCommand(teleopSwerve);
+
+		// driverController.rightTrigger(OperatorConstants.boolTriggerThreshold)
+		// .whileTrue(teleopSwerve.holdToggleFieldRelative());
+		// driverController.rightBumper()
+		// .whileTrue(teleopSwerve.holdRotateAroundPiece());
+
+		driverController.a().onTrue(teleopSwerve.toggleFieldRelative());
+		driverController.x().whileTrue(new XStance(swerve));
+
+		driverController.y().onTrue(teleopSwerve.new ZeroYaw());
+
+		/*
+		 * operator console
+		 */
+		operatorConsole.button(1) // scissor in
+			.whileTrue(new MoveArm(arm, -0.2));
+		operatorConsole.button(5) // scissor out
+			.whileTrue(new MoveArm(arm, 0.2));
+
+		operatorConsole.button(6) // elevator up
+			.whileTrue(new MoveElevator(elevator, 0.2));
+		operatorConsole.button(10) // elevator down
+			.whileTrue(new MoveElevator(elevator, -0.2));
+
+		operatorConsole.button(2)
+			.whileTrue(new GrabGrabber(grabber, GrabberConstants.cubeGrabSpeed));
+		operatorConsole.button(3)
+			.whileTrue(new GrabGrabber(grabber, GrabberConstants.coneGrabSpeed));
+		operatorConsole.button(4)
+			.whileTrue(new ReleaseGrabber(grabber));
+
+		operatorConsole.button(14) // double substation
+			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.DoubleSubstation));
+		operatorConsole.button(7) // high cone
+			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.HighCone));
+		operatorConsole.button(8) // high cube
+			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.HighCube));
+		operatorConsole.button(11) // mid cone
+			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.MidCone));
+		operatorConsole.button(12) // mid cube
+			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.MidCube));
+		operatorConsole.button(15) // all in
+			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.AllIn));
+		operatorConsole.button(16) // ground
+			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.Ground));
+
+		operatorConsole.button(13)
+			.whileTrue(Commands.run(this::killEverything));
+	}
+
+	private void killEverything() {
+		CommandScheduler.getInstance().cancelAll();
+		swerve.setChasisSpeeds(new ChassisSpeeds(0, 0, 0));
+		elevator.killMotor(); // stop();
+		arm.stop();
+		grabber.stop();
+	}
+
 	// @SuppressWarnings("unused")
 	private void configureCameras() {
-		if (!Robot.isReal())
-			return;
+		// if (!Robot.isReal())
+		// return;
 
 		// camera
 		// try {
@@ -307,6 +427,8 @@ public class RobotContainer {
 	 * @return the command to run in autonomous
 	 */
 	public Command getAutonomousCommand() {
+		if (demoModeDash.getBoolean(lastDemoMode))
+			return Commands.none();
 		// if (autoDelay.getDouble(0) > 0)
 		// return Commands.waitSeconds(autoDelay.getDouble(0)).andThen(autoChooser.get());
 		return autoChooser.get().get(); // 😭

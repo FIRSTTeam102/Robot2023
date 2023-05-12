@@ -4,8 +4,6 @@ import frc.robot.subsystems.Elevator;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-/** @deprecated should not be used outside of testing */
-@Deprecated
 public class MoveElevator extends CommandBase {
 	private Elevator elevator;
 	private double speed;

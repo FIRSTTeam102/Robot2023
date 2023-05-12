@@ -4,7 +4,6 @@ import frc.robot.subsystems.Arm;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-@Deprecated
 public class MoveArm extends CommandBase {
 	private Arm arm;
 	private double speed;
