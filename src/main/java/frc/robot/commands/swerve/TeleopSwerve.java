@@ -17,6 +17,8 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 
+import org.littletonrobotics.junction.Logger;
+
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
@@ -48,17 +50,17 @@ public class TeleopSwerve extends CommandBase {
 			});
 	}
 
-	private static Alert zeroedYaw = new Alert("never zeroed yaw", AlertType.Warning);
+	private static Alert zeroYawAlert = new Alert("didn't zero yaw", AlertType.Warning);
 
 	public class ZeroYaw extends InstantCommand {
 		public ZeroYaw() {
-			zeroedYaw.set(true);
+			zeroYawAlert.set(true);
 		}
 
 		@Override
 		public void initialize() {
 			swerve.zeroYaw();
-			zeroedYaw.set(false);
+			zeroYawAlert.set(false);
 		}
 
 		@Override
@@ -103,7 +105,7 @@ public class TeleopSwerve extends CommandBase {
 	private double driveMax = 1.0;
 	private double turnMaxPercent = 1.0;
 
-	// todo: tune, see if stopping takes too long and maybe add an override
+	// todo: see if stopping takes too long and maybe add an override
 	private static final double accelerationLimit_mps2 = 13;
 	private SlewRateLimiter driveLimiter = new SlewRateLimiter(accelerationLimit_mps2);
 	private SlewRateLimiter strafeLimiter = new SlewRateLimiter(accelerationLimit_mps2);
@@ -138,8 +140,8 @@ public class TeleopSwerve extends CommandBase {
 			driveLimiter.calculate(driveMax * modifyAxis(driveSupplier.getAsDouble())),
 			strafeLimiter.calculate(driveMax * modifyAxis(strafeSupplier.getAsDouble())));
 
-		// Logger.getInstance().recordOutput("TeleopSwerve/translationX_mps", translation.getX());
-		// Logger.getInstance().recordOutput("TeleopSwerve/translationY_mps", translation.getY());
+		Logger.getInstance().recordOutput("TeleopSwerve/translationX_mps", translation.getX());
+		Logger.getInstance().recordOutput("TeleopSwerve/translationY_mps", translation.getY());
 
 		rotation = modifyAxis(turnSupplier.getAsDouble())
 			* SwerveConstants.maxAngularVelocity_radps
@@ -148,7 +150,7 @@ public class TeleopSwerve extends CommandBase {
 		if (invertRotation) // todo: why is this necessary?
 			rotation *= -1;
 
-		// Logger.getInstance().recordOutput("TeleopSwerve/rotation_radps", rotation);
+		Logger.getInstance().recordOutput("TeleopSwerve/rotation_radps", rotation);
 
 		swerve.drive(translation, rotation, fieldRelative);
 	}

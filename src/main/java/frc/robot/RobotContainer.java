@@ -37,6 +37,7 @@ import frc.robot.commands.vision.AprilTagVision;
 import frc.robot.commands.vision.GamePieceVision;
 import frc.robot.commands.vision.RetroreflectiveVision;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -56,6 +57,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import java.util.Map;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import lombok.Getter;
@@ -100,11 +102,8 @@ public class RobotContainer {
 	@Getter
 	private boolean lastDemoMode = true;
 	public GenericEntry demoModeDash;
+	private double demoSpeed = 0.5;
 	private GenericEntry demoSpeedDash;
-
-	double getDemoSpeed() {
-		return demoSpeedDash.getDouble(0);
-	}
 
 	/** The container for the robot. Contains subsystems, OI devices, and commands. */
 	public RobotContainer() {
@@ -152,7 +151,7 @@ public class RobotContainer {
 			.withPosition(9, 5)
 			.withSize(2, 1)
 			.getEntry();
-		demoSpeedDash = driveTab.addPersistent("swerve speed", 0.5)
+		demoSpeedDash = driveTab.addPersistent("swerve speed", demoSpeed)
 			.withWidget(BuiltInWidgets.kNumberSlider)
 			.withProperties(Map.of("min", 0.0, "max", 1.0, "block increment", 0.1))
 			.withPosition(11, 5)
@@ -175,6 +174,7 @@ public class RobotContainer {
 			else
 				configureBindings();
 		}
+		demoSpeed = demoSpeedDash.getDouble(demoSpeed);
 	}
 
 	public void clearButtons() {
@@ -298,14 +298,20 @@ public class RobotContainer {
 		// .onTrue(new GrabGrabberUntilGrabbed(grabber));
 	}
 
+	/** clamps axis to max demo speed */
+	private double demoAxis(DoubleSupplier axis) {
+		// todo: clamp or multiply?
+		return MathUtil.clamp(axis.getAsDouble(), -demoSpeed, demoSpeed);
+	}
+
 	public void configureDemoButtons() {
 		/*
 		 * driver
 		 */
 		var teleopSwerve = new TeleopSwerve(
-			() -> -driverController.getLeftY() * getDemoSpeed(),
-			() -> -driverController.getLeftX() * getDemoSpeed(),
-			() -> -driverController.getRightX() * getDemoSpeed(),
+			() -> demoAxis(driverController::getLeftY),
+			() -> demoAxis(driverController::getLeftX),
+			() -> demoAxis(driverController::getRightY),
 			() -> false, // override speed
 			() -> driverController.getLeftTriggerAxis() > OperatorConstants.boolTriggerThreshold, // preceise mode
 			swerve, arm, elevator);
