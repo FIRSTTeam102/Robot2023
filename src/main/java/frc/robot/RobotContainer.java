@@ -174,7 +174,11 @@ public class RobotContainer {
 			else
 				configureBindings();
 		}
-		demoSpeed = demoSpeedDash.getDouble(demoSpeed);
+		if (lastDemoMode && demoSpeedDash.getDouble(demoSpeed) != demoSpeed) {
+			demoSpeed = demoSpeedDash.getDouble(demoSpeed);
+			if (demoTeleopSwerve != null)
+				demoTeleopSwerve.newRateLimiter(Math.sqrt(demoSpeed)); // the less speedy, the less limitey
+		}
 	}
 
 	public void clearButtons() {
@@ -300,32 +304,37 @@ public class RobotContainer {
 
 	/** clamps axis to max demo speed */
 	private double demoAxis(DoubleSupplier axis) {
+		if (killed)
+			return 0;
 		// todo: clamp or multiply?
-		return MathUtil.clamp(axis.getAsDouble(), -demoSpeed, demoSpeed);
+		return MathUtil.clamp(-axis.getAsDouble(), -demoSpeed, demoSpeed);
 	}
+
+	private TeleopSwerve demoTeleopSwerve;
 
 	public void configureDemoButtons() {
 		/*
 		 * driver
 		 */
-		var teleopSwerve = new TeleopSwerve(
+		demoTeleopSwerve = new TeleopSwerve(
 			() -> demoAxis(driverController::getLeftY),
 			() -> demoAxis(driverController::getLeftX),
-			() -> demoAxis(driverController::getRightY),
+			() -> demoAxis(driverController::getRightX),
 			() -> false, // override speed
 			() -> driverController.getLeftTriggerAxis() > OperatorConstants.boolTriggerThreshold, // preceise mode
 			swerve, arm, elevator);
-		swerve.setDefaultCommand(teleopSwerve);
+		demoTeleopSwerve.fieldRelative = false; // default to robot oriented
+		swerve.setDefaultCommand(demoTeleopSwerve);
 
 		// driverController.rightTrigger(OperatorConstants.boolTriggerThreshold)
-		// .whileTrue(teleopSwerve.holdToggleFieldRelative());
+		// .whileTrue(demoTeleopSwerve.holdToggleFieldRelative());
 		// driverController.rightBumper()
-		// .whileTrue(teleopSwerve.holdRotateAroundPiece());
+		// .whileTrue(demoTeleopSwerve.holdRotateAroundPiece());
 
-		driverController.a().onTrue(teleopSwerve.toggleFieldRelative());
+		driverController.a().onTrue(demoTeleopSwerve.toggleFieldRelative());
 		driverController.x().whileTrue(new XStance(swerve));
 
-		driverController.y().onTrue(teleopSwerve.new ZeroYaw());
+		driverController.y().onTrue(demoTeleopSwerve.new ZeroYaw());
 
 		/*
 		 * operator console
@@ -362,14 +371,21 @@ public class RobotContainer {
 		operatorConsole.button(16) // ground
 			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.Ground));
 
-		operatorConsole.button(13)
-			.whileTrue(Commands.run(this::killEverything));
+		/** @link {Robot#robotPeriodic} */
+		// making this not a command as it kills all commands
+		// operatorConsole.button(13)
+		// .whileTrue(Commands.runEnd(this::killEverything, () -> {
+		// killed = false;
+		// }));
 	}
 
-	private void killEverything() {
+	public boolean killed = false;
+
+	public void killEverything() {
+		killed = true;
 		CommandScheduler.getInstance().cancelAll();
 		swerve.setChasisSpeeds(new ChassisSpeeds(0, 0, 0));
-		elevator.killMotor(); // stop();
+		elevator.stop(); // killMotor();
 		arm.stop();
 		grabber.stop();
 	}

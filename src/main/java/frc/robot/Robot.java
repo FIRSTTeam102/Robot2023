@@ -129,6 +129,13 @@ public class Robot extends LoggedRobot {
 		Lights.periodic();
 
 		Logger.getInstance().recordOutput("Mechanism/Scoring", ScoringMechanism2d.mech);
+
+		// making this not a command as it kills all commands
+		if (robotContainer.isLastDemoMode() && robotContainer.operatorConsole.getHID().getRawButton(13)) {
+			robotContainer.killEverything();
+		} else {
+			robotContainer.killed = false;
+		}
 	}
 
 	/** This function is called once each time the robot enters Disabled mode. */

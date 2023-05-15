@@ -176,4 +176,9 @@ public class TeleopSwerve extends CommandBase {
 				(cubicWeight * Math.pow(absValue, weightExponent) + (1 - cubicWeight) * absValue + minOutput) / (1 + minOutput),
 				value);
 	}
+
+	public void newRateLimiter(double percent) {
+		driveLimiter = new SlewRateLimiter(accelerationLimit_mps2 * percent);
+		strafeLimiter = new SlewRateLimiter(accelerationLimit_mps2 * percent);
+	}
 }
