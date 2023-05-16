@@ -349,12 +349,12 @@ public class RobotContainer {
 		operatorConsole.button(10) // elevator down
 			.whileTrue(new MoveElevator(elevator, -0.2));
 
-		operatorConsole.button(2)
-			.whileTrue(new GrabGrabber(grabber, GrabberConstants.cubeGrabSpeed));
-		operatorConsole.button(3)
-			.whileTrue(new GrabGrabber(grabber, GrabberConstants.coneGrabSpeed));
-		operatorConsole.button(4)
+		operatorConsole.button(2) // release
 			.whileTrue(new ReleaseGrabber(grabber));
+		operatorConsole.button(3) // grab cone
+			.whileTrue(new GrabGrabber(grabber, GrabberConstants.coneGrabSpeed));
+		operatorConsole.button(4) // grab cube
+			.whileTrue(new GrabGrabber(grabber, GrabberConstants.cubeGrabSpeed));
 
 		operatorConsole.button(14) // double substation
 			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.DoubleSubstation));
