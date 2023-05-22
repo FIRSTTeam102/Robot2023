@@ -37,7 +37,7 @@ import lombok.Setter;
 
 public class Elevator extends SubsystemBase {
 	private CANSparkMax motor = new CANSparkMax(motorId, MotorType.kBrushless);
-	private SparkMaxPIDController pidController = motor.getPIDController();
+	public SparkMaxPIDController pidController = motor.getPIDController();
 	private RelativeEncoder encoder = motor.getEncoder();
 	private SparkMaxLimitSwitch topSwitch = motor.getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);
 	private SparkMaxLimitSwitch bottomSwitch = motor.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);
@@ -69,7 +69,7 @@ public class Elevator extends SubsystemBase {
 		pidController.setD(kD);
 		pidController.setI(kI);
 		pidController.setIZone(kIZone);
-		pidController.setOutputRange(minOuput, maxOutput);
+		pidController.setOutputRange(minOutput, maxOutput);
 
 		motor.setClosedLoopRampRate(0.1);
 

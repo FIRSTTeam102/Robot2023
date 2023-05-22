@@ -33,7 +33,7 @@ import lombok.Setter;
 public class Arm extends SubsystemBase {
 	private CANSparkMax motor = new CANSparkMax(motorId, MotorType.kBrushless);
 
-	private SparkMaxPIDController pidController = motor.getPIDController();
+	public SparkMaxPIDController pidController = motor.getPIDController();
 	private RelativeEncoder encoder = motor.getEncoder();
 	private SparkMaxLimitSwitch limitSwitch = motor.getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);
 	// private SparkMaxLimitSwitch backLimitSwitch = motor.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);
@@ -141,13 +141,17 @@ public class Arm extends SubsystemBase {
 		// limitSwitch.enableLimitSwitch(false);
 		// motor.enableSoftLimit(SoftLimitDirection.kReverse, false);
 		pidController.setOutputRange(0, 0);
-		pidController.setReference(0, CANSparkMax.ControlType.kVoltage, 0, 0);
-		inManualMode = true;
+		killMotor();
 	}, () -> {
 		// limitSwitch.enableLimitSwitch(true);
 		// motor.enableSoftLimit(SoftLimitDirection.kReverse, true);
 		pidController.setOutputRange(minOutput, maxOutput);
 	});
+
+	public void killMotor() {
+		inManualMode = true;
+		pidController.setReference(0, ControlType.kVoltage, 0, 0);
+	}
 
 	/**
 	 * inputs

@@ -1,5 +1,6 @@
 package frc.robot;
 
+import frc.robot.constants.ArmConstants;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.constants.Constants.ShuffleboardConstants;
@@ -57,6 +58,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -104,6 +106,9 @@ public class RobotContainer {
 	public GenericEntry demoModeDash;
 	private double demoSpeed = 0.5;
 	private GenericEntry demoSpeedDash;
+	@Getter
+	private boolean lastDemoScoring = true;
+	public GenericEntry demoScoringDash;
 
 	/** The container for the robot. Contains subsystems, OI devices, and commands. */
 	public RobotContainer() {
@@ -151,6 +156,11 @@ public class RobotContainer {
 			.withPosition(9, 5)
 			.withSize(2, 1)
 			.getEntry();
+		demoScoringDash = driveTab.addPersistent("demo scoring", lastDemoScoring)
+			.withWidget(BuiltInWidgets.kToggleSwitch)
+			.withPosition(9, 6)
+			.withSize(2, 1)
+			.getEntry();
 		demoSpeedDash = driveTab.addPersistent("swerve speed", demoSpeed)
 			.withWidget(BuiltInWidgets.kNumberSlider)
 			.withProperties(Map.of("min", 0.0, "max", 1.0, "block increment", 0.1))
@@ -173,6 +183,21 @@ public class RobotContainer {
 				configureDemoButtons();
 			else
 				configureBindings();
+		}
+		if (lastDemoScoring != demoScoringDash.getBoolean(lastDemoScoring)) {
+			lastDemoScoring = demoScoringDash.getBoolean(lastDemoScoring);
+			if (lastDemoScoring) {
+				// enable scoring
+				elevator.pidController.setOutputRange(ElevatorConstants.minOutput, ElevatorConstants.maxOutput);
+				arm.pidController.setOutputRange(ArmConstants.minOutput, ArmConstants.maxOutput);
+			} else {
+				// disable scoring, output range only affects pid stuff
+				elevator.pidController.setOutputRange(0, 0);
+				elevator.killMotor();
+				arm.pidController.setOutputRange(0, 0);
+				arm.killMotor();
+				grabber.stop();
+			}
 		}
 		if (lastDemoMode && demoSpeedDash.getDouble(demoSpeed) != demoSpeed) {
 			demoSpeed = demoSpeedDash.getDouble(demoSpeed);
@@ -310,6 +335,10 @@ public class RobotContainer {
 		return MathUtil.clamp(-axis.getAsDouble(), -demoSpeed, demoSpeed);
 	}
 
+	private double negSquare(double value) {
+		return Math.copySign(Math.pow(value, 2), value);
+	}
+
 	private TeleopSwerve demoTeleopSwerve;
 
 	public void configureDemoButtons() {
@@ -319,11 +348,12 @@ public class RobotContainer {
 		demoTeleopSwerve = new TeleopSwerve(
 			() -> demoAxis(driverController::getLeftY),
 			() -> demoAxis(driverController::getLeftX),
-			() -> demoAxis(driverController::getRightX),
+			() -> demoAxis(() -> negSquare(driverController.getRightX())),
 			() -> false, // override speed
 			() -> driverController.getLeftTriggerAxis() > OperatorConstants.boolTriggerThreshold, // preceise mode
 			swerve, arm, elevator);
-		demoTeleopSwerve.fieldRelative = false; // default to robot oriented
+		// demoTeleopSwerve.fieldRelative = false; // default to robot oriented
+		demoTeleopSwerve.fieldRelative = true;
 		swerve.setDefaultCommand(demoTeleopSwerve);
 
 		// driverController.rightTrigger(OperatorConstants.boolTriggerThreshold)
@@ -336,26 +366,36 @@ public class RobotContainer {
 
 		driverController.y().onTrue(demoTeleopSwerve.new ZeroYaw());
 
+		BooleanSupplier demoScoring = () -> lastDemoScoring;
+
 		/*
 		 * operator console
 		 */
 		operatorConsole.button(1) // scissor in
-			.whileTrue(new MoveArm(arm, -0.2));
-		operatorConsole.button(5) // scissor out
+			.and(demoScoring)
 			.whileTrue(new MoveArm(arm, 0.2));
+		operatorConsole.button(5) // scissor out
+			.and(demoScoring)
+			.whileTrue(new MoveArm(arm, -0.2));
 
 		operatorConsole.button(6) // elevator up
+			.and(demoScoring)
 			.whileTrue(new MoveElevator(elevator, 0.2));
 		operatorConsole.button(10) // elevator down
+			.and(demoScoring)
 			.whileTrue(new MoveElevator(elevator, -0.2));
 
 		operatorConsole.button(2)
-			.whileTrue(new GrabGrabber(grabber, GrabberConstants.cubeGrabSpeed));
+			.and(demoScoring)
+			.whileTrue(new ReleaseGrabber(grabber));
 		operatorConsole.button(3)
+			.and(demoScoring)
 			.whileTrue(new GrabGrabber(grabber, GrabberConstants.coneGrabSpeed));
 		operatorConsole.button(4)
-			.whileTrue(new ReleaseGrabber(grabber));
+			.and(demoScoring)
+			.whileTrue(new GrabGrabber(grabber, GrabberConstants.cubeGrabSpeed));
 
+		// demoScoring will be killed by pid controller
 		operatorConsole.button(14) // double substation
 			.onTrue(new SetScoringPosition(elevator, arm, ScoringPosition.DoubleSubstation));
 		operatorConsole.button(7) // high cone

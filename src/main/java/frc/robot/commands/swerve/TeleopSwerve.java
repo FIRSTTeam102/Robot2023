@@ -162,7 +162,7 @@ public class TeleopSwerve extends CommandBase {
 
 	private static final double cubicWeight = 0.3;
 	private static final double weightExponent = 6.5;
-	private static final double minOutput = 0.1;
+	private static final double minOutput = 0.05; // DEMO
 
 	// custom input scaling
 	// @see https://desmos.com/calculator/7wy4gmgdpv

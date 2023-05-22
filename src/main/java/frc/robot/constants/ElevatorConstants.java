@@ -14,7 +14,7 @@ public final class ElevatorConstants {
 	public static final double percentSpeed = 0.6;
 
 	public static final double maxOutput = .7;
-	public static final double minOuput = -maxOutput;
+	public static final double minOutput = -maxOutput;
 
 	/* pid stuff */
 	public static final double kP = 1;
