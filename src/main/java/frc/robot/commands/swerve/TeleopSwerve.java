@@ -48,17 +48,17 @@ public class TeleopSwerve extends CommandBase {
 			});
 	}
 
-	private Alert zeroedYaw = new Alert("never zeroed yaw", AlertType.Warning);
+	private static Alert zeroYawAlert = new Alert("didn't zero yaw", AlertType.Warning);
 
 	public class ZeroYaw extends InstantCommand {
 		public ZeroYaw() {
-			zeroedYaw.set(true);
+			zeroYawAlert.set(true);
 		}
 
 		@Override
 		public void initialize() {
 			swerve.zeroYaw();
-			zeroedYaw.set(false);
+			zeroYawAlert.set(false);
 		}
 
 		@Override

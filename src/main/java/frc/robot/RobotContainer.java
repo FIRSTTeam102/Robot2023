@@ -103,20 +103,20 @@ public class RobotContainer {
 		autoChooser.addOption("nothing", () -> new InstantCommand());
 		autoChooser.addDefaultOption("cube and nothing", () -> Autos.initAndScore(this, ScoringPosition.HighCube));
 
-		autoChooser.addOption("lz cube", () -> Autos.lzCube(this));
-		autoChooser.addOption("lz cube 2", () -> Autos.lzCube2(this));
-		autoChooser.addOption("lz cube aim cone", () -> Autos.lzCubeAimCone(this));
-		autoChooser.addOption("lz cube pickup cone", () -> Autos.lzCubePickupCone(this));
-		// autoChooser.addOption("lz 2cube balance", () -> Autos.lz2CubeBalance(this));
+		autoChooser.addOption("lz cube", Autos.lzCube(this));
+		autoChooser.addOption("lz cube 2", Autos.lzCube2(this));
+		autoChooser.addOption("lz cube aim cone", Autos.lzCubeAimCone(this));
+		autoChooser.addOption("lz cube pickup cone", Autos.lzCubePickupCone(this));
+		// autoChooser.addOption("lz 2cube balance", Autos.lz2CubeBalance(this));
 
-		autoChooser.addOption("fw cube", () -> Autos.fwCube(this));
-		// autoChooser.addOption("fw cube balance", () -> Autos.fwCubeBalance(this));
-		autoChooser.addOption("fw cube 2", () -> Autos.fwCube2(this));
-		autoChooser.addOption("fw cube pickup cone", () -> Autos.fwCubePickupCone(this));
-		// autoChooser.addOption("fw 2cube balance", () -> Autos.fw2CubeBalance(this));
+		autoChooser.addOption("fw cube", Autos.fwCube(this));
+		// autoChooser.addOption("fw cube balance", Autos.fwCubeBalance(this));
+		autoChooser.addOption("fw cube 2", Autos.fwCube2(this));
+		autoChooser.addOption("fw cube pickup cone", Autos.fwCubePickupCone(this));
+		// autoChooser.addOption("fw 2cube balance", Autos.fw2CubeBalance(this));
 
-		autoChooser.addOption("coop cube balance", () -> Autos.coopCubeBalance(this));
-		autoChooser.addOption("coop cube mobility balance", () -> Autos.coopCubeMobilityBalance(this));
+		autoChooser.addOption("coop cube balance", Autos.coopCubeBalance(this));
+		autoChooser.addOption("coop cube mobility balance", Autos.coopCubeMobilityBalance(this));
 
 		// for testing
 		autoChooser.addOption("[testing] drive characterization",

@@ -1,7 +1,5 @@
 package frc.robot.io;
 
-import frc.robot.constants.FieldConstants;
-
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -21,6 +19,7 @@ public class VisionIO {
 		public double fieldVisionCrosshairToTargetErrorY_rad = 0.0;
 		public double fieldVisionTargetArea = 0.0;
 
+		// these are always for the wpiblue side, (0,0) is the right corner of the blue alliance's driver station wall
 		public double fieldVisionBotpose_TargetspaceTranslationX_m = 0.0;
 		public double fieldVisionBotpose_TargetspaceTranslationY_m = 0.0;
 		public double fieldVisionBotpose_TargetspaceTranslationZ_m = 0.0;
@@ -61,8 +60,8 @@ public class VisionIO {
 	private NetworkTableEntry botpose_targetspaceEntryFieldVision = tableFieldVision.getEntry("botpose_targetspace");
 	private double[] botpose_targetspaceCacheFieldVision = new double[6];
 
-	private NetworkTableEntry botpose_fieldspaceEntryFieldVision = tableFieldVision.getEntry("botpose");
-	private double[] botpose_fieldspaceCacheFieldVision = new double[7];
+	private NetworkTableEntry botpose_wpiblueEntryFieldVision = tableFieldVision.getEntry("botpose_wpiblue");
+	private double[] botpose_wpiblueCacheFieldVision = new double[7];
 
 	/* gamepiecevision */
 	private NetworkTable tableGamePieceVision = NetworkTableInstance.getDefault().getTable("limelight-gpv");
@@ -97,17 +96,15 @@ public class VisionIO {
 		} else
 			DriverStation.reportWarning("Invalid botpose array from limelight", true);
 
-		botpose_fieldspaceCacheFieldVision = botpose_fieldspaceEntryFieldVision
-			.getDoubleArray(botpose_fieldspaceCacheFieldVision);
-		inputs.fieldVisionBotpose_FieldspaceTranslationX_m = botpose_fieldspaceCacheFieldVision[0]
-			+ FieldConstants.fieldLengthX_m / 2;
-		inputs.fieldVisionBotpose_FieldspaceTranslationY_m = botpose_fieldspaceCacheFieldVision[1]
-			+ FieldConstants.fieldLengthY_m / 2;
-		inputs.fieldVisionBotpose_FieldspaceTranslationZ_m = botpose_fieldspaceCacheFieldVision[2];
-		inputs.fieldVisionBotpose_FieldspaceRotationX_rad = Math.toRadians(botpose_fieldspaceCacheFieldVision[3]);
-		inputs.fieldVisionBotpose_FieldspaceRotationY_rad = Math.toRadians(botpose_fieldspaceCacheFieldVision[4]);
-		inputs.fieldVisionBotpose_FieldspaceRotationZ_rad = Math.toRadians(botpose_fieldspaceCacheFieldVision[5]);
-		inputs.fieldVisionBotpose_Latency_s = botpose_fieldspaceCacheFieldVision[6] / 1000;
+		botpose_wpiblueCacheFieldVision = botpose_wpiblueEntryFieldVision
+			.getDoubleArray(botpose_wpiblueCacheFieldVision);
+		inputs.fieldVisionBotpose_FieldspaceTranslationX_m = botpose_wpiblueCacheFieldVision[0];
+		inputs.fieldVisionBotpose_FieldspaceTranslationY_m = botpose_wpiblueCacheFieldVision[1];
+		inputs.fieldVisionBotpose_FieldspaceTranslationZ_m = botpose_wpiblueCacheFieldVision[2];
+		inputs.fieldVisionBotpose_FieldspaceRotationX_rad = Math.toRadians(botpose_wpiblueCacheFieldVision[3]);
+		inputs.fieldVisionBotpose_FieldspaceRotationY_rad = Math.toRadians(botpose_wpiblueCacheFieldVision[4]);
+		inputs.fieldVisionBotpose_FieldspaceRotationZ_rad = Math.toRadians(botpose_wpiblueCacheFieldVision[5]);
+		inputs.fieldVisionBotpose_Latency_s = botpose_wpiblueCacheFieldVision[6] / 1000;
 
 		/* gamepiecevision */
 		inputs.gamePieceVisionPipeline = pipelineEntryGamePieceVision.getNumber(inputs.gamePieceVisionPipeline).intValue();

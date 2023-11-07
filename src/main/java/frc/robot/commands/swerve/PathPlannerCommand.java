@@ -21,6 +21,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import lombok.SneakyThrows;
 
@@ -28,9 +29,52 @@ import lombok.SneakyThrows;
  * instructs the swerve subsystem to follow the specified trajectory 
  */
 public class PathPlannerCommand extends PPSwerveControllerCommand {
+	/**
+	 * We may not know which alliance we are until auto starts.
+	 * We don't want to do mirroring after auto starts as it is expensive.
+	 * If we generate both possible routes, we can do a cheap if during auto to use one of the pregerenated routes.
+	 * Out paths are split up into multiple chunks, so this returns a list of command suppliers for each chunk of a path.
+	 * This way, we can implement our own logic in between path parts.
+	 */
+	public static List<Supplier<PathPlannerCommand>> pregenerateAutoPathSuppliers(
+		List<PathPlannerTrajectory> blueTrajectories, Swerve swerve) {
+		List<Supplier<PathPlannerCommand>> pps = new ArrayList<>();
+
+		var firstPathEver = true;
+		for (var blueTrajectory : blueTrajectories) {
+			// pregenerate red paths when first called
+			var redTrajectory = CustomPPTransform.reflectiveTransformTrajectory(blueTrajectory);
+			final var myFirstPathEver = firstPathEver;
+
+			pps.add(() -> {
+				return new PathPlannerCommand(
+					(DriverStation.getAlliance() == DriverStation.Alliance.Red) ? redTrajectory : blueTrajectory,
+					swerve,
+					false,
+					myFirstPathEver);
+			});
+
+			if (firstPathEver)
+				firstPathEver = false;
+		}
+		return pps;
+	}
+
 	private Swerve swerve;
-	private PathPlannerTrajectory trajectory;
 	private boolean resetOdometry;
+
+	private static Field trajectoryField;
+
+	static {
+		try {
+			// Set all `.deltaPos` on PathPlannerState objects to be public
+			trajectoryField = PPSwerveControllerCommand.class.getDeclaredField("trajectory");
+			trajectoryField.setAccessible(true);
+		} catch (NoSuchFieldException | SecurityException e) {
+			System.err.println("Could not access private fields via reflection");
+			e.printStackTrace(System.err);
+		}
+	}
 
 	/**
 	 * @param trajectory the specified trajectory created by PathPlanner
@@ -50,23 +94,32 @@ public class PathPlannerCommand extends PPSwerveControllerCommand {
 	public PathPlannerCommand(PathPlannerTrajectory trajectory, Swerve swerve, boolean transformForAlliance,
 		boolean firstPathEver) {
 		super(
-			susTransformTrajectory(trajectory, transformForAlliance),
+			customTransformTrajectory(trajectory, transformForAlliance),
 			swerve::getPose,
 			swerve.kinematics,
 			Autos.ppXController,
 			Autos.ppYController,
 			Autos.ppRotationController,
 			swerve::setModuleStates,
-			false, // transformForAlliance,
+			false, // custom transform instead
 			swerve);
 
 		this.swerve = swerve;
-		// why can't it be a public 😭 i just want it in initialize
-		this.trajectory = susTransformTrajectory(trajectory, transformForAlliance);
 		this.resetOdometry = firstPathEver;
 	}
 
-	private static PathPlannerTrajectory susTransformTrajectory(PathPlannerTrajectory traj,
+	/**
+	 * PathPlanner and WPILib moves (0,0) to the red side when on the red alliance
+	 * instead of having it constant no matter the alliance.
+	 * This is bad for actually knowing where we are with vision. (changing the origin during runtime is so sus)
+	 * 
+	 * Instead of using the built in transformation, we have a custom one to properly transform for
+	 * the red alliance such that the trajectory will be on the same side/manner as the state information fed in.
+	 * 
+	 * This function does the mirrored instead of rotated transformation for the 2023 field.
+	 * todo: Evaluate if this is necessary for future years.
+	 */
+	private static PathPlannerTrajectory customTransformTrajectory(PathPlannerTrajectory traj,
 		boolean transformForAlliance) {
 		// return PathPlanner.transformTrajectoryForAlliance(traj, Robot.isBlue() ? Alliance.Blue : Alliance.Red)
 
@@ -74,7 +127,7 @@ public class PathPlannerCommand extends PPSwerveControllerCommand {
 		// we want (0,0) to always be blue bottom corner
 		// https://github.com/mjansen4857/pathplanner/issues/297
 		return transformForAlliance && DriverStation.getAlliance() == DriverStation.Alliance.Red
-			? ReflectedTransform.reflectiveTransformTrajectory(traj)
+			? CustomPPTransform.reflectiveTransformTrajectory(traj)
 			: traj;
 	}
 
@@ -82,9 +135,13 @@ public class PathPlannerCommand extends PPSwerveControllerCommand {
 	public void initialize() {
 		super.initialize();
 
-		// reset odometry to the starting pose of the trajectory
-		if (resetOdometry)
-			swerve.resetOdometry(trajectory.getInitialState());
+		try {
+			// reset odometry to the starting pose of the trajectory
+			if (resetOdometry)
+				swerve.resetOdometry(((PathPlannerTrajectory) trajectoryField.get(this)).getInitialState());
+		} catch (IllegalAccessException e) {
+			DriverStation.reportError(e.getMessage(), e.getStackTrace());
+		}
 
 		// reset controller such that old accumulated PID values aren't used with the new path
 		// this doesn't matter if only the P value is non-zero
@@ -100,21 +157,21 @@ public class PathPlannerCommand extends PPSwerveControllerCommand {
 	}
 
 	/**
-	* Provides utilities for converting blue-side PathPlanner objects to red-side. Reflection is needed
-	* due to private or protected fields within PathPlanner's API.
+	* Provides utilities for converting blue-side PathPlanner objects to red-side.
 	*
 	* <p>These transformations assume an absolute field origin on the blue alliance driver station, on
-	* the scoring table side (away from the human player station).
+	* the scoring table side (away from the 2023 human player station).
 	* <p>+X is the direction from blue alliance driver station to red alliance driver station.
 	* <p>+Y is the direction from scoring table to human player station.
 	* 
 	* {@see https://github.com/FRC2713/Robot2023/blob/main/src/main/java/frc/robot/util/ReflectedTransform.java}
 	*/
-	public static class ReflectedTransform {
+	public static class CustomPPTransform {
 		private static Field deltaPosField;
 		private static Field curveRadiusField;
 		private static Constructor<PathPlannerTrajectory> constructor;
 
+		// Reflection is needed due to private or protected fields within PathPlanner's API.
 		// Reflection is expensive. Create declared objects at startup instead of per state or per trajectory.
 		static {
 			try {
