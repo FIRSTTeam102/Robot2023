@@ -12,10 +12,10 @@ import com.revrobotics.CANSparkMax.IdleMode;
 public final class SwerveConstants {
 	// FL, FR, BR, BL
 	public static final SwerveModuleConstants moduleConstants[] = {
-		new SwerveModuleConstants(21, 22, 23, 3.693),
-		new SwerveModuleConstants(24, 25, 26, 2.577),
-		new SwerveModuleConstants(27, 28, 29, 3.020),
-		new SwerveModuleConstants(30, 31, 32, 0.907)
+		new SwerveModuleConstants(21, 22, 23, 0.56836 + Math.PI),
+		new SwerveModuleConstants(24, 25, 26, 5.74013 + Math.PI),
+		new SwerveModuleConstants(27, 28, 29, 6.15820 + Math.PI),
+		new SwerveModuleConstants(30, 31, 32, 0.89383)
 	};
 
 	// the left-to-right distance between the drivetrain wheels, should be measured from center to center
