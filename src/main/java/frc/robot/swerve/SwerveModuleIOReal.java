@@ -6,6 +6,7 @@ import frc.robot.util.BuildManager;
 import frc.robot.util.Conversions;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Rotation2d;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
@@ -20,7 +21,9 @@ import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.SensorTimeBase;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
+import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.SparkMaxPIDController;
 
 /**
@@ -32,7 +35,7 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 	private CANCoder angleCancoder;
 	private CANSparkMax angleMotor;
 	private SparkMaxPIDController angleSparkPidController;
-	// private SparkMaxAbsoluteEncoder angleMotorAbsoluteEncoder;
+	private SparkMaxAbsoluteEncoder angleMotorAbsoluteEncoder;
 	// private RelativeEncoder angleMotorRelativeEncoder;
 	private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(driveKs, driveKv);
 	private double angleOffset_rad;
@@ -59,10 +62,10 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		angleMotor = new CANSparkMax(moduleConstants.angleMotorId(), CANSparkMax.MotorType.kBrushless);
 		angleMotor.restoreFactoryDefaults();
 		angleSparkPidController = angleMotor.getPIDController();
-		// angleSparkPidController.setP(angleKp);
-		// angleSparkPidController.setI(angleKi);
-		// angleSparkPidController.setD(angleKd);
-		// angleSparkPidController.setFF(angleKf);
+		angleSparkPidController.setP(angleKp);
+		angleSparkPidController.setI(angleKi);
+		angleSparkPidController.setD(angleKd);
+		angleSparkPidController.setFF(angleKf);
 		// angleSparkPidController.setOutputRange(-angleMaxPercentOutput, angleMaxPercentOutput);
 		angleMotor.setSmartCurrentLimit(angleCurrentLimit_amp);
 		angleMotor.setInverted(angleInverted);
@@ -70,16 +73,17 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		angleMotor.setClosedLoopRampRate(angleRampTime_s);
 		angleMotor.enableVoltageCompensation(12);
 
-		// angleMotorAbsoluteEncoder = angleMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
-		// angleMotorAbsoluteEncoder.setPositionConversionFactor(angleEncoderPositionFactor_rad);
+		angleMotorAbsoluteEncoder = angleMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
+		angleMotorAbsoluteEncoder.setPositionConversionFactor(angleEncoderPositionFactor_rad);
+		angleMotorAbsoluteEncoder.setZeroOffset(Conversions.twoPi);
 		// angleMotorAbsoluteEncoder.setVelocityConversionFactor(angleEncoderVelocityFactor_radps);
 		// angleMotorRelativeEncoder = angleMotor.getEncoder();
-		// angleSparkPidController.setFeedbackDevice(angleMotorRelativeEncoder);
+		angleSparkPidController.setFeedbackDevice(angleMotorAbsoluteEncoder);
 
 		// wrap betwee 0 and 2pi radians
-		// angleSparkPidController.setPositionPIDWrappingEnabled(true);
-		// angleSparkPidController.setPositionPIDWrappingMinInput(0);
-		// angleSparkPidController.setPositionPIDWrappingMaxInput(Conversions.twoPi);
+		angleSparkPidController.setPositionPIDWrappingEnabled(true);
+		angleSparkPidController.setPositionPIDWrappingMinInput(0);
+		angleSparkPidController.setPositionPIDWrappingMaxInput(Conversions.twoPi);
 
 		// turn down frequency as we only log them, not needed for calculations
 		angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 40); // percent output
@@ -111,8 +115,8 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		driveMotor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 40);
 	}
 
-	private double getAbsoluteCancoder_rad() {
-		return Conversions.angleModulus2pi(angleCancoder.getAbsolutePosition() - angleOffset_rad);
+	private double getAbsoluteEncoder_rad() {
+		return Conversions.angleModulus2pi(angleMotorAbsoluteEncoder.getPosition()  - angleOffset_rad);
 	}
 
 	private double calculateDriveFeedforward(double velocity) {
@@ -122,7 +126,7 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 
 	@Override
 	public void updateInputs(SwerveModuleIOInputs inputs) {
-		inputs.angleAbsolutePosition_rad = getAbsoluteCancoder_rad();
+		inputs.angleAbsolutePosition_rad = getAbsoluteEncoder_rad();
 
 		inputs.drivePosition_rad = Conversions.falconToRadians(
 			driveMotor.getSelectedSensorPosition(), driveGearRatio);
@@ -164,6 +168,11 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 	@Override
 	public void setAngleVoltage(double voltage) {
 		angleSparkPidController.setReference(voltage, CANSparkMax.ControlType.kVoltage);
+	}
+
+	@Override
+	public void setAnglePosition(Rotation2d angle) {
+		angleSparkPidController.setReference(Conversions.angleModulus2pi(angle.getRadians()), ControlType.kPosition);
 	}
 
 	@Override

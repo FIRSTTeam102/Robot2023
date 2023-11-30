@@ -1,6 +1,7 @@
 package frc.robot.constants;
 
 import frc.robot.swerve.SwerveModuleConstants;
+import frc.robot.util.Conversions;
 
 import edu.wpi.first.math.geometry.Translation2d;
 
@@ -83,6 +84,8 @@ public final class SwerveConstants {
 	public static final double simAngleKi = 0.0;
 	public static final double simAngleKd = 0.0;
 	public static final double simAngleKf = 0.0;
+	/* angle motor PID conversion factors */
+	public static final double angleEncoderPositionFactor_rad = (Conversions.twoPi) / 1200; /* rad per ticks */
 
 	/* drive motor characterization (feed forward) */
 	/**

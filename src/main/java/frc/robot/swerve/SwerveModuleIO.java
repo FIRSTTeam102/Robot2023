@@ -1,5 +1,7 @@
 package frc.robot.swerve;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+
 import org.littletonrobotics.junction.AutoLog;
 
 /** swerve module hardware abstraction interface */
@@ -33,6 +35,8 @@ public interface SwerveModuleIO extends AutoCloseable {
 
 	/** runs the angle motor at the specified voltage */
 	public default void setAngleVoltage(double voltage) {}
+
+	public default void setAnglePosition(Rotation2d angle) {}
 
 	/** enable or disable brake mode on the drive motor */
 	public default void setDriveBrakeMode(boolean enable) {}

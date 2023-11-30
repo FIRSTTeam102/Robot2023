@@ -99,10 +99,10 @@ public class SwerveModule implements AutoCloseable {
 			: optimizedState.angle;
 
 		// run turn
-		// io.setAnglePosition(angle);
-		io.setAngleVoltage(
-			anglePIDController.calculate(inputs.angleAbsolutePosition_rad,
-				Conversions.angleModulus2pi(angle.getRadians())));
+		io.setAnglePosition(angle);
+		// io.setAngleVoltage(
+		// anglePIDController.calculate(inputs.angleAbsolutePosition_rad,
+		// Conversions.angleModulus2pi(angle.getRadians())));
 
 		// update velocity based on angle error
 		optimizedState.speedMetersPerSecond *= Math.cos(anglePIDController.getPositionError());
