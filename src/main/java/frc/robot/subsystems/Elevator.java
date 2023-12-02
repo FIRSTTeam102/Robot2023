@@ -95,6 +95,10 @@ public class Elevator extends SubsystemBase {
 		pidController.setReference(speed, ControlType.kDutyCycle, 0, feedForward_V);
 	}
 
+	public void setMaxSpeed(double speed) {
+		pidController.setOutputRange(-speed, speed);
+	}
+
 	public void stop() {
 		pidController.setReference(0, ControlType.kDutyCycle, 0, feedForward_V);
 	}

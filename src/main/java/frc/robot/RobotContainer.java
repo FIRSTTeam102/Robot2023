@@ -1,6 +1,7 @@
 package frc.robot;
 
 import frc.robot.constants.ArmConstants;
+import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.constants.Constants.ShuffleboardConstants;
@@ -21,9 +22,7 @@ import frc.robot.util.Alert.AlertType;
 
 import frc.robot.commands.Autos;
 import frc.robot.commands.FeedForwardCharacterization;
-import frc.robot.commands.arm.ManualArmControl;
 import frc.robot.commands.arm.MoveArm;
-import frc.robot.commands.elevator.ManualElevatorControl;
 import frc.robot.commands.elevator.MoveElevator;
 import frc.robot.commands.elevator.MoveElevatorBy;
 import frc.robot.commands.grabber.GrabGrabber;
@@ -50,6 +49,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -168,11 +168,21 @@ public class RobotContainer {
 			.withSize(4, 2)
 			.getEntry();
 
-		clearButtons();
-		if (demoModeDash.getBoolean(lastDemoMode))
-			configureDemoButtons();
-		else
-			configureBindings();
+		// clearButtons();
+		// if (demoModeDash.getBoolean(lastDemoMode))
+		// configureDemoButtons();
+		// else
+		// configureBindings();
+
+		arm.setMaxSpeed(0.4);
+		elevator.setMaxSpeed(0.25);
+
+		elevator.setDefaultCommand(
+			new SequentialCommandGroup(new SetScoringPosition(elevator, arm, ScoringPosition.AllIn, 0.4, 0.2),
+				Commands.waitSeconds(1.5),
+				new SetScoringPosition(elevator, arm, ScoringPosition.HolidayFun, AutoConstants.elevatorTolerance_m,
+					AutoConstants.armTolerance_m),
+				Commands.waitSeconds(3)));
 	}
 
 	public void updateDemoMode() {
@@ -308,8 +318,8 @@ public class RobotContainer {
 		/*
 		 * operator flight stick
 		 */
-		arm.setDefaultCommand(new ManualArmControl(arm, () -> -operatorJoystick.getX()));
-		elevator.setDefaultCommand(new ManualElevatorControl(elevator, () -> operatorJoystick.getY()));
+		// arm.setDefaultCommand(new ManualArmControl(arm, () -> -operatorJoystick.getX()));
+		// elevator.setDefaultCommand(new ManualElevatorControl(elevator, () -> operatorJoystick.getY()));
 		// todo: what happens when both pressed?
 		operatorJoystick.trigger()
 			.whileTrue(new GrabGrabber(grabber, GrabberConstants.cubeGrabSpeed));

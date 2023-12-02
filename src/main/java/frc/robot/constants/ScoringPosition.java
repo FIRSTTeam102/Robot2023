@@ -15,7 +15,8 @@ public enum ScoringPosition {
 	SingleSubstationCube(.58, 0),
 	AllIn(.23, Arm.nutDistToArmDist(ArmConstants.minNutDist_m)),
 	AllInHigher(.25, Arm.nutDistToArmDist(ArmConstants.minNutDist_m)),
-	AllInBumper(.18, Arm.nutDistToArmDist(ArmConstants.minNutDist_m));
+	AllInBumper(.18, Arm.nutDistToArmDist(ArmConstants.minNutDist_m)),
+	HolidayFun(1.15, 0.95),;
 
 // @formatter:on
 	public final double elevatorHeight_m;

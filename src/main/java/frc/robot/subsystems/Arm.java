@@ -148,6 +148,10 @@ public class Arm extends SubsystemBase {
 		pidController.setOutputRange(minOutput, maxOutput);
 	});
 
+	public void setMaxSpeed(double speed) {
+		pidController.setOutputRange(-speed, speed);
+	}
+
 	public void killMotor() {
 		inManualMode = true;
 		pidController.setReference(0, ControlType.kVoltage, 0, 0);
