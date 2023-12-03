@@ -175,7 +175,7 @@ public class RobotContainer {
 		// configureBindings();
 
 		arm.setMaxSpeed(0.4);
-		elevator.setMaxSpeed(0.25);
+		elevator.setMaxSpeed(0.6);
 
 		elevator.setDefaultCommand(
 			new SequentialCommandGroup(new SetScoringPosition(elevator, arm, ScoringPosition.AllIn, 0.4, 0.2),
