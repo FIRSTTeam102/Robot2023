@@ -85,7 +85,7 @@ public final class SwerveConstants {
 	public static final double simAngleKd = 0.0;
 	public static final double simAngleKf = 0.0;
 	/* angle motor PID conversion factors */
-	public static final double angleEncoderPositionFactor_rad = (Conversions.twoPi) / 1200; /* rad per ticks */
+	public static final double angleEncoderPositionFactor_rad = (Conversions.twoPi) / 1200; /* rad per ticks NOTE: MUST BE REPLACED WITH ACTUAL ENCODER RESOLUTION */
 
 	/* drive motor characterization (feed forward) */
 	/**
